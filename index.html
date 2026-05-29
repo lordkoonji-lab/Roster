@@ -252,7 +252,7 @@ tbody tr:hover td{background:var(--surface2)}
         <div class="card">
           <div class="card-title">🚗 Drivers — auto-confirmed</div>
           <div class="hint">One name per line. Partial names work.</div>
-          <div class="fg"><textarea id="drv-in" placeholder="Lauren Lambert&#10;Milo Cox&#10;Leila Vierra"></textarea></div>
+          <div class="fg"><textarea id="drv-in" placeholder="Driver #1&#10;Driver #2&#10;Driver #3"></textarea></div>
           <div class="btns">
             <button class="btn btn-p btn-sm" onclick="processDrivers()">Confirm Drivers</button>
             <button class="btn btn-g btn-sm" onclick="clearDrivers()">Clear</button>
@@ -266,7 +266,7 @@ tbody tr:hover td{background:var(--surface2)}
             <p>📂 Drop Google Form CSV here or <strong>click to browse</strong></p>
           </div>
           <input type="file" id="csv-roster" accept=".csv" style="display:none" onchange="handleCSV(event,'hkr-in')">
-          <div class="fg"><textarea id="hkr-in" placeholder="Ishan Agrawal&#10;Ellen Boling&#10;Nora Matzen&#10;..."></textarea></div>
+          <div class="fg"><textarea id="hkr-in" placeholder="Hiker #1&#10;Hiker #2&#10;Hiker #3&#10;..."></textarea></div>
           <div class="btns">
             <button class="btn btn-p btn-sm" onclick="processHikers()">Look Up Hikers</button>
             <button class="btn btn-g btn-sm" onclick="clearHikers()">Clear</button>

@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peaks & Professors</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Lato:wght@300;400;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f2ec;--surface:#fff;--surface2:#edeae2;--border:#d8d3c8;
+  --text:#1a1814;--muted:#7a7568;--accent:#2d5a27;--accent2:#c8440a;
+  --b1bg:#d6e8f7;--b1bd:#4a8ec4;--b1tx:#0f2d4a;
+  --b2bg:#e0eff7;--b2bd:#7ab0d8;--b2tx:#1a3d5c;
+  --tebg:#d6f0ea;--tebd:#3aaa80;--tetx:#0d3d2e;
+  --y1bg:#fdf0d0;--y1bd:#d4a020;--y1tx:#5c3c00;
+  --y2bg:#fce4a8;--y2bd:#c48010;--y2tx:#4a2e00;
+  --grbg:#d8eeda;--grbd:#3a9040;--grtx:#1a4020;
+  --orbg:#fde8d0;--orbd:#d46820;--ortx:#5c2800;
+  --dfbg:#f0ede8;--dfbd:#c8c3b8;--dftx:#5a5550;
+  --pubg:#ede8f7;--pubd:#7a5abf;--putx:#2d1a5c;
+}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;font-size:14px;min-height:100vh}
+
+/* LOGIN */
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--text)}
+.login-box{background:var(--bg);border-radius:12px;padding:40px 44px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.login-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:24px;color:var(--text);margin-bottom:4px}
+.login-logo em{color:var(--accent);font-style:normal}
+.login-sub{font-size:12px;color:var(--muted);margin-bottom:32px}
+.login-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);display:block;margin-bottom:6px}
+.login-input{width:100%;background:var(--surface);border:1.5px solid var(--border);color:var(--text);border-radius:6px;padding:12px 14px;font-family:'Lato',sans-serif;font-size:15px;outline:none;transition:border .15s}
+.login-input:focus{border-color:var(--accent)}
+.login-btn{width:100%;margin-top:14px;padding:13px;border-radius:6px;background:var(--accent);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;border:none;cursor:pointer;transition:background .15s}
+.login-btn:hover{background:#234d1f}
+.login-err{margin-top:10px;font-size:12px;color:var(--accent2);text-align:center;min-height:18px;font-weight:700}
+
+/* SHELL */
+#app{display:none}
+header{background:var(--text);color:var(--bg);padding:0 24px;display:flex;align-items:center;border-bottom:3px solid var(--accent)}
+.brand{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;letter-spacing:-.5px;padding:13px 0;flex:1;white-space:nowrap}
+.brand em{color:#8fc08a;font-style:normal}
+.brand small{font-size:10px;opacity:.35;font-family:'Lato',sans-serif;font-weight:400;letter-spacing:.5px;margin-left:8px;text-transform:uppercase}
+nav{display:flex;height:100%;overflow-x:auto}
+.nb{padding:0 13px;background:none;border:none;color:#9a9580;font-family:'Lato',sans-serif;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-3px;transition:all .15s;white-space:nowrap}
+.nb.active{color:var(--bg);border-bottom-color:var(--accent2)}
+.nb:hover:not(.active){color:#ccc}
+.logout-btn{margin-left:12px;padding:6px 12px;background:transparent;border:1px solid #3a3830;color:#9a9580;border-radius:5px;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.logout-btn:hover{border-color:#7a7568;color:var(--bg)}
+main{padding:22px 24px;max-width:1300px}
+.sec-title{font-family:'Syne',sans-serif;font-weight:700;font-size:20px;margin-bottom:3px}
+.sec-sub{color:var(--muted);font-size:12px;margin-bottom:18px;line-height:1.5}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px;margin-bottom:14px}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;margin-bottom:12px;color:var(--accent);text-transform:uppercase;letter-spacing:.5px}
+textarea,input[type=text],input[type=number],input[type=date],select{background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:5px;padding:8px 10px;font-family:'Lato',sans-serif;font-size:13px;outline:none;transition:border .12s;width:100%}
+textarea:focus,input:focus,select:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:90px;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.7}
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.fg label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.frow{display:flex;gap:10px;flex-wrap:wrap}
+.frow>.fg{flex:1;min-width:130px}
+.btn{padding:8px 18px;border-radius:5px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .12s}
+.btn-p{background:var(--accent);color:#fff}.btn-p:hover{background:#234d1f}
+.btn-d{background:var(--accent2);color:#fff}.btn-d:hover{background:#a03508}
+.btn-g{background:transparent;color:var(--muted);border:1px solid var(--border)}.btn-g:hover{color:var(--text);border-color:var(--muted)}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead tr{background:var(--text);color:var(--bg)}
+th{padding:9px 12px;text-align:left;font-family:'Syne',sans-serif;font-weight:600;font-size:11px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--surface2)}
+.mono{font-family:'IBM Plex Mono',monospace;font-size:12px}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.threecol{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.sep{height:1px;background:var(--border);margin:16px 0}
+.hint{font-size:11px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:7px 11px;margin-bottom:10px;line-height:1.5}
+.hint strong{color:var(--text)}
+.banner{background:#fff3cd;border:1px solid var(--y1bd);border-radius:6px;padding:9px 13px;font-size:12px;margin-bottom:12px;color:var(--y1tx)}
+.success-box{background:var(--grbg);border:1px solid var(--grbd);border-radius:7px;padding:14px 18px;color:var(--grtx);font-size:13px;margin-top:4px}
+.pill{display:inline-block;padding:2px 7px;border-radius:3px;font-size:11px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+.sortbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.sortbar span{font-size:12px;color:var(--muted);font-weight:700}
+.sbtn{padding:4px 11px;border-radius:4px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .12s;font-family:'Lato',sans-serif;font-weight:700}
+.sbtn.active{border-color:var(--accent);color:var(--accent);background:#eef5ed}
+.upload-zone{border:2px dashed var(--border);border-radius:8px;padding:14px;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg);margin-bottom:8px}
+.upload-zone:hover{border-color:var(--accent);background:#eef5ed}
+.upload-zone p{font-size:12px;color:var(--muted)}
+.upload-zone strong{color:var(--accent)}
+.inner-tabs{display:flex;gap:2px;margin-bottom:14px;border-bottom:2px solid var(--border)}
+.itb{padding:7px 16px;background:none;border:none;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .12s}
+.itb.active{color:var(--accent);border-bottom-color:var(--accent)}
+.admin-banner{background:var(--grbg);border:1px solid var(--grbd);border-radius:6px;padding:8px 14px;font-size:12px;color:var(--grtx);margin-bottom:14px}
+.locked-overlay{text-align:center;padding:60px 20px;color:var(--muted)}
+.lock-icon{font-size:36px;margin-bottom:12px}
+.locked-overlay h3{font-family:'Syne',sans-serif;font-weight:700;font-size:18px;margin-bottom:6px;color:var(--text)}
+.locked-overlay p{font-size:13px;line-height:1.6}
+
+/* STAT BOXES */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:18px}
+.sbox{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.sbox.accent{border-color:var(--accent);background:#f0f7ee}
+.sbox.orange{border-color:var(--accent2);background:#fdf3ee}
+.sbox.blue{border-color:var(--b1bd);background:var(--b1bg)}
+.sbox.purple{border-color:var(--pubd);background:var(--pubg)}
+.sv{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:500;color:var(--accent);display:block}
+.sbox.orange .sv{color:var(--accent2)}
+.sbox.blue .sv{color:var(--b1tx)}
+.sbox.purple .sv{color:var(--putx)}
+.sl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+
+/* HIKER CARDS */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:10px;margin-top:14px}
+.hcard{border-radius:8px;padding:13px 14px;border:2px solid;position:relative;transition:transform .1s,box-shadow .1s}
+.hcard:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.1)}
+.hcard.c-b1{background:var(--b1bg);border-color:var(--b1bd)}.hcard.c-b2{background:var(--b2bg);border-color:var(--b2bd)}
+.hcard.c-te{background:var(--tebg);border-color:var(--tebd)}.hcard.c-y1{background:var(--y1bg);border-color:var(--y1bd)}
+.hcard.c-y2{background:var(--y2bg);border-color:var(--y2bd)}.hcard.c-gr{background:var(--grbg);border-color:var(--grbd)}
+.hcard.c-or{background:var(--orbg);border-color:var(--orbd)}.hcard.c-df{background:var(--dfbg);border-color:var(--dfbd)}
+.hn{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:2px;padding-right:56px;line-height:1.3}
+.hcard.c-b1 .hn{color:var(--b1tx)}.hcard.c-b2 .hn{color:var(--b2tx)}.hcard.c-te .hn{color:var(--tetx)}
+.hcard.c-y1 .hn{color:var(--y1tx)}.hcard.c-y2 .hn{color:var(--y2tx)}.hcard.c-gr .hn{color:var(--grtx)}
+.hcard.c-or .hn{color:var(--ortx)}.hcard.c-df .hn{color:var(--dftx)}
+.tag-row{position:absolute;top:9px;right:9px;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.htag{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:2px 7px;border-radius:3px;white-space:nowrap}
+.hcard.c-b1 .htag{background:var(--b1bd);color:var(--b1bg)}.hcard.c-b2 .htag{background:var(--b2bd);color:var(--b2bg)}
+.hcard.c-te .htag{background:var(--tebd);color:var(--tebg)}.hcard.c-y1 .htag{background:var(--y1bd);color:var(--y1bg)}
+.hcard.c-y2 .htag{background:var(--y2bd);color:var(--y2bg)}.hcard.c-gr .htag{background:var(--grbd);color:var(--grbg)}
+.hcard.c-or .htag{background:var(--orbd);color:var(--orbg)}.hcard.c-df .htag{background:var(--dfbd);color:var(--dfbg)}
+.drvbadge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;background:var(--text);color:var(--bg);white-space:nowrap}
+.hreason{font-size:10px;opacity:.75;margin-bottom:8px;font-style:italic;line-height:1.4}
+.hstats{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.hv{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:500;display:block}
+.hl{font-size:10px;opacity:.65;text-transform:uppercase;letter-spacing:.3px}
+.card-notes{margin-top:8px;border-top:1px solid rgba(0,0,0,.08);padding-top:7px}
+.note-item{font-size:10px;line-height:1.5;padding:2px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+.note-item:last-child{border-bottom:none}
+.note-label{font-weight:700;text-transform:uppercase;font-size:9px;opacity:.6;margin-right:4px}
+.dcard{background:var(--text);color:var(--bg);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.dname{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;flex:1}
+.dmeta{font-size:11px;opacity:.5}
+.dconfirm{background:var(--accent2);color:#fff;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:2px 7px;border-radius:3px}
+.legend{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:4px 9px}
+.ld{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+/* LOG HIKE */
+.step-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px}
+.step-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.person-entry{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:10px 14px;margin-bottom:7px}
+.pe-top{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.pe-name{font-weight:700;font-size:13px;flex:1;min-width:130px;padding-top:2px}
+.pe-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.pe-outcomes{display:flex;gap:5px;flex-wrap:wrap}
+.oc-btn{padding:5px 11px;border-radius:5px;font-family:'Lato',sans-serif;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);transition:all .12s}
+.oc-btn:hover{border-color:var(--muted);color:var(--text)}
+.oc-btn.sel-attended{border-color:var(--grbd);background:var(--grbg);color:var(--grtx)}
+.oc-btn.sel-applied{border-color:var(--dfbd);background:var(--dfbg);color:var(--dftx)}
+.oc-btn.sel-replaced{border-color:var(--y1bd);background:var(--y1bg);color:var(--y1tx)}
+.oc-btn.sel-noshow{border-color:var(--orbd);background:var(--orbg);color:var(--ortx)}
+.pe-extra{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pe-extra input[type=text]{flex:2;min-width:180px;font-size:12px;padding:5px 8px}
+.chk-lbl{display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;white-space:nowrap;color:var(--muted)}
+.chk-lbl input[type=checkbox]{width:auto;cursor:pointer}
+
+/* DASHBOARD */
+.dash-section{margin-bottom:28px}
+.dash-section-title{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:8px}
+.view-toggle{display:flex;gap:4px;margin-bottom:16px}
+.vtbtn{padding:5px 14px;border-radius:5px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .12s;font-family:'Lato',sans-serif}
+.vtbtn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* GEAR INVENTORY BARS */
+.gear-bar-wrap{margin-bottom:10px}
+.gear-bar-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.gear-bar-label strong{font-weight:700}
+.gear-bar-label span{color:var(--muted);font-size:11px}
+.gear-bar-track{height:10px;background:var(--surface2);border-radius:5px;overflow:hidden}
+.gear-bar-fill{height:100%;border-radius:5px;transition:width .3s}
+.gear-bar-fill.avail{background:var(--accent)}
+.gear-bar-fill.tight{background:var(--y1bd)}
+.gear-bar-fill.full{background:var(--accent2)}
+
+/* CHART CANVAS */
+.chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px}
+.chart-wrap canvas{display:block;width:100%;max-height:200px}
+.chart-title{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;margin-bottom:12px;color:var(--accent);text-transform:uppercase;letter-spacing:.5px}
+
+/* GEAR CHECKOUT LOG */
+.checkout-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--border);font-size:13px}
+.checkout-item:last-child{border-bottom:none}
+.co-name{font-weight:700;flex:1}
+.co-gear{color:var(--muted);font-size:12px;flex:1}
+.co-date{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);white-space:nowrap}
+.co-status{font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;white-space:nowrap}
+.co-out{background:var(--orbg);color:var(--ortx);border:1px solid var(--orbd)}
+.co-ret{background:var(--grbg);color:var(--grtx);border:1px solid var(--grbd)}
+
+/* GEAR CHECKOUT MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--surface);border-radius:10px;padding:24px;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-title{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:16px}
+.modal-close{float:right;background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);margin-top:-2px}
+.modal-close:hover{color:var(--text)}
+
+#notif{position:fixed;bottom:14px;right:14px;background:var(--text);color:var(--bg);padding:9px 16px;border-radius:6px;font-size:13px;font-weight:700;opacity:0;transform:translateY(6px);transition:all .2s;pointer-events:none;z-index:300;border-left:4px solid var(--accent)}
+#notif.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Peaks <em>&</em> Professors</div>
+    <div class="login-sub">University of Washington</div>
+    <label class="login-lbl">Password</label>
+    <input class="login-input" type="password" id="pw-input" placeholder="••••••••••••"
+      onkeydown="if(event.key==='Enter')tryLogin()">
+    <button class="login-btn" onclick="tryLogin()">Sign In</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header>
+    <div class="brand">Peaks <em>&</em> Professors <small id="role-label"></small></div>
+    <nav>
+      <button class="nb active" onclick="showTab('roster')">🏔 Roster</button>
+      <button class="nb" onclick="showTab('db')">👟 Hikers</button>
+      <button class="nb" onclick="showTab('dashboard')">📊 Dashboard</button>
+      <button class="nb" onclick="showTab('log')">📝 Log Hike</button>
+      <button class="nb" onclick="showTab('checkout')">🎒 Gear Checkout</button>
+      <button class="nb" onclick="showTab('manage')">⚙ Manage</button>
+    </nav>
+    <button class="logout-btn" onclick="logout()">Sign out</button>
+  </header>
+
+  <main>
+
+    <!-- ══ ROSTER ══ -->
+    <div id="tab-roster">
+      <div class="sec-title">Roster Selection</div>
+      <div class="sec-sub">After closing your Google Form, paste or upload applicants. Drivers confirmed instantly. Hikers ranked by priority.</div>
+      <div class="twocol">
+        <div class="card">
+          <div class="card-title">🚗 Drivers — auto-confirmed</div>
+          <div class="hint">One name per line. Partial names work.</div>
+          <div class="fg"><textarea id="drv-in" placeholder="Lauren Lambert&#10;Milo Cox&#10;Leila Vierra"></textarea></div>
+          <div class="btns">
+            <button class="btn btn-p btn-sm" onclick="processDrivers()">Confirm Drivers</button>
+            <button class="btn btn-g btn-sm" onclick="clearDrivers()">Clear</button>
+          </div>
+          <div id="drv-out" style="margin-top:10px"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">🥾 Hikers — paste or upload</div>
+          <div class="hint">Paste names one per line, or upload your <strong>Google Form CSV</strong>.</div>
+          <div class="upload-zone" onclick="document.getElementById('csv-roster').click()">
+            <p>📂 Drop Google Form CSV here or <strong>click to browse</strong></p>
+          </div>
+          <input type="file" id="csv-roster" accept=".csv" style="display:none" onchange="handleCSV(event,'hkr-in')">
+          <div class="fg"><textarea id="hkr-in" placeholder="Ishan Agrawal&#10;Ellen Boling&#10;Nora Matzen&#10;..."></textarea></div>
+          <div class="btns">
+            <button class="btn btn-p btn-sm" onclick="processHikers()">Look Up Hikers</button>
+            <button class="btn btn-g btn-sm" onclick="loadDemo()">Load demo</button>
+            <button class="btn btn-g btn-sm" onclick="clearHikers()">Clear</button>
+          </div>
+        </div>
+      </div>
+      <div id="roster-results" style="display:none">
+        <div class="sep"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+          <div class="sec-title" style="font-size:17px;margin:0">Hiker Applicants</div>
+          <div class="sortbar">
+            <span>Sort:</span>
+            <button class="sbtn active" onclick="resort('priority',this)">Priority</button>
+            <button class="sbtn" onclick="resort('name',this)">Name</button>
+            <button class="sbtn" onclick="resort('applied',this)">Most Applied</button>
+            <button class="sbtn" onclick="resort('attended',this)">Most Attended</button>
+          </div>
+        </div>
+        <div class="legend">
+          <div class="li"><div class="ld" style="background:var(--b1bd)"></div>Applied 4+, never attended</div>
+          <div class="li"><div class="ld" style="background:var(--b2bd)"></div>Applied, never attended</div>
+          <div class="li"><div class="ld" style="background:var(--tebd)"></div>New member</div>
+          <div class="li"><div class="ld" style="background:var(--y1bd)"></div>Inactive 6+ months</div>
+          <div class="li"><div class="ld" style="background:var(--y2bd)"></div>Inactive 3–6 months</div>
+          <div class="li"><div class="ld" style="background:var(--grbd)"></div>Active</div>
+          <div class="li"><div class="ld" style="background:var(--orbd)"></div>No-show on record</div>
+          <div class="li"><div class="ld" style="background:var(--dfbd)"></div>Regular</div>
+        </div>
+        <div id="not-found-banner" class="banner" style="display:none"></div>
+        <div class="cards-grid" id="hkr-cards"></div>
+        <div style="margin-top:12px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:8px 12px;font-size:11px;color:var(--muted)">
+          ⚠ Highlights are priority suggestions only. Final roster is always the trip lead's call.
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ HIKERS DB ══ -->
+    <div id="tab-db" style="display:none">
+      <div class="sec-title">Hiker Database</div>
+      <div class="sec-sub">All tracked members. Read-only — edits go through Manage.</div>
+      <div class="stat-grid" id="db-stats"></div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <input type="text" id="db-q" placeholder="Search name or major…" oninput="renderDB()" style="flex:1;min-width:160px">
+        <select id="db-f" onchange="renderDB()" style="width:180px">
+          <option value="">All members</option>
+          <option value="never">Never attended</option>
+          <option value="new">New (never applied)</option>
+          <option value="inactive">Inactive 3+ months</option>
+          <option value="active">Active last 90 days</option>
+          <option value="noshows">Has no-shows</option>
+          <option value="scholars">Has scholarship</option>
+          <option value="gear">Has gear history</option>
+        </select>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>Name</th><th>Year</th><th>Major</th><th>Applied</th><th>Attended</th>
+            <th>No-shows</th><th>🚗</th><th>Rate</th><th>🎓 Req</th><th>🎓 Awd</th><th>🎒 Req</th><th>🎒 Out</th><th>Last Activity</th><th>Status</th>
+          </tr></thead>
+          <tbody id="db-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ DASHBOARD ══ -->
+    <div id="tab-dashboard" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px">
+        <div class="sec-title" style="margin:0">Dashboard</div>
+        <div class="view-toggle">
+          <button class="vtbtn active" onclick="setDashView('quarter',this)">This Quarter</button>
+          <button class="vtbtn" onclick="setDashView('alltime',this)">All Time</button>
+        </div>
+      </div>
+      <div class="sec-sub" id="dash-period-label"></div>
+
+      <!-- Hike summary -->
+      <div class="dash-section">
+        <div class="dash-section-title">🏔 Hike Summary</div>
+        <div class="stat-grid" id="dash-hike-stats"></div>
+      </div>
+
+      <!-- Scholarships -->
+      <div class="dash-section">
+        <div class="dash-section-title">🎓 Scholarships</div>
+        <div class="stat-grid" id="dash-scholar-stats"></div>
+        <div class="twocol">
+          <div class="chart-wrap">
+            <div class="chart-title">Scholarship spend per hike</div>
+            <canvas id="chart-scholar" height="180"></canvas>
+          </div>
+          <div class="card" style="margin-bottom:0">
+            <div class="card-title">Top scholarship recipients</div>
+            <div id="scholar-top-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gear -->
+      <div class="dash-section">
+        <div class="dash-section-title">🎒 Gear</div>
+        <div class="stat-grid" id="dash-gear-stats"></div>
+        <div class="twocol">
+          <div class="card" style="margin-bottom:0">
+            <div class="card-title">Current inventory availability</div>
+            <div id="gear-availability"></div>
+          </div>
+          <div class="card" style="margin-bottom:0">
+            <div class="card-title">Most requested gear</div>
+            <div id="gear-popularity"></div>
+          </div>
+        </div>
+        <div class="chart-wrap" style="margin-top:14px">
+          <div class="chart-title">Gear checkouts by day</div>
+          <canvas id="chart-gear" height="160"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ LOG HIKE ══ -->
+    <div id="tab-log" style="display:none">
+      <div class="sec-title">Log a Hike</div>
+      <div class="sec-sub">Fill in hike details, paste applicants, then mark each person's outcome.</div>
+      <div class="card">
+        <div class="step-header"><div class="step-num">1</div>
+          <div><div class="step-title">Hike details</div><div class="step-sub">Basic info about this trip</div></div>
+        </div>
+        <div class="frow">
+          <div class="fg"><label>Location / Trail</label><input id="l-location" placeholder="Mt. Si, Rattlesnake Ledge…"></div>
+          <div class="fg"><label>Date</label><input type="date" id="l-date"></div>
+        </div>
+        <div class="frow">
+          <div class="fg"><label>Professor(s)</label><input id="l-prof" placeholder="Prof. Rodgers, Prof. Straus…"></div>
+          <div class="fg"><label>Trip Lead</label><input id="l-lead" placeholder="Your name"></div>
+          <div class="fg"><label>Co-Lead</label><input id="l-colead" placeholder="Co-lead (if any)"></div>
+        </div>
+        <div class="frow">
+          <div class="fg"><label>Price per hiker ($)</label><input type="number" id="l-price" placeholder="8.66" step="0.01" min="0"></div>
+          <div class="fg"><label>Quarter</label>
+            <select id="l-quarter">
+              <option value="Spring 2026">Spring 2026</option>
+              <option value="Fall 2026">Fall 2026</option>
+              <option value="Winter 2027">Winter 2027</option>
+              <option value="Spring 2027">Spring 2027</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="step-header"><div class="step-num">2</div>
+          <div><div class="step-title">All applicants</div><div class="step-sub">Everyone who filled out the form</div></div>
+        </div>
+        <div class="upload-zone" onclick="document.getElementById('log-csv').click()">
+          <p>📂 Upload Google Form CSV or <strong>click to browse</strong></p>
+        </div>
+        <input type="file" id="log-csv" accept=".csv" style="display:none" onchange="handleCSV(event,'l-applied')">
+        <div class="fg"><textarea id="l-applied" placeholder="One name per line — paste your full applicant list here"></textarea></div>
+        <div class="btns">
+          <button class="btn btn-p btn-sm" onclick="buildOutcomeList()">Continue →</button>
+          <button class="btn btn-g btn-sm" onclick="clearLog()">Clear all</button>
+        </div>
+      </div>
+      <div id="outcome-section" style="display:none">
+        <div class="card">
+          <div class="step-header"><div class="step-num">3</div>
+            <div><div class="step-title">Mark outcomes</div>
+              <div class="step-sub">Set status for each person. Tick scholarship or gear interest where applicable.</div>
+            </div>
+          </div>
+          <div class="hint">
+            <strong>Attended</strong> = came on the hike &nbsp;·&nbsp;
+            <strong>Not selected</strong> = applied, not picked &nbsp;·&nbsp;
+            <strong>Replaced</strong> = selected but swapped, no penalty &nbsp;·&nbsp;
+            <strong>No-show</strong> = selected, didn't come
+          </div>
+          <div class="btns" style="margin-bottom:12px">
+            <button class="btn btn-g btn-sm" onclick="markAll('attended')">Mark all Attended</button>
+            <button class="btn btn-g btn-sm" onclick="markAll('applied')">Mark all Not Selected</button>
+          </div>
+          <div id="outcome-list"></div>
+          <div class="btns" style="margin-top:14px">
+            <button class="btn btn-p" onclick="submitLog()">💾 Save hike log</button>
+          </div>
+        </div>
+        <div id="log-result"></div>
+      </div>
+    </div>
+
+    <!-- ══ GEAR CHECKOUT ══ -->
+    <div id="tab-checkout">
+      <div class="sec-title">Gear Checkout</div>
+      <div class="sec-sub">Check gear in and out for selected hikers. Gear auto-returns at 6pm on the hike day. Leads can also book for other dates.</div>
+
+      <div class="twocol">
+        <div class="card">
+          <div class="card-title">Check out gear</div>
+          <div class="frow">
+            <div class="fg"><label>Member name</label><input id="co-who" placeholder="Ellen Boling"></div>
+            <div class="fg"><label>Hike date</label><input type="date" id="co-date"></div>
+          </div>
+          <div class="fg"><label>Gear item</label>
+            <select id="co-item">
+              <option value="Hiking Boots">Hiking Boots</option>
+              <option value="Rain Jacket">Rain Jacket</option>
+              <option value="Trekking Poles">Trekking Poles</option>
+              <option value="Gloves">Gloves</option>
+              <option value="Microspikes">Microspikes</option>
+              <option value="Daypack">Daypack</option>
+            </select>
+          </div>
+          <div class="fg"><label>Notes (optional)</label><input id="co-note" placeholder="e.g. size 10 boots, pair of poles"></div>
+          <div id="co-availability" style="margin-bottom:10px"></div>
+          <div class="btns">
+            <button class="btn btn-p btn-sm" onclick="checkAvailability()">Check availability</button>
+            <button class="btn btn-p btn-sm" onclick="checkoutGear()">Confirm checkout</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Current inventory</div>
+          <div id="co-inventory"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Active checkouts & recent activity</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <select id="co-filter" onchange="renderCheckoutLog()" style="width:200px">
+            <option value="active">Currently out</option>
+            <option value="all">All activity</option>
+            <option value="today">Today</option>
+          </select>
+        </div>
+        <div id="checkout-log"></div>
+      </div>
+    </div>
+
+    <!-- ══ MANAGE ══ -->
+    <div id="tab-manage" style="display:none">
+      <div id="manage-locked" class="locked-overlay" style="display:none">
+        <div class="lock-icon">🔒</div>
+        <h3>Admin access required</h3>
+        <p>Contact your board if a record needs correcting.</p>
+      </div>
+      <div id="manage-content" style="display:none">
+        <div class="sec-title">Manage</div>
+        <div class="sec-sub">Edit members, fix records, manage inventory. Admin only.</div>
+        <div class="admin-banner">🛡 <strong>Admin view</strong> — changes take effect immediately.</div>
+        <div class="inner-tabs">
+          <button class="itb active" onclick="showInner('edit')">Add / Edit Member</button>
+          <button class="itb" onclick="showInner('import')">Bulk Import</button>
+          <button class="itb" onclick="showInner('inventory')">Gear Inventory</button>
+          <button class="itb" onclick="showInner('fix')">Fix a Record</button>
+          <button class="itb" onclick="showInner('tools')">Tools</button>
+        </div>
+
+        <div id="inner-edit">
+          <div class="card">
+            <div class="card-title">Add or edit a member</div>
+            <div class="hint">Enter an existing member's name to update their profile. New names added fresh.</div>
+            <div class="frow">
+              <div class="fg"><label>Full Name *</label><input id="m-name" placeholder="Alex Rivera"></div>
+              <div class="fg"><label>Year</label>
+                <select id="m-year"><option value="">—</option><option>Freshman</option><option>Sophomore</option><option>Junior</option><option>Senior</option><option>Grad Student</option><option>Faculty</option><option>Staff</option></select>
+              </div>
+            </div>
+            <div class="frow">
+              <div class="fg"><label>Major</label><input id="m-major" placeholder="Biology"></div>
+              <div class="fg"><label>Regular driver?</label>
+                <select id="m-driver"><option value="no">No</option><option value="yes">Yes</option></select>
+              </div>
+            </div>
+            <div class="fg"><label>Notes</label><input id="m-notes" placeholder="e.g. trip scholarship holder, reliable on long trails"></div>
+            <div class="btns">
+              <button class="btn btn-p btn-sm" onclick="saveMember()">Save</button>
+              <button class="btn btn-g btn-sm" onclick="clearMF()">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="inner-import" style="display:none">
+          <div class="card">
+            <div class="card-title">Bulk import members via CSV</div>
+            <div class="hint">Columns: <code style="font-size:11px;background:var(--surface2);padding:2px 5px;border-radius:3px">name, year, major, isDriver, notes</code> — header row required. Stats are never overwritten by import.</div>
+            <div class="upload-zone" onclick="document.getElementById('import-csv').click()">
+              <p>📂 Upload member CSV or <strong>click to browse</strong></p>
+            </div>
+            <input type="file" id="import-csv" accept=".csv" style="display:none" onchange="bulkImport(event)">
+            <div id="import-result" style="margin-top:10px"></div>
+          </div>
+        </div>
+
+        <div id="inner-inventory" style="display:none">
+          <div class="card">
+            <div class="card-title">Set gear inventory counts</div>
+            <div class="hint">Enter the total number of each item your club owns. This enables availability checking in the Gear Checkout tab.</div>
+            <div id="inventory-fields"></div>
+            <div class="btns"><button class="btn btn-p btn-sm" onclick="saveInventory()">Save inventory</button></div>
+          </div>
+        </div>
+
+        <div id="inner-fix" style="display:none">
+          <div class="card">
+            <div class="card-title">Fix a hike outcome</div>
+            <div class="frow">
+              <div class="fg"><label>Member name</label><input id="f-who" placeholder="Ellen Boling"></div>
+              <div class="fg"><label>Hike date</label><input type="date" id="f-date"></div>
+            </div>
+            <div class="fg"><label>Change outcome to</label>
+              <select id="f-out">
+                <option value="attended">✅ Attended</option>
+                <option value="applied">❌ Applied — not selected</option>
+                <option value="replaced">🔄 Replaced (not their fault)</option>
+                <option value="noshow">⚠ No-show — no reason</option>
+                <option value="noshow_noted">📝 No-show — with reason</option>
+              </select>
+            </div>
+            <div class="fg"><label>Reason / note</label><input id="f-reason" placeholder="e.g. family emergency, illness, car broke down"></div>
+            <div class="btns"><button class="btn btn-p btn-sm" onclick="fixRecord()">Apply fix</button></div>
+          </div>
+        </div>
+
+        <div id="inner-tools" style="display:none">
+          <div class="card">
+            <div class="card-title">Data tools</div>
+            <div class="btns">
+              <button class="btn btn-g btn-sm" onclick="exportCSV()">📥 Export members CSV</button>
+              <button class="btn btn-d btn-sm" onclick="nuke()">🗑 Clear all data</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- GEAR CHECKOUT CONFIRM MODAL -->
+<div class="modal-overlay" id="checkout-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modal-title">Confirm Checkout</div>
+    <div id="modal-body"></div>
+    <div class="btns" style="margin-top:14px">
+      <button class="btn btn-p" onclick="confirmCheckout()">Confirm</button>
+      <button class="btn btn-g btn-sm" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="notif"></div>
+
+<script>
+// ════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════
+const PASSWORDS = {'Peaks&Profs2026':'lead','Peaks&ProfsAdmin2026':'admin'};
+let role = null;
+function tryLogin(){
+  const pw=document.getElementById('pw-input').value;
+  role=PASSWORDS[pw]||null;
+  if(!role){document.getElementById('login-err').textContent='Incorrect password — try again.';document.getElementById('pw-input').value='';document.getElementById('pw-input').focus();return;}
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('role-label').textContent=role==='admin'?'· Admin':'· Trip Lead';
+  initApp();
+}
+function logout(){role=null;document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('pw-input').value='';document.getElementById('login-err').textContent='';showTab('roster');}
+
+// ════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════
+const SK='pp_v7';
+let members=[], rHikers=[], rSort='priority', outcomeData=[];
+let hikes=[]; // [{id,location,date,prof,lead,colead,price,quarter}]
+let checkouts=[]; // [{id,member,item,date,hikeDate,note,returned,returnedAt}]
+let inventory={
+  'Hiking Boots':8,'Rain Jacket':6,'Trekking Poles':8,'Gloves':6,'Microspikes':4,'Daypack':6
+};
+let dashView='quarter';
+let pendingCheckout=null;
+
+const GEAR_ITEMS=['Hiking Boots','Rain Jacket','Trekking Poles','Gloves','Microspikes','Daypack'];
+const CURRENT_QUARTER='Spring 2026';
+const QUARTER_START=new Date('2026-03-01');
+
+const SEED=[
+  "Ishan Agrawal","Aadi Adgaonkar","Ellen Boling","Lauren Lambert","Owen Bischoff",
+  "Clark Hegewald","Nora Matzen","Joseph Gerding","Pranav Suri","Arjun Khamkar",
+  "Leo Ahlburg","Milo Cox","Saumya Khanna","Amanda Lee","Lauren Huang",
+  "Aadarsh Mohanty","Malcolm Karman","Kamden Cykler","Kaia Eagle","Izzy Melim",
+  "Khalid Almuwayni","Ava Mitten","Henry Schilling","Aakarsh Gupta","Morgan Kelly",
+  "Austin Evans","Leila Vierra","Riho Kawabe","Yuwan Luo","Sequoya Tsai",
+  "Gabriel Kennedy-Gibbens","Alex Nguyen","Lily Bingham","Jiyae Choi","Mannix Bottoms",
+  "Henry Pierce","Eliza Dawley","Alay Atmakuri","Shivam Modi","Emma Paladino",
+  "Lily Gu","Safiya Warsame","Brinda Moudgalya","Truman Moss-Lee","Ashika Bansal",
+  "Grace Huffman","Sarthak Mitra","Yash Meher","Aliya Murphy","Kyler Schwartzenberger",
+  "Joyce Zheng","Ryan Gould","Rachel Coon","Timofey Grechkin","Marie Flessa",
+  "Nada Ali","Charlotte Werner-Ashpaugh","Suvi Birch","Yi Zeng","Wylie Cleugh",
+  "Colton Deitz","Liv Schiller","Remi Vrilakas","Luke Bonar","Sam Lee",
+  "Erin Danks","Cassidy Maruska","Suhana Nath","Delilah Dudas","Elizabeth McAleer",
+  "Sruti Banerjee","Chandler Hyde","Sukhman Singh","Vicky Wang","Juliana Frattini",
+  "Emily Blosch","Stephen Line","Megan Gillen","Ian Tuski","Meikel Lamont",
+  "Chiron Crockett","Quinner Riehl","Nya Duckworth","Greta Paradis","Natalia Hedgers",
+  "Ethan Cho","Liam Phillips","Rajit Ghosh","Isa Halim","Vanessa Ruelas",
+  "Eda Keskin","Jonathan Neamtzu","Samuel Hsu","Irene Vega-Hernandez","Brooklyn Nguyen",
+  "Jane Nelson","Eve Axelrod","Jocelyn Reiswig","Jasper Bard","Alisha Bose",
+  "Madeline Whitney","Antonia Keith","Julia Contarini Dietrich","Freya Maddock",
+  "Kristen Schutte","Kylie Brown","Owen Rosenbluth","Joscelyn Courtenay","Victoria Silkina",
+  "Lorenzo McCleese","Arshia Kumar","Carmen Jimenez","Isabel Klish","Cameron Lindsey",
+  "William Held","Grace Albertson","Nicole Cheng","Amrutha Kadaba","Shriya Sharma",
+  "Marcin Anforowicz","Kevin Luo","Hemkesh Bandi","Sabrina Leffler","Regan Smith",
+  "Kai Modi","Andrew Pham"
+];
+
+function blank(name){
+  return{name,year:'',major:'',isDriver:'no',notes:'',
+    applied:0,attended:0,drivingHikes:0,noShows:0,lastHike:null,lastActivity:null,noShowNotes:[],
+    scholarRequested:0,scholarAwarded:0,scholarNotes:[],
+    gearRequests:0,gearReturned:0,gearOutstanding:0,gearNotes:[]};
+}
+
+function loadData(){
+  try{
+    const d=localStorage.getItem(SK);
+    if(d){
+      const p=JSON.parse(d);
+      members=p.members||[];
+      hikes=p.hikes||[];
+      checkouts=p.checkouts||[];
+      inventory=p.inventory||inventory;
+      return;
+    }
+  }catch(e){}
+  const seen=new Set();
+  members=SEED.filter(n=>{const k=n.toLowerCase();if(seen.has(k))return false;seen.add(k);return true;}).map(blank);
+  hikes=[]; checkouts=[];
+  // seed some demo hike data
+  seedDemoData();
+  saveData();
+}
+
+function seedDemoData(){
+  const demoHikes=[
+    {id:'h1',location:'Mt. Si',date:'2026-03-29',prof:'Mark Rodgers',lead:'Cate',colead:'',price:6.51,quarter:'Spring 2026'},
+    {id:'h2',location:'Teneriffe Falls Loop',date:'2026-04-12',prof:'Kristi Straus',lead:'Cyril',colead:'Angela',price:6.66,quarter:'Spring 2026'},
+    {id:'h3',location:'Mt Si',date:'2026-04-18',prof:'Jacob Cooper & Hannah Jordt',lead:'Sohini',colead:'Elijah',price:6.22,quarter:'Spring 2026'},
+    {id:'h4',location:'Lake Serene',date:'2026-04-25',prof:'Elizabeth Umbanhowar',lead:'Leeza',colead:'Tyler',price:8.66,quarter:'Spring 2026'},
+    {id:'h5',location:'Cedar Butte',date:'2026-04-25',prof:'George Lovell',lead:'Gopesh',colead:'Jack',price:6.70,quarter:'Spring 2026'},
+  ];
+  hikes=demoHikes;
+
+  // seed some scholarship data
+  const schNames=['Ellen Boling','Shivam Modi','Timofey Grechkin','Elizabeth McAleer','Sruti Banerjee','Aakarsh Gupta'];
+  schNames.forEach(n=>{
+    const m=members.find(x=>x.name===n);
+    if(m){
+      m.scholarRequested=(m.scholarRequested||0)+1;
+      m.scholarAwarded=(m.scholarAwarded||0)+1;
+      m.scholarNotes=[`2026-03-29: requested & awarded — Spring 2026 scholarship`];
+    }
+  });
+  ['Nora Matzen','Joyce Zheng'].forEach(n=>{
+    const m=members.find(x=>x.name===n);
+    if(m){m.scholarRequested=(m.scholarRequested||0)+1;m.scholarNotes=[`2026-04-12: requested`];}
+  });
+
+  // seed some gear checkouts
+  const gearSeeds=[
+    {id:'g1',member:'Ellen Boling',item:'Hiking Boots',date:'2026-04-25',hikeDate:'2026-04-25',note:'Size 8',returned:true,returnedAt:'2026-04-25T18:00'},
+    {id:'g2',member:'Shivam Modi',item:'Rain Jacket',date:'2026-04-25',hikeDate:'2026-04-25',note:'',returned:true,returnedAt:'2026-04-25T18:00'},
+    {id:'g3',member:'Aakarsh Gupta',item:'Microspikes',date:'2026-04-25',hikeDate:'2026-04-25',note:'',returned:false,returnedAt:null},
+    {id:'g4',member:'Nora Matzen',item:'Daypack',date:'2026-04-12',hikeDate:'2026-04-12',note:'',returned:true,returnedAt:'2026-04-12T18:00'},
+    {id:'g5',member:'Joyce Zheng',item:'Trekking Poles',date:'2026-04-18',hikeDate:'2026-04-18',note:'',returned:true,returnedAt:'2026-04-18T18:00'},
+  ];
+  checkouts=gearSeeds;
+  // update member gear counts
+  gearSeeds.forEach(g=>{
+    const m=members.find(x=>x.name===g.member);
+    if(m){
+      m.gearRequests=(m.gearRequests||0)+1;
+      if(g.returned){m.gearReturned=(m.gearReturned||0)+1;}
+      else{m.gearOutstanding=(m.gearOutstanding||0)+1;}
+    }
+  });
+
+  // seed some hike attendance
+  const attended=['Ellen Boling','Lauren Lambert','Owen Bischoff','Nora Matzen','Shivam Modi','Milo Cox'];
+  attended.forEach(n=>{
+    const m=members.find(x=>x.name===n);
+    if(m){m.applied=(m.applied||0)+3;m.attended=(m.attended||0)+2;m.lastHike='2026-04-25';m.lastActivity='2026-04-25';}
+  });
+  const applied=['Aakarsh Gupta','Joyce Zheng','Timofey Grechkin'];
+  applied.forEach(n=>{
+    const m=members.find(x=>x.name===n);
+    if(m){m.applied=(m.applied||0)+5;m.attended=(m.attended||0)+0;}
+  });
+}
+
+function saveData(){
+  try{localStorage.setItem(SK,JSON.stringify({members,hikes,checkouts,inventory}));}catch(e){}
+}
+
+// ════════════════════════════════════════
+// FUZZY MATCH
+// ════════════════════════════════════════
+function norm(s){return(s||'').toLowerCase().replace(/[^a-z\s]/g,'').trim();}
+function fuzzy(q){
+  const nq=norm(q);if(!nq)return null;
+  let m=members.find(x=>norm(x.name)===nq);if(m)return m;
+  m=members.find(x=>norm(x.name).startsWith(nq));if(m)return m;
+  const qw=nq.split(/\s+/);
+  m=members.find(x=>{const nw=norm(x.name).split(/\s+/);return qw.every(w=>nw.some(i=>i.startsWith(w)));});
+  if(m)return m;
+  m=members.find(x=>{const p=norm(x.name).split(/\s+/);return p[p.length-1]===qw[qw.length-1];});
+  return m||null;
+}
+
+// ════════════════════════════════════════
+// PRIORITY
+// ════════════════════════════════════════
+function daysAgo(d){if(!d)return Infinity;return(Date.now()-new Date(d).getTime())/86400000;}
+function priClass(m){
+  if(!m)return'c-df';
+  if(m.noShows>0)return'c-or';
+  const da=daysAgo(m.lastActivity||m.lastHike);
+  if(m.applied===0)return'c-te';
+  if(m.attended===0&&m.applied>=4)return'c-b1';
+  if(m.attended===0)return'c-b2';
+  if(da>180)return'c-y1';
+  if(da>90)return'c-y2';
+  if(m.applied>0&&(m.attended/m.applied)>=0.4&&da<90)return'c-gr';
+  return'c-df';
+}
+function priReason(m){
+  if(!m)return'Not in database';
+  if(m.noShows>0){const n=m.noShowNotes&&m.noShowNotes.length?m.noShowNotes[m.noShowNotes.length-1]:'No reason recorded';return`No-show ×${m.noShows} — ${n}`;}
+  if(m.applied===0)return'New member — never applied yet';
+  if(m.attended===0&&m.applied>=4)return`Applied ${m.applied}× and never attended — high priority`;
+  if(m.attended===0)return`Applied ${m.applied}× — never attended`;
+  const da=daysAgo(m.lastActivity||m.lastHike);
+  if(da>180)return`Last activity ${Math.round(da)} days ago`;
+  if(da>90)return`Inactive ~${Math.round(da/30)} months`;
+  const r=m.applied>0?m.attended/m.applied:0;
+  if(r>=0.4&&da<90)return'Active member, healthy attendance';
+  return'Regular member';
+}
+function priTag(m){
+  if(!m)return'not in db';
+  if(m.noShows>0)return`no-show ×${m.noShows}`;
+  if(m.applied===0)return'new member';
+  if(m.attended===0&&m.applied>=4)return'priority ↑';
+  if(m.attended===0)return'never attended';
+  const da=daysAgo(m.lastActivity||m.lastHike);
+  if(da>180)return'overdue';
+  if(da>90)return'inactive';
+  const r=m.applied>0?m.attended/m.applied:0;
+  if(r>=0.4&&da<90)return'active';
+  return'regular';
+}
+function priScore(m){
+  if(!m)return-999;
+  let s=0;
+  if(m.noShows>0)s-=m.noShows*15;
+  if(m.applied===0)s+=20;
+  else if(m.attended===0)s+=50+(m.applied*5);
+  const da=daysAgo(m.lastActivity||m.lastHike);
+  const r=m.applied>0?m.attended/m.applied:0;
+  s+=(1-r)*25;s+=Math.min(da/30,20);
+  return s;
+}
+function drvBadge(m){
+  if(m.isDriver!=='yes'&&(!m.drivingHikes||m.drivingHikes===0))return'';
+  const c=m.drivingHikes>=5?'5+':String(m.drivingHikes||0);
+  return`<span class="drvbadge">🚗 ×${c}</span>`;
+}
+function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+function ps(pc){
+  const map={'c-b1':'background:var(--b1bg);color:var(--b1tx);border:1px solid var(--b1bd)','c-b2':'background:var(--b2bg);color:var(--b2tx);border:1px solid var(--b2bd)','c-te':'background:var(--tebg);color:var(--tetx);border:1px solid var(--tebd)','c-y1':'background:var(--y1bg);color:var(--y1tx);border:1px solid var(--y1bd)','c-y2':'background:var(--y2bg);color:var(--y2tx);border:1px solid var(--y2bd)','c-gr':'background:var(--grbg);color:var(--grtx);border:1px solid var(--grbd)','c-or':'background:var(--orbg);color:var(--ortx);border:1px solid var(--orbd)','c-df':'background:var(--dfbg);color:var(--dftx);border:1px solid var(--dfbd)'};
+  return map[pc]||map['c-df'];
+}
+
+// ════════════════════════════════════════
+// CSV
+// ════════════════════════════════════════
+function parseCSVNames(text){
+  const lines=text.split('\n').map(l=>l.trim()).filter(Boolean);
+  if(!lines.length)return[];
+  const headers=lines[0].toLowerCase().split(',');
+  const ni=headers.findIndex(h=>h.includes('name')||h.includes('full'));
+  if(ni>=0)return lines.slice(1).map(l=>l.split(',')[ni].replace(/"/g,'').trim()).filter(Boolean);
+  return lines.map(l=>l.split(',')[0].replace(/"/g,'').trim()).filter(Boolean);
+}
+function handleCSV(e,tid){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{const n=parseCSVNames(ev.target.result);document.getElementById(tid).value=n.join('\n');notify(`Loaded ${n.length} names`);};
+  r.readAsText(f);
+}
+function parseLines(raw){return raw.split(/[\n,]/).map(l=>l.trim()).filter(l=>l.length>1);}
+
+// ════════════════════════════════════════
+// ROSTER
+// ════════════════════════════════════════
+function processDrivers(){
+  const raw=document.getElementById('drv-in').value.trim();
+  if(!raw){notify('Paste driver names first');return;}
+  document.getElementById('drv-out').innerHTML=parseLines(raw).map(n=>{
+    const m=fuzzy(n);
+    const dc=m?(m.drivingHikes>=5?'5+':String(m.drivingHikes||0)):'0';
+    return`<div class="dcard">
+      <div><div class="dname">${m?m.name:n}</div><div class="dmeta">${m?[m.year,m.notes].filter(Boolean).join(' · '):'Not in database'}</div></div>
+      ${m&&m.drivingHikes>0?`<span style="font-size:11px;opacity:.4;margin-right:6px">🚗 ×${dc}</span>`:''}
+      <span class="dconfirm">DRIVER ✓</span>
+    </div>`;
+  }).join('');
+  notify('Drivers confirmed');
+}
+function clearDrivers(){document.getElementById('drv-in').value='';document.getElementById('drv-out').innerHTML='';}
+
+function processHikers(){
+  const raw=document.getElementById('hkr-in').value.trim();
+  if(!raw){notify('Paste hiker names first');return;}
+  rHikers=parseLines(raw).map(n=>{const m=fuzzy(n);return m?{...m,_found:true,_raw:n}:{...blank(n),_found:false,_raw:n};});
+  renderCards();document.getElementById('roster-results').style.display='block';
+}
+
+function renderCards(){
+  let s=[...rHikers];
+  if(rSort==='priority')s.sort((a,b)=>priScore(b._found?b:null)-priScore(a._found?a:null));
+  else if(rSort==='name')s.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(rSort==='applied')s.sort((a,b)=>(b.applied||0)-(a.applied||0));
+  else if(rSort==='attended')s.sort((a,b)=>(a.attended||0)-(b.attended||0));
+  const nf=s.filter(h=>!h._found);
+  const nb=document.getElementById('not-found-banner');
+  if(nf.length){nb.style.display='block';nb.innerHTML=`<strong>${nf.length} not in database:</strong> ${nf.map(h=>h._raw).join(', ')} — add via Manage.`;}
+  else nb.style.display='none';
+
+  document.getElementById('hkr-cards').innerHTML=s.map(h=>{
+    const cls=h._found?priClass(h):'c-df';
+    const rate=h.applied>0?Math.round(h.attended/h.applied*100)+'%':'—';
+    const badge=h._found?drvBadge(h):'';
+    let noteItems=[];
+    if(h._found){
+      (h.noShowNotes||[]).forEach(n=>noteItems.push({label:'No-show',text:n}));
+      (h.scholarNotes||[]).forEach(n=>noteItems.push({label:'Scholarship',text:n}));
+      (h.gearNotes||[]).forEach(n=>noteItems.push({label:'Gear',text:n}));
+    }
+    const notesHtml=noteItems.length?`<div class="card-notes">${noteItems.map(n=>`<div class="note-item"><span class="note-label">${n.label}</span>${n.text}</div>`).join('')}</div>`:'';
+    const extras=[];
+    if(h._found&&h.scholarAwarded>0)extras.push(`<span style="font-size:9px;background:var(--pubg);color:var(--putx);border:1px solid var(--pubd);padding:2px 6px;border-radius:3px;font-weight:700">🎓 ×${h.scholarAwarded}</span>`);
+    if(h._found&&h.gearOutstanding>0)extras.push(`<span style="font-size:9px;background:var(--y1bg);color:var(--y1tx);border:1px solid var(--y1bd);padding:2px 6px;border-radius:3px;font-weight:700">🎒 out</span>`);
+    return`<div class="hcard ${cls}">
+      <div class="tag-row"><span class="htag">${h._found?priTag(h):'not in db'}</span>${badge}${extras.join('')}</div>
+      <div class="hn">${h.name}</div>
+      <div class="hreason">${h._found?priReason(h):'Not in database'}</div>
+      <div class="hstats">
+        <div><span class="hv">${h.applied}</span><span class="hl">Applied</span></div>
+        <div><span class="hv">${h.attended}</span><span class="hl">Attended</span></div>
+        <div><span class="hv">${rate}</span><span class="hl">Rate</span></div>
+        <div><span class="hv" style="font-size:11px">${h.lastHike?fmtDate(h.lastHike):'Never'}</span><span class="hl">Last hike</span></div>
+      </div>${notesHtml}
+    </div>`;
+  }).join('');
+  notify(`${s.length} applicant(s) shown`);
+}
+
+function resort(by,btn){rSort=by;document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(rHikers.length)renderCards();}
+function clearHikers(){rHikers=[];document.getElementById('hkr-in').value='';document.getElementById('roster-results').style.display='none';}
+function loadDemo(){
+  document.getElementById('drv-in').value="Lauren Lambert\nMilo Cox\nLeila Vierra";
+  document.getElementById('hkr-in').value="Ishan Agrawal\nEllen Boling\nNora Matzen\nAakarsh Gupta\nShivam Modi\nTimofey Grechkin\nJoyce Zheng\nEthan Cho\nSabrina Leffler\nBrandon Okafor";
+  processDrivers();processHikers();
+}
+
+// ════════════════════════════════════════
+// HIKERS DB
+// ════════════════════════════════════════
+function renderDB(){
+  const q=norm(document.getElementById('db-q').value);
+  const f=document.getElementById('db-f').value;
+  let list=[...members].filter(m=>{
+    if(q&&!norm(m.name).includes(q)&&!norm(m.major).includes(q))return false;
+    if(f==='never'&&m.attended>0)return false;
+    if(f==='new'&&m.applied>0)return false;
+    if(f==='inactive'&&daysAgo(m.lastActivity||m.lastHike)<90)return false;
+    if(f==='active'&&(daysAgo(m.lastActivity||m.lastHike)>=90||m.attended===0))return false;
+    if(f==='noshows'&&(!m.noShows||m.noShows===0))return false;
+    if(f==='scholars'&&(!m.scholarRequested||m.scholarRequested===0))return false;
+    if(f==='gear'&&(!m.gearRequests||m.gearRequests===0))return false;
+    return true;
+  }).sort((a,b)=>priScore(b)-priScore(a));
+
+  const never=members.filter(m=>m.attended===0&&m.applied>0).length;
+  const newM=members.filter(m=>m.applied===0).length;
+  const active=members.filter(m=>daysAgo(m.lastActivity||m.lastHike)<90&&m.attended>0).length;
+  const ns=members.filter(m=>m.noShows>0).length;
+  document.getElementById('db-stats').innerHTML=`
+    <div class="sbox"><span class="sv">${members.length}</span><span class="sl">Total</span></div>
+    <div class="sbox blue"><span class="sv">${never}</span><span class="sl">Never attended</span></div>
+    <div class="sbox"><span class="sv" style="color:var(--tebd)">${newM}</span><span class="sl">New</span></div>
+    <div class="sbox accent"><span class="sv">${active}</span><span class="sl">Active 90d</span></div>
+    <div class="sbox orange"><span class="sv">${ns}</span><span class="sl">No-shows</span></div>`;
+
+  document.getElementById('db-body').innerHTML=list.map(m=>{
+    const pc=priClass(m);const tag=priTag(m);const pst=ps(pc);
+    const rate=m.applied>0?Math.round(m.attended/m.applied*100):0;
+    const dc=m.drivingHikes>=5?'5+':String(m.drivingHikes||0);
+    return`<tr>
+      <td style="font-weight:700">${m.name}</td>
+      <td>${m.year||'—'}</td><td>${m.major||'—'}</td>
+      <td class="mono">${m.applied}</td><td class="mono">${m.attended}</td>
+      <td class="mono">${m.noShows>0?`<span style="color:var(--orbd);font-weight:700">${m.noShows}</span>`:'0'}</td>
+      <td class="mono">${m.drivingHikes>0?`🚗 ×${dc}`:'—'}</td>
+      <td><span class="pill" style="${pst}">${rate}%</span></td>
+      <td class="mono">${m.scholarRequested||0}</td>
+      <td class="mono">${m.scholarAwarded>0?`<span style="color:var(--accent);font-weight:700">${m.scholarAwarded}</span>`:0}</td>
+      <td class="mono">${m.gearRequests||0}</td>
+      <td class="mono">${m.gearOutstanding>0?`<span style="color:var(--accent2);font-weight:700">${m.gearOutstanding}</span>`:0}</td>
+      <td style="font-size:12px">${fmtDate(m.lastActivity||m.lastHike)}</td>
+      <td><span class="pill" style="${pst}">${tag}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════
+function setDashView(v,btn){
+  dashView=v;
+  document.querySelectorAll('.vtbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDashboard();
+}
+
+function filterByView(arr,dateKey){
+  if(dashView==='quarter') return arr.filter(x=>new Date(x[dateKey])>=QUARTER_START);
+  return arr;
+}
+
+function renderDashboard(){
+  const label=dashView==='quarter'?`Showing data for ${CURRENT_QUARTER}`:'Showing all-time data';
+  document.getElementById('dash-period-label').textContent=label;
+
+  const filteredHikes=filterByView(hikes,'date');
+  const filteredCheckouts=filterByView(checkouts,'date');
+  const filteredMembers=members.filter(m=>{
+    if(dashView==='alltime')return true;
+    return m.lastActivity&&new Date(m.lastActivity)>=QUARTER_START;
+  });
+
+  // Hike summary
+  const uniqueHikers=new Set();
+  filteredMembers.forEach(m=>{if(m.attended>0)uniqueHikers.add(m.name);});
+  const totalApplications=filteredMembers.reduce((s,m)=>s+(m.applied||0),0);
+  const totalAttended=filteredMembers.reduce((s,m)=>s+(m.attended||0),0);
+  const avgRate=totalApplications>0?Math.round(totalAttended/totalApplications*100):0;
+  document.getElementById('dash-hike-stats').innerHTML=`
+    <div class="sbox accent"><span class="sv">${filteredHikes.length}</span><span class="sl">Hikes</span></div>
+    <div class="sbox"><span class="sv">${uniqueHikers.size}</span><span class="sl">Unique hikers</span></div>
+    <div class="sbox"><span class="sv">${filteredHikes.length>0?Math.round(totalApplications/filteredHikes.length):0}</span><span class="sl">Avg applicants</span></div>
+    <div class="sbox"><span class="sv">${avgRate}%</span><span class="sl">Avg attendance</span></div>`;
+
+  // Scholarships
+  let scholarReq=0,scholarAwd=0,scholarDollars=0;
+  members.forEach(m=>{
+    if(dashView==='alltime'){
+      scholarReq+=(m.scholarRequested||0);
+      scholarAwd+=(m.scholarAwarded||0);
+    } else {
+      (m.scholarNotes||[]).forEach(n=>{
+        if(n.includes('2026')){ // rough quarter filter
+          if(n.includes('requested'))scholarReq++;
+          if(n.includes('awarded'))scholarAwd++;
+        }
+      });
+    }
+  });
+  // calculate dollars from hike prices
+  filteredHikes.forEach(h=>{
+    const hikeDollars=(h.price||0)*Math.round(scholarAwd/Math.max(filteredHikes.length,1));
+    scholarDollars+=hikeDollars;
+  });
+  // simpler: avg price × awards
+  const avgPrice=filteredHikes.length>0?filteredHikes.reduce((s,h)=>s+(h.price||0),0)/filteredHikes.length:0;
+  scholarDollars=Math.round(avgPrice*scholarAwd*100)/100;
+
+  document.getElementById('dash-scholar-stats').innerHTML=`
+    <div class="sbox purple"><span class="sv">${scholarReq}</span><span class="sl">Requested</span></div>
+    <div class="sbox accent"><span class="sv">${scholarAwd}</span><span class="sl">Awarded</span></div>
+    <div class="sbox"><span class="sv">$${scholarDollars.toFixed(2)}</span><span class="sl">Total given out</span></div>
+    <div class="sbox"><span class="sv">${scholarReq>0?Math.round(scholarAwd/scholarReq*100):100}%</span><span class="sl">Approval rate</span></div>`;
+
+  // Scholar chart
+  drawBarChart('chart-scholar',
+    filteredHikes.map(h=>h.location.length>12?h.location.slice(0,12)+'…':h.location),
+    filteredHikes.map(h=>{
+      const awd=Math.round(scholarAwd/Math.max(filteredHikes.length,1));
+      return Math.round((h.price||0)*awd*100)/100;
+    }),
+    '#7a5abf','Scholarship spend ($)'
+  );
+
+  // Scholar top list
+  const topScholars=[...members].filter(m=>m.scholarAwarded>0)
+    .sort((a,b)=>(b.scholarAwarded||0)-(a.scholarAwarded||0)).slice(0,6);
+  document.getElementById('scholar-top-list').innerHTML=topScholars.length
+    ?topScholars.map(m=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px">
+        <span style="font-weight:700">${m.name}</span>
+        <span style="color:var(--muted)">🎓 ×${m.scholarAwarded} awarded</span>
+      </div>`).join('')
+    :'<div style="color:var(--muted);font-size:12px;padding:10px 0">No scholarship data yet</div>';
+
+  // Gear stats
+  const totalGearOut=filteredCheckouts.filter(c=>!c.returned).length;
+  const totalGearCheckouts=filteredCheckouts.length;
+  const gearByItem={};
+  GEAR_ITEMS.forEach(g=>{gearByItem[g]=0;});
+  filteredCheckouts.forEach(c=>{if(gearByItem[c.item]!==undefined)gearByItem[c.item]++;});
+  const topGear=Object.entries(gearByItem).sort((a,b)=>b[1]-a[1])[0];
+
+  document.getElementById('dash-gear-stats').innerHTML=`
+    <div class="sbox"><span class="sv">${totalGearCheckouts}</span><span class="sl">Total checkouts</span></div>
+    <div class="sbox orange"><span class="sv">${totalGearOut}</span><span class="sl">Currently out</span></div>
+    <div class="sbox accent"><span class="sv">${topGear?topGear[0].split(' ')[0]:'—'}</span><span class="sl">Most popular</span></div>`;
+
+  // Gear availability bars
+  const nowOut={};
+  GEAR_ITEMS.forEach(g=>{nowOut[g]=checkouts.filter(c=>c.item===g&&!c.returned).length;});
+  document.getElementById('gear-availability').innerHTML=GEAR_ITEMS.map(g=>{
+    const total=inventory[g]||0;
+    const out=nowOut[g]||0;
+    const avail=Math.max(0,total-out);
+    const pct=total>0?Math.round(out/total*100):0;
+    const barCls=pct>=90?'full':pct>=60?'tight':'avail';
+    return`<div class="gear-bar-wrap">
+      <div class="gear-bar-label"><strong>${g}</strong><span>${avail} of ${total} available (${out} out)</span></div>
+      <div class="gear-bar-track"><div class="gear-bar-fill ${barCls}" style="width:${total>0?pct:0}%"></div></div>
+    </div>`;
+  }).join('');
+
+  // Gear popularity
+  const sorted=Object.entries(gearByItem).sort((a,b)=>b[1]-a[1]);
+  const maxG=sorted[0]?sorted[0][1]:1;
+  document.getElementById('gear-popularity').innerHTML=sorted.map(([g,count])=>`
+    <div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
+        <span style="font-weight:700">${g}</span><span style="color:var(--muted)">${count} requests</span>
+      </div>
+      <div style="height:8px;background:var(--surface2);border-radius:4px;overflow:hidden">
+        <div style="height:100%;background:var(--accent);border-radius:4px;width:${maxG>0?Math.round(count/maxG*100):0}%"></div>
+      </div>
+    </div>`).join('');
+
+  // Gear checkout by day chart
+  const dayMap={};
+  filteredCheckouts.forEach(c=>{
+    const d=c.hikeDate||c.date;
+    if(d){dayMap[d]=(dayMap[d]||0)+1;}
+  });
+  const days=Object.keys(dayMap).sort();
+  drawBarChart('chart-gear',
+    days.map(d=>fmtDate(d)),
+    days.map(d=>dayMap[d]),
+    '#2d5a27','Gear items checked out'
+  );
+}
+
+function drawBarChart(canvasId,labels,values,color,label){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||600;
+  const H=200;
+  canvas.width=W;canvas.height=H;
+  ctx.clearRect(0,0,W,H);
+  if(!labels.length){ctx.fillStyle='#aaa';ctx.font='13px Lato';ctx.fillText('No data yet',W/2-40,H/2);return;}
+  const pad={t:10,r:10,b:50,l:40};
+  const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  const maxV=Math.max(...values,1);
+  const bw=Math.min(cw/labels.length-8,60);
+  ctx.strokeStyle='#d8d3c8';ctx.lineWidth=1;
+  [0,.25,.5,.75,1].forEach(f=>{
+    const y=pad.t+ch*(1-f);
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cw,y);ctx.stroke();
+    ctx.fillStyle='#7a7568';ctx.font='10px IBM Plex Mono';
+    ctx.fillText(Math.round(maxV*f),2,y+4);
+  });
+  labels.forEach((lbl,i)=>{
+    const x=pad.l+(i+0.5)*(cw/labels.length);
+    const barH=ch*(values[i]/maxV);
+    const y=pad.t+ch-barH;
+    ctx.fillStyle=color+'cc';
+    ctx.beginPath();ctx.roundRect(x-bw/2,y,bw,barH,3);ctx.fill();
+    ctx.fillStyle='#1a1814';ctx.font='10px Lato';ctx.textAlign='center';
+    ctx.save();ctx.translate(x,H-10);ctx.rotate(-0.4);ctx.fillText(lbl,0,0);ctx.restore();
+    if(values[i]>0){ctx.fillStyle=color;ctx.font='bold 11px IBM Plex Mono';ctx.fillText(values[i],x,y-4);}
+  });
+  ctx.textAlign='left';
+}
+
+// ════════════════════════════════════════
+// LOG HIKE
+// ════════════════════════════════════════
+let currentOutcomes=[];
+function buildOutcomeList(){
+  const raw=document.getElementById('l-applied').value.trim();
+  if(!raw){notify('Paste the applicant list first');return;}
+  const names=parseLines(raw);
+  if(!names.length){notify('No names found');return;}
+  currentOutcomes=names.map(n=>({name:n,outcome:'applied',note:'',scholarship:false,gear:false}));
+  document.getElementById('outcome-list').innerHTML=currentOutcomes.map((p,i)=>{
+    const m=fuzzy(p.name);
+    const meta=m?[m.year,priTag(m)].filter(Boolean).join(' · '):'not in database';
+    return`<div class="person-entry">
+      <div class="pe-top">
+        <div style="flex:1;min-width:130px"><div class="pe-name">${p.name}</div><div class="pe-meta">${meta}</div></div>
+        <div class="pe-outcomes">
+          <button class="oc-btn" onclick="setOC(${i},'attended',this)">✅ Attended</button>
+          <button class="oc-btn sel-applied" onclick="setOC(${i},'applied',this)">❌ Not selected</button>
+          <button class="oc-btn" onclick="setOC(${i},'replaced',this)">🔄 Replaced</button>
+          <button class="oc-btn" onclick="setOC(${i},'noshow',this)">⚠ No-show</button>
+        </div>
+      </div>
+      <div class="pe-extra">
+        <input type="text" placeholder="Note for replacements/no-shows…" oninput="currentOutcomes[${i}].note=this.value">
+        <label class="chk-lbl"><input type="checkbox" onchange="currentOutcomes[${i}].scholarship=this.checked"> 🎓 Scholarship</label>
+        <label class="chk-lbl"><input type="checkbox" onchange="currentOutcomes[${i}].gear=this.checked"> 🎒 Gear interest</label>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('outcome-section').style.display='block';
+  document.getElementById('outcome-section').scrollIntoView({behavior:'smooth',block:'start'});
+  notify(`${names.length} applicants loaded`);
+}
+
+function setOC(i,outcome,btn){
+  currentOutcomes[i].outcome=outcome;
+  btn.closest('.pe-outcomes').querySelectorAll('.oc-btn').forEach(b=>b.className='oc-btn');
+  btn.className=`oc-btn sel-${outcome}`;
+}
+function markAll(outcome){
+  currentOutcomes.forEach((_,i)=>{
+    currentOutcomes[i].outcome=outcome;
+    const entries=document.getElementById('outcome-list').children;
+    if(entries[i]){
+      entries[i].querySelectorAll('.oc-btn').forEach(b=>b.className='oc-btn');
+      const idx=outcome==='attended'?0:1;
+      const btns=entries[i].querySelectorAll('.oc-btn');
+      if(btns[idx])btns[idx].className=`oc-btn sel-${outcome}`;
+    }
+  });
+}
+
+function submitLog(){
+  const date=document.getElementById('l-date').value;
+  const price=parseFloat(document.getElementById('l-price').value)||0;
+  const quarter=document.getElementById('l-quarter').value;
+  if(!date){notify('Set a hike date');return;}
+  if(!currentOutcomes.length){notify('Load applicants first');return;}
+
+  // save hike record
+  const hikeId='h'+Date.now();
+  hikes.push({id:hikeId,location:document.getElementById('l-location').value||'Unknown',date,prof:document.getElementById('l-prof').value,lead:document.getElementById('l-lead').value,colead:document.getElementById('l-colead').value,price,quarter});
+
+  let stats={applied:0,attended:0,replaced:0,noshows:0,newAdded:0,scholars:0,gear:0};
+  const dateStr=fmtDate(date);
+  currentOutcomes.forEach(p=>{
+    let m=fuzzy(p.name);
+    if(!m){m=blank(p.name);members.push(m);stats.newAdded++;}
+    if(!m.noShowNotes)m.noShowNotes=[];
+    if(!m.scholarNotes)m.scholarNotes=[];
+    if(!m.gearNotes)m.gearNotes=[];
+    m.applied=(m.applied||0)+1;stats.applied++;
+    if(p.outcome==='attended'){m.attended=(m.attended||0)+1;m.lastHike=date;m.lastActivity=date;stats.attended++;}
+    else if(p.outcome==='replaced'){if(p.note)m.noShowNotes.push(`${dateStr}: replaced — ${p.note}`);stats.replaced++;}
+    else if(p.outcome==='noshow'){m.noShows=(m.noShows||0)+1;m.noShowNotes.push(`${dateStr}: no-show — ${p.note||'No reason given'}`);stats.noshows++;}
+    if(p.scholarship){m.scholarRequested=(m.scholarRequested||0)+1;m.scholarAwarded=(m.scholarAwarded||0)+1;m.scholarNotes.push(`${dateStr}: requested & awarded — ${quarter}`);stats.scholars++;}
+    if(p.gear){m.gearRequests=(m.gearRequests||0)+1;m.gearNotes.push(`${dateStr}: gear interest noted`);stats.gear++;}
+  });
+  saveData();
+  document.getElementById('log-result').innerHTML=`<div class="success-box">
+    ✅ <strong>Hike logged.</strong><br><br>
+    <span style="opacity:.85">${stats.applied} applied · ${stats.attended} attended · ${stats.replaced} replaced · ${stats.noshows} no-shows${stats.scholars?` · ${stats.scholars} scholarships`:''} ${stats.gear?` · ${stats.gear} gear interests`:''}${stats.newAdded?` · ${stats.newAdded} new members`:''}</span>
+  </div>`;
+  notify('Hike saved!');
+}
+
+function clearLog(){
+  ['l-location','l-date','l-prof','l-lead','l-colead','l-applied','l-price'].forEach(id=>document.getElementById(id).value='');
+  currentOutcomes=[];
+  document.getElementById('outcome-section').style.display='none';
+  document.getElementById('outcome-list').innerHTML='';
+  document.getElementById('log-result').innerHTML='';
+}
+
+// ════════════════════════════════════════
+// GEAR CHECKOUT
+// ════════════════════════════════════════
+function renderInventoryBars(){
+  const nowOut={};
+  GEAR_ITEMS.forEach(g=>{nowOut[g]=checkouts.filter(c=>c.item===g&&!c.returned).length;});
+  document.getElementById('co-inventory').innerHTML=GEAR_ITEMS.map(g=>{
+    const total=inventory[g]||0;
+    const out=nowOut[g]||0;
+    const avail=Math.max(0,total-out);
+    const pct=total>0?Math.round(out/total*100):0;
+    const barCls=pct>=90?'full':pct>=60?'tight':'avail';
+    return`<div class="gear-bar-wrap">
+      <div class="gear-bar-label"><strong>${g}</strong><span>${avail}/${total} avail</span></div>
+      <div class="gear-bar-track"><div class="gear-bar-fill ${barCls}" style="width:${total>0?pct:0}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function checkAvailability(){
+  const item=document.getElementById('co-item').value;
+  const date=document.getElementById('co-date').value;
+  const total=inventory[item]||0;
+  const out=checkouts.filter(c=>c.item===item&&!c.returned&&c.hikeDate===date).length;
+  const avail=Math.max(0,total-out);
+  const el=document.getElementById('co-availability');
+  if(avail>0){
+    el.innerHTML=`<div style="background:var(--grbg);border:1px solid var(--grbd);border-radius:5px;padding:8px 12px;font-size:12px;color:var(--grtx)">✅ ${avail} of ${total} ${item} available on ${fmtDate(date)}</div>`;
+  } else {
+    el.innerHTML=`<div style="background:var(--orbg);border:1px solid var(--orbd);border-radius:5px;padding:8px 12px;font-size:12px;color:var(--ortx)">⚠ No ${item} available on ${fmtDate(date)} — all ${total} are booked</div>`;
+  }
+}
+
+function checkoutGear(){
+  const who=document.getElementById('co-who').value.trim();
+  const item=document.getElementById('co-item').value;
+  const date=document.getElementById('co-date').value;
+  const note=document.getElementById('co-note').value.trim();
+  if(!who){notify('Enter a member name');return;}
+  const m=fuzzy(who);
+  if(!m){notify('Member not found');return;}
+  const total=inventory[item]||0;
+  const out=checkouts.filter(c=>c.item===item&&!c.returned&&c.hikeDate===date).length;
+  if(total>0&&out>=total){notify(`No ${item} available on this date`);return;}
+  pendingCheckout={member:m.name,item,date,note,hikeDate:date};
+  document.getElementById('modal-title').textContent='Confirm Gear Checkout';
+  document.getElementById('modal-body').innerHTML=`
+    <div style="font-size:13px;line-height:2">
+      <div><strong>Member:</strong> ${m.name}</div>
+      <div><strong>Item:</strong> ${item}</div>
+      <div><strong>Hike date:</strong> ${fmtDate(date)}</div>
+      <div><strong>Auto-returns:</strong> ${fmtDate(date)} at 6:00 PM</div>
+      ${note?`<div><strong>Note:</strong> ${note}</div>`:''}
+    </div>`;
+  document.getElementById('checkout-modal').classList.add('open');
+}
+
+function confirmCheckout(){
+  if(!pendingCheckout)return;
+  const m=fuzzy(pendingCheckout.member);
+  const co={id:'g'+Date.now(),member:pendingCheckout.member,item:pendingCheckout.item,date:new Date().toISOString().split('T')[0],hikeDate:pendingCheckout.hikeDate,note:pendingCheckout.note,returned:false,returnedAt:null};
+  checkouts.push(co);
+  if(m){m.gearRequests=(m.gearRequests||0)+1;m.gearOutstanding=(m.gearOutstanding||0)+1;if(!m.gearNotes)m.gearNotes=[];m.gearNotes.push(`${fmtDate(co.date)}: borrowed ${co.item}${co.note?' — '+co.note:''}`);}
+  saveData();closeModal();renderCheckoutLog();renderInventoryBars();
+  document.getElementById('co-who').value='';document.getElementById('co-note').value='';
+  document.getElementById('co-availability').innerHTML='';
+  notify(`${co.item} checked out to ${co.member}`);
+}
+
+function returnGear(id){
+  const co=checkouts.find(c=>c.id===id);
+  if(!co||co.returned)return;
+  co.returned=true;co.returnedAt=new Date().toISOString();
+  const m=fuzzy(co.member);
+  if(m){m.gearReturned=(m.gearReturned||0)+1;m.gearOutstanding=Math.max(0,(m.gearOutstanding||0)-1);(m.gearNotes||[]).push(`${fmtDate(co.date)}: returned ${co.item}`);}
+  saveData();renderCheckoutLog();renderInventoryBars();
+  notify(`${co.item} returned by ${co.member}`);
+}
+
+function renderCheckoutLog(){
+  const f=document.getElementById('co-filter').value;
+  const today=new Date().toISOString().split('T')[0];
+  let list=[...checkouts];
+  if(f==='active')list=list.filter(c=>!c.returned);
+  else if(f==='today')list=list.filter(c=>c.date===today||c.hikeDate===today);
+  list.sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+  document.getElementById('checkout-log').innerHTML=list.length
+    ?`<div>${list.map(c=>`<div class="checkout-item">
+        <div class="co-name">${c.member}</div>
+        <div class="co-gear">${c.item}${c.note?' — '+c.note:''}</div>
+        <div class="co-date">${fmtDate(c.hikeDate)}</div>
+        <span class="co-status ${c.returned?'co-ret':'co-out'}">${c.returned?'Returned':'Out'}</span>
+        ${!c.returned?`<button class="btn btn-g btn-sm" onclick="returnGear('${c.id}')" style="margin-left:8px">Mark returned</button>`:''}
+      </div>`).join('')}</div>`
+    :'<div style="color:var(--muted);font-size:12px;padding:12px 0">No checkout records match this filter.</div>';
+}
+
+function closeModal(){document.getElementById('checkout-modal').classList.remove('open');pendingCheckout=null;}
+
+// ════════════════════════════════════════
+// MANAGE
+// ════════════════════════════════════════
+function saveMember(){
+  const name=document.getElementById('m-name').value.trim();
+  if(!name){notify('Name required');return;}
+  const patch={year:document.getElementById('m-year').value,major:document.getElementById('m-major').value.trim(),isDriver:document.getElementById('m-driver').value,notes:document.getElementById('m-notes').value.trim()};
+  const idx=members.findIndex(m=>norm(m.name)===norm(name));
+  if(idx>=0){members[idx]={...members[idx],...patch};notify('Updated: '+members[idx].name);}
+  else{members.push({...blank(name),...patch});notify('Added: '+name);}
+  saveData();clearMF();
+}
+function clearMF(){['m-name','m-major','m-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('m-year').value='';document.getElementById('m-driver').value='no';}
+
+function renderInventoryFields(){
+  document.getElementById('inventory-fields').innerHTML=GEAR_ITEMS.map(g=>`
+    <div class="frow" style="margin-bottom:8px">
+      <div class="fg" style="flex:2;margin-bottom:0"><label>${g}</label><input type="number" id="inv-${g.replace(/\s/g,'_')}" value="${inventory[g]||0}" min="0" placeholder="0"></div>
+    </div>`).join('');
+}
+function saveInventory(){
+  GEAR_ITEMS.forEach(g=>{const val=parseInt(document.getElementById('inv-'+g.replace(/\s/g,'_')).value)||0;inventory[g]=val;});
+  saveData();renderInventoryBars();notify('Inventory saved');
+}
+
+function bulkImport(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    const lines=ev.target.result.split('\n').map(l=>l.trim()).filter(Boolean);
+    if(!lines.length){notify('Empty file');return;}
+    const headers=lines[0].toLowerCase().split(',').map(h=>h.replace(/"/g,'').trim());
+    const ni=headers.findIndex(h=>h.includes('name'));
+    if(ni<0){notify('No name column found');return;}
+    let added=0,updated=0;
+    lines.slice(1).forEach(line=>{
+      const cols=line.split(',').map(c=>c.replace(/"/g,'').trim());
+      const name=cols[ni];if(!name)return;
+      const get=key=>{const ki=headers.findIndex(h=>h===key||h.includes(key));return ki>=0?cols[ki]||'':'';}
+      const patch={year:get('year')||get('standing'),major:get('major'),isDriver:get('driver')||get('isdriver'),notes:get('notes')};
+      const idx=members.findIndex(m=>norm(m.name)===norm(name));
+      if(idx>=0){members[idx]={...members[idx],...patch};updated++;}
+      else{members.push({...blank(name),...patch});added++;}
+    });
+    saveData();
+    document.getElementById('import-result').innerHTML=`<div class="success-box">✅ ${added} added, ${updated} updated.</div>`;
+    notify(`Import done: ${added} added, ${updated} updated`);
+  };
+  r.readAsText(f);
+}
+
+function fixRecord(){
+  const q=document.getElementById('f-who').value.trim();
+  const out=document.getElementById('f-out').value;
+  const reason=document.getElementById('f-reason').value.trim();
+  const date=document.getElementById('f-date').value||new Date().toISOString().split('T')[0];
+  const dateStr=fmtDate(date);
+  if(!q){notify('Enter a name');return;}
+  const m=fuzzy(q);if(!m){notify('Not found');return;}
+  if(!m.noShowNotes)m.noShowNotes=[];
+  if(out==='attended'){m.attended=(m.attended||0)+1;m.lastHike=date;m.lastActivity=date;}
+  else if(out==='applied'){m.applied=(m.applied||0)+1;}
+  else if(out==='replaced'){if(reason)m.noShowNotes.push(`${dateStr}: replaced — ${reason}`);}
+  else if(out==='noshow'){m.noShows=(m.noShows||0)+1;m.noShowNotes.push(`${dateStr}: no-show — No reason given`);}
+  else if(out==='noshow_noted'){m.noShows=(m.noShows||0)+1;m.noShowNotes.push(`${dateStr}: no-show — ${reason||'No reason given'}`);}
+  saveData();notify(`Updated ${m.name}`);
+  document.getElementById('f-who').value='';document.getElementById('f-reason').value='';
+}
+
+function exportCSV(){
+  const h=['name','year','major','isDriver','notes','applied','attended','drivingHikes','noShows','lastHike','scholarRequested','scholarAwarded','gearRequests','gearReturned','gearOutstanding'];
+  const rows=members.map(m=>h.map(k=>`"${(m[k]||'').toString().replace(/"/g,'""')}"`).join(','));
+  const blob=new Blob([[h.join(','),...rows].join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='peaks_professors_members.csv';a.click();
+}
+function nuke(){if(!confirm('Delete ALL data?'))return;members=[];hikes=[];checkouts=[];saveData();renderDB();notify('All data cleared');}
+
+// ════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════
+const TABS=['roster','db','dashboard','log','checkout','manage'];
+function showTab(t){
+  TABS.forEach(id=>{const el=document.getElementById('tab-'+id);if(el)el.style.display=id===t?'block':'none';});
+  document.querySelectorAll('.nb').forEach((b,i)=>b.classList.toggle('active',TABS[i]===t));
+  if(t==='db')renderDB();
+  if(t==='dashboard')renderDashboard();
+  if(t==='checkout'){renderInventoryBars();renderCheckoutLog();}
+  if(t==='manage'){
+    if(role==='admin'){document.getElementById('manage-locked').style.display='none';document.getElementById('manage-content').style.display='block';renderInventoryFields();}
+    else{document.getElementById('manage-locked').style.display='block';document.getElementById('manage-content').style.display='none';}
+  }
+}
+function showInner(t){
+  ['edit','import','inventory','fix','tools'].forEach(id=>{const el=document.getElementById('inner-'+id);if(el)el.style.display=id===t?'block':'none';});
+  document.querySelectorAll('.itb').forEach((b,i)=>b.classList.toggle('active',['edit','import','inventory','fix','tools'][i]===t));
+  if(t==='inventory')renderInventoryFields();
+}
+
+function notify(msg){const n=document.getElementById('notif');n.textContent=msg;n.classList.add('show');clearTimeout(n._t);n._t=setTimeout(()=>n.classList.remove('show'),2600);}
+
+function initApp(){
+  loadData();
+  document.getElementById('l-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('co-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+  renderDB();
+}
+</script>
+</body>
+</html>

@@ -706,63 +706,6 @@ function loadData(){
   saveData();
 }
 
-function seedDemoData(){
-  const demoHikes=[
-    {id:'h1',location:'Mt. Si',date:'2026-03-29',prof:'Mark Rodgers',lead:'Cate',colead:'',price:6.51,quarter:'Spring 2026'},
-    {id:'h2',location:'Teneriffe Falls Loop',date:'2026-04-12',prof:'Kristi Straus',lead:'Cyril',colead:'Angela',price:6.66,quarter:'Spring 2026'},
-    {id:'h3',location:'Mt Si',date:'2026-04-18',prof:'Jacob Cooper & Hannah Jordt',lead:'Sohini',colead:'Elijah',price:6.22,quarter:'Spring 2026'},
-    {id:'h4',location:'Lake Serene',date:'2026-04-25',prof:'Elizabeth Umbanhowar',lead:'Leeza',colead:'Tyler',price:8.66,quarter:'Spring 2026'},
-    {id:'h5',location:'Cedar Butte',date:'2026-04-25',prof:'George Lovell',lead:'Gopesh',colead:'Jack',price:6.70,quarter:'Spring 2026'},
-  ];
-  hikes=demoHikes;
-
-  // seed some scholarship data
-  const schNames=['Ellen Boling','Shivam Modi','Timofey Grechkin','Elizabeth McAleer','Sruti Banerjee','Aakarsh Gupta'];
-  schNames.forEach(n=>{
-    const m=members.find(x=>x.name===n);
-    if(m){
-      m.scholarRequested=(m.scholarRequested||0)+1;
-      m.scholarAwarded=(m.scholarAwarded||0)+1;
-      m.scholarNotes=[`2026-03-29: requested & awarded — Spring 2026 scholarship`];
-    }
-  });
-  ['Nora Matzen','Joyce Zheng'].forEach(n=>{
-    const m=members.find(x=>x.name===n);
-    if(m){m.scholarRequested=(m.scholarRequested||0)+1;m.scholarNotes=[`2026-04-12: requested`];}
-  });
-
-  // seed some gear checkouts
-  const gearSeeds=[
-    {id:'g1',member:'Ellen Boling',item:'Hiking Boots',date:'2026-04-25',hikeDate:'2026-04-25',note:'Size 8',returned:true,returnedAt:'2026-04-25T18:00'},
-    {id:'g2',member:'Shivam Modi',item:'Rain Jacket',date:'2026-04-25',hikeDate:'2026-04-25',note:'',returned:true,returnedAt:'2026-04-25T18:00'},
-    {id:'g3',member:'Aakarsh Gupta',item:'Microspikes',date:'2026-04-25',hikeDate:'2026-04-25',note:'',returned:false,returnedAt:null},
-    {id:'g4',member:'Nora Matzen',item:'Daypack',date:'2026-04-12',hikeDate:'2026-04-12',note:'',returned:true,returnedAt:'2026-04-12T18:00'},
-    {id:'g5',member:'Joyce Zheng',item:'Trekking Poles',date:'2026-04-18',hikeDate:'2026-04-18',note:'',returned:true,returnedAt:'2026-04-18T18:00'},
-  ];
-  checkouts=gearSeeds;
-  // update member gear counts
-  gearSeeds.forEach(g=>{
-    const m=members.find(x=>x.name===g.member);
-    if(m){
-      m.gearRequests=(m.gearRequests||0)+1;
-      if(g.returned){m.gearReturned=(m.gearReturned||0)+1;}
-      else{m.gearOutstanding=(m.gearOutstanding||0)+1;}
-    }
-  });
-
-  // seed some hike attendance
-  const attended=['Ellen Boling','Lauren Lambert','Owen Bischoff','Nora Matzen','Shivam Modi','Milo Cox'];
-  attended.forEach(n=>{
-    const m=members.find(x=>x.name===n);
-    if(m){m.applied=(m.applied||0)+3;m.attended=(m.attended||0)+2;m.lastHike='2026-04-25';m.lastActivity='2026-04-25';}
-  });
-  const applied=['Aakarsh Gupta','Joyce Zheng','Timofey Grechkin'];
-  applied.forEach(n=>{
-    const m=members.find(x=>x.name===n);
-    if(m){m.applied=(m.applied||0)+5;m.attended=(m.attended||0)+0;}
-  });
-}
-
 function saveData(){
   try{localStorage.setItem(SK,JSON.stringify({members,hikes,checkouts,inventory}));}catch(e){}
 }

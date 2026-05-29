@@ -638,7 +638,7 @@ function logout(){role=null;document.getElementById('login-screen').style.displa
 // ════════════════════════════════════════
 // DATA
 // ════════════════════════════════════════
-const SK='pp_v7';
+const SK='pp_v8';
 let members=[], rHikers=[], rSort='priority', outcomeData=[];
 let hikes=[]; // [{id,location,date,prof,lead,colead,price,quarter}]
 let checkouts=[]; // [{id,member,item,date,hikeDate,note,returned,returnedAt}]
@@ -703,8 +703,6 @@ function loadData(){
   const seen=new Set();
   members=SEED.filter(n=>{const k=n.toLowerCase();if(seen.has(k))return false;seen.add(k);return true;}).map(blank);
   hikes=[]; checkouts=[];
-  // seed some demo hike data
-  seedDemoData();
   saveData();
 }
 

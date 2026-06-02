@@ -253,7 +253,7 @@ tbody tr:hover td{background:var(--surface2)}
         <div class="card">
           <div class="card-title">🚗 Drivers — auto-confirmed</div>
           <div class="hint">One name per line. Partial names work.</div>
-          <div class="fg"><textarea id="drv-in" placeholder="Lauren Lambert&#10;Milo Cox&#10;Leila Vierra"></textarea></div>
+          <div class="fg"><textarea id="drv-in" placeholder="Driver #1&#10;Driver #2&#10;Driver #3"></textarea></div>
           <div class="btns">
             <button class="btn btn-p btn-sm" onclick="processDrivers()">Confirm Drivers</button>
             <button class="btn btn-g btn-sm" onclick="clearDrivers()">Clear</button>
@@ -267,7 +267,7 @@ tbody tr:hover td{background:var(--surface2)}
             <p>📂 Drop Google Form CSV here or <strong>click to browse</strong></p>
           </div>
           <input type="file" id="csv-roster" accept=".csv" style="display:none" onchange="handleCSV(event,'hkr-in')">
-          <div class="fg"><textarea id="hkr-in" placeholder="Ishan Agrawal&#10;Ellen Boling&#10;Nora Matzen&#10;..."></textarea></div>
+          <div class="fg"><textarea id="hkr-in" placeholder="Hiker #1&#10;Hiker #2&#10;Hiker #3&#10;..."></textarea></div>
           <div class="btns">
             <button class="btn btn-p btn-sm" onclick="processHikers()">Look Up Hikers</button>
             <button class="btn btn-g btn-sm" onclick="clearHikers()">Clear</button>
@@ -465,7 +465,7 @@ tbody tr:hover td{background:var(--surface2)}
         <div class="card">
           <div class="card-title">Check out gear</div>
           <div class="frow">
-            <div class="fg"><label>Member name</label><input id="co-who" placeholder="Ellen Boling"></div>
+            <div class="fg"><label>Hiker name</label><input id="co-who" placeholder="Hiker"></div>
             <div class="fg"><label>Hike date</label><input type="date" id="co-date"></div>
           </div>
           <div class="fg"><label>Gear item</label>
@@ -513,10 +513,10 @@ tbody tr:hover td{background:var(--surface2)}
       </div>
       <div id="manage-content" style="display:none">
         <div class="sec-title">Manage</div>
-        <div class="sec-sub">Edit members, fix records, manage inventory. Admin only.</div>
+        <div class="sec-sub">Edit hiker, fix records, manage inventory. Admin only.</div>
         <div class="admin-banner">🛡 <strong>Admin view</strong> — changes take effect immediately.</div>
         <div class="inner-tabs">
-          <button class="itb active" onclick="showInner('edit')">Add / Edit Member</button>
+          <button class="itb active" onclick="showInner('edit')">Add / Edit Hiker</button>
           <button class="itb" onclick="showInner('import')">Bulk Import</button>
           <button class="itb" onclick="showInner('inventory')">Gear Inventory</button>
           <button class="itb" onclick="showInner('fix')">Fix a Record</button>
@@ -525,8 +525,8 @@ tbody tr:hover td{background:var(--surface2)}
 
         <div id="inner-edit">
           <div class="card">
-            <div class="card-title">Add or edit a member</div>
-            <div class="hint">Enter an existing member's name to update their profile. New names added fresh.</div>
+            <div class="card-title">Add or edit a hiker</div>
+            <div class="hint">Enter an existing hiker's name to update their profile. New names added fresh.</div>
             <div class="frow">
               <div class="fg"><label>Full Name *</label><input id="m-name" placeholder="Alex Rivera"></div>
               <div class="fg"><label>Year</label>
@@ -549,10 +549,10 @@ tbody tr:hover td{background:var(--surface2)}
 
         <div id="inner-import" style="display:none">
           <div class="card">
-            <div class="card-title">Bulk import members via CSV</div>
+            <div class="card-title">Bulk import hikers via CSV</div>
             <div class="hint">Columns: <code style="font-size:11px;background:var(--surface2);padding:2px 5px;border-radius:3px">name, year, major, isDriver, notes</code> — header row required. Stats are never overwritten by import.</div>
             <div class="upload-zone" onclick="document.getElementById('import-csv').click()">
-              <p>📂 Upload member CSV or <strong>click to browse</strong></p>
+              <p>📂 Upload hiker CSV or <strong>click to browse</strong></p>
             </div>
             <input type="file" id="import-csv" accept=".csv" style="display:none" onchange="bulkImport(event)">
             <div id="import-result" style="margin-top:10px"></div>
@@ -572,7 +572,7 @@ tbody tr:hover td{background:var(--surface2)}
           <div class="card">
             <div class="card-title">Fix a hike outcome</div>
             <div class="frow">
-              <div class="fg"><label>Member name</label><input id="f-who" placeholder="Ellen Boling"></div>
+              <div class="fg"><label>Hiker name</label><input id="f-who" placeholder="Ellen Boling"></div>
               <div class="fg"><label>Hike date</label><input type="date" id="f-date"></div>
             </div>
             <div class="fg"><label>Change outcome to</label>

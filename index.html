@@ -1464,11 +1464,6 @@ function renderInventoryFields(){
       <div class="fg" style="flex:2;margin-bottom:0"><label>${g}</label><input type="number" id="inv-${g.replace(/\s/g,'_')}" value="${inventory[g]||0}" min="0" placeholder="0"></div>
     </div>`).join('');
 }
-function saveInventory(){
-  GEAR_ITEMS.forEach(g=>{const val=parseInt(document.getElementById('inv-'+g.replace(/\s/g,'_')).value)||0;inventory[g]=val;});
-  saveData();renderInventoryBars();notify('Inventory saved');
-}
-
 function bulkImport(e){
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();

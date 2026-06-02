@@ -240,6 +240,7 @@ tbody tr:hover td{background:var(--surface2)}
       <button class="nb" onclick="showTab('manage')">⚙ Manage</button>
     </nav>
     <button class="logout-btn" onclick="logout()">Sign out</button>
+    <span id="sync-status" style="margin-left:10px;font-size:11px;font-family:'IBM Plex Mono',monospace;white-space:nowrap"></span>
   </header>
 
   <main>
@@ -252,7 +253,7 @@ tbody tr:hover td{background:var(--surface2)}
         <div class="card">
           <div class="card-title">🚗 Drivers — auto-confirmed</div>
           <div class="hint">One name per line. Partial names work.</div>
-          <div class="fg"><textarea id="drv-in" placeholder="Driver #1&#10;Driver #2&#10;Driver #3"></textarea></div>
+          <div class="fg"><textarea id="drv-in" placeholder="Lauren Lambert&#10;Milo Cox&#10;Leila Vierra"></textarea></div>
           <div class="btns">
             <button class="btn btn-p btn-sm" onclick="processDrivers()">Confirm Drivers</button>
             <button class="btn btn-g btn-sm" onclick="clearDrivers()">Clear</button>
@@ -266,7 +267,7 @@ tbody tr:hover td{background:var(--surface2)}
             <p>📂 Drop Google Form CSV here or <strong>click to browse</strong></p>
           </div>
           <input type="file" id="csv-roster" accept=".csv" style="display:none" onchange="handleCSV(event,'hkr-in')">
-          <div class="fg"><textarea id="hkr-in" placeholder="Hiker #1&#10;Hiker #2&#10;Hiker #3&#10;..."></textarea></div>
+          <div class="fg"><textarea id="hkr-in" placeholder="Ishan Agrawal&#10;Ellen Boling&#10;Nora Matzen&#10;..."></textarea></div>
           <div class="btns">
             <button class="btn btn-p btn-sm" onclick="processHikers()">Look Up Hikers</button>
             <button class="btn btn-g btn-sm" onclick="clearHikers()">Clear</button>
@@ -464,7 +465,7 @@ tbody tr:hover td{background:var(--surface2)}
         <div class="card">
           <div class="card-title">Check out gear</div>
           <div class="frow">
-            <div class="fg"><label>Member name</label><input id="co-who" placeholder="Hiker Name"></div>
+            <div class="fg"><label>Member name</label><input id="co-who" placeholder="Ellen Boling"></div>
             <div class="fg"><label>Hike date</label><input type="date" id="co-date"></div>
           </div>
           <div class="fg"><label>Gear item</label>
@@ -615,6 +616,11 @@ tbody tr:hover td{background:var(--surface2)}
   </div>
 </div>
 
+<div id="loading-overlay" style="display:none;position:fixed;inset:0;background:rgba(26,24,20,.85);z-index:500;align-items:center;justify-content:center;flex-direction:column;gap:14px">
+  <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:20px;color:#f5f2ec">Peaks <span style="color:#8fc08a">&</span> Professors</div>
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#9a9580">Loading from Google Sheets…</div>
+</div>
+
 <div id="notif"></div>
 
 <script>
@@ -635,21 +641,34 @@ function tryLogin(){
 function logout(){role=null;document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('pw-input').value='';document.getElementById('login-err').textContent='';showTab('roster');}
 
 // ════════════════════════════════════════
+// CONFIG — swap these when moving to peaks account
+// ════════════════════════════════════════
+const SHEET_ID   = '1kluEdpGcdfkROR8qeKNG3ZCcS2h6J5HSi82kfbgq3lo';
+const API_KEY    = 'AIzaSyDZqCdpBp2HhrqnGWX28WHNJCb0Q6vsCes';
+const BASE       = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}`;
+
+// ════════════════════════════════════════
 // DATA
 // ════════════════════════════════════════
-const SK='pp_v9_clean';
 let members=[], rHikers=[], rSort='priority', outcomeData=[];
-let hikes=[];
-let checkouts=[];
+let hikes=[], checkouts=[];
 let inventory={
   'Hiking Boots':0,'Rain Jacket':0,'Trekking Poles':0,'Gloves':0,'Microspikes':0,'Daypack':0
 };
 let dashView='quarter';
 let pendingCheckout=null;
+let syncStatus='idle'; // idle | syncing | error
 
 const GEAR_ITEMS=['Hiking Boots','Rain Jacket','Trekking Poles','Gloves','Microspikes','Daypack'];
 const CURRENT_QUARTER='Spring 2026';
 const QUARTER_START=new Date('2026-03-01');
+
+// Member columns in order (must match Sheet headers)
+const M_COLS=['name','year','major','isDriver','notes','applied','attended','drivingHikes',
+  'noShows','lastHike','lastActivity','noShowNotes','scholarRequested','scholarAwarded',
+  'scholarNotes','gearRequests','gearReturned','gearOutstanding','gearNotes'];
+const H_COLS=['id','location','date','prof','lead','colead','price','quarter'];
+const C_COLS=['id','member','item','date','hikeDate','note','returned','returnedAt'];
 
 function blank(name){
   return{name,year:'',major:'',isDriver:'no',notes:'',
@@ -658,24 +677,169 @@ function blank(name){
     gearRequests:0,gearReturned:0,gearOutstanding:0,gearNotes:[]};
 }
 
-function loadData(){
-  try{
-    const d=localStorage.getItem(SK);
-    if(d){
-      const p=JSON.parse(d);
-      members=p.members||[];
-      hikes=p.hikes||[];
-      checkouts=p.checkouts||[];
-      inventory=p.inventory||inventory;
-      return;
-    }
-  }catch(e){}
-  members=[]; hikes=[]; checkouts=[];
-  saveData();
+// ── SHEETS API HELPERS ──────────────────
+async function sheetRead(range){
+  const url=`${BASE}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
+  const r=await fetch(url);
+  if(!r.ok) throw new Error(`Sheet read failed: ${r.status}`);
+  const d=await r.json();
+  return d.values||[];
 }
 
-function saveData(){
-  try{localStorage.setItem(SK,JSON.stringify({members,hikes,checkouts,inventory}));}catch(e){}
+async function sheetWrite(range,values){
+  const url=`${BASE}/values/${encodeURIComponent(range)}?valueInputOption=RAW&key=${API_KEY}`;
+  const r=await fetch(url,{
+    method:'PUT',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({range,majorDimension:'ROWS',values})
+  });
+  if(!r.ok){const e=await r.text();throw new Error(`Sheet write failed: ${r.status} ${e}`);}
+  return r.json();
+}
+
+async function sheetAppend(sheetName,values){
+  const range=`${sheetName}!A:A`;
+  const url=`${BASE}/values/${encodeURIComponent(range)}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS&key=${API_KEY}`;
+  const r=await fetch(url,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({range,majorDimension:'ROWS',values})
+  });
+  if(!r.ok){const e=await r.text();throw new Error(`Sheet append failed: ${r.status} ${e}`);}
+  return r.json();
+}
+
+async function sheetClearAndWrite(sheetName,headers,rows){
+  // Clear everything below header row then write all data
+  const clearUrl=`${BASE}/values/${encodeURIComponent(sheetName+'!A2:ZZ')}:clear?key=${API_KEY}`;
+  await fetch(clearUrl,{method:'POST',headers:{'Content-Type':'application/json'}});
+  if(rows.length===0) return;
+  const range=`${sheetName}!A2`;
+  const url=`${BASE}/values/${encodeURIComponent(range)}?valueInputOption=RAW&key=${API_KEY}`;
+  await fetch(url,{
+    method:'PUT',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({range,majorDimension:'ROWS',values:rows})
+  });
+}
+
+// ── SERIALISE / DESERIALISE ─────────────
+function memberToRow(m){
+  return M_COLS.map(k=>{
+    const v=m[k];
+    if(Array.isArray(v)) return JSON.stringify(v);
+    return v===null||v===undefined?'':String(v);
+  });
+}
+
+function rowToMember(row){
+  const m={};
+  M_COLS.forEach((k,i)=>{
+    const v=row[i]||'';
+    if(k==='noShowNotes'||k==='scholarNotes'||k==='gearNotes'){
+      try{m[k]=v?JSON.parse(v):[]}catch{m[k]=v?[v]:[];}
+    } else if(['applied','attended','drivingHikes','noShows','scholarRequested','scholarAwarded','gearRequests','gearReturned','gearOutstanding'].includes(k)){
+      m[k]=parseInt(v)||0;
+    } else {
+      m[k]=v||( ['lastHike','lastActivity'].includes(k)?null:'');
+    }
+  });
+  if(!m.name) return null;
+  return m;
+}
+
+function hikeToRow(h){ return H_COLS.map(k=>h[k]===null||h[k]===undefined?'':String(h[k])); }
+function rowToHike(row){ const h={}; H_COLS.forEach((k,i)=>h[k]=row[i]||''); return h.id?h:null; }
+
+function checkoutToRow(c){
+  return C_COLS.map(k=>{
+    if(k==='returned') return c.returned?'TRUE':'FALSE';
+    return c[k]===null||c[k]===undefined?'':String(c[k]);
+  });
+}
+function rowToCheckout(row){
+  const c={};
+  C_COLS.forEach((k,i)=>{
+    if(k==='returned') c[k]=row[i]==='TRUE';
+    else c[k]=row[i]||'';
+  });
+  return c.id?c:null;
+}
+
+// ── SYNC INDICATOR ──────────────────────
+function setSyncStatus(s,msg=''){
+  syncStatus=s;
+  const el=document.getElementById('sync-status');
+  if(!el) return;
+  if(s==='syncing') el.innerHTML='<span style="color:#f0b060">⟳ Syncing…</span>';
+  else if(s==='ok')    el.innerHTML='<span style="color:#5fba8a">✓ Saved</span>';
+  else if(s==='error') el.innerHTML=`<span style="color:#e05050" title="${msg}">✗ Sync error</span>`;
+  else el.innerHTML='';
+}
+
+// ── LOAD FROM SHEETS ────────────────────
+async function loadData(){
+  setSyncStatus('syncing');
+  try{
+    const [mRows,hRows,cRows]=await Promise.all([
+      sheetRead('Members!A2:S'),
+      sheetRead('Hikes!A2:H'),
+      sheetRead('Checkouts!A2:H')
+    ]);
+    members=mRows.map(rowToMember).filter(Boolean);
+    hikes=hRows.map(rowToHike).filter(Boolean);
+    checkouts=cRows.map(rowToCheckout).filter(Boolean);
+
+    // inventory stored as a special row in a Config sheet — fallback to defaults if not found
+    try{
+      const cfg=await sheetRead('Config!A2:B');
+      cfg.forEach(([k,v])=>{ if(inventory.hasOwnProperty(k)) inventory[k]=parseInt(v)||0; });
+    }catch(e){ /* no config sheet yet, use defaults */ }
+
+    setSyncStatus('ok');
+    setTimeout(()=>setSyncStatus('idle'),2000);
+  }catch(e){
+    console.error('loadData error',e);
+    setSyncStatus('error',e.message);
+    // fall back to empty so app still works
+    members=[]; hikes=[]; checkouts=[];
+  }
+}
+
+// ── SAVE ENTIRE MEMBERS SHEET ───────────
+async function saveMembers(){
+  setSyncStatus('syncing');
+  try{
+    await sheetClearAndWrite('Members',M_COLS,members.map(memberToRow));
+    setSyncStatus('ok');
+    setTimeout(()=>setSyncStatus('idle'),2000);
+  }catch(e){ setSyncStatus('error',e.message); console.error(e); }
+}
+
+// ── SAVE ENTIRE HIKES SHEET ─────────────
+async function saveHikes(){
+  try{ await sheetClearAndWrite('Hikes',H_COLS,hikes.map(hikeToRow)); }
+  catch(e){ setSyncStatus('error',e.message); console.error(e); }
+}
+
+// ── SAVE ENTIRE CHECKOUTS SHEET ─────────
+async function saveCheckouts(){
+  try{ await sheetClearAndWrite('Checkouts',C_COLS,checkouts.map(checkoutToRow)); }
+  catch(e){ setSyncStatus('error',e.message); console.error(e); }
+}
+
+// ── SAVE INVENTORY TO CONFIG SHEET ──────
+async function saveInventoryToSheet(){
+  try{
+    const rows=GEAR_ITEMS.map(g=>[g,String(inventory[g]||0)]);
+    // ensure Config sheet has headers first call
+    await sheetClearAndWrite('Config',['item','count'],rows);
+  }catch(e){ console.error('inventory save',e); }
+}
+
+// saveData = save everything (used after bulk operations)
+async function saveData(){
+  await Promise.all([saveMembers(),saveHikes(),saveCheckouts()]);
 }
 
 // ════════════════════════════════════════
@@ -1155,7 +1319,7 @@ function submitLog(){
     if(p.scholarship){m.scholarRequested=(m.scholarRequested||0)+1;m.scholarAwarded=(m.scholarAwarded||0)+1;m.scholarNotes.push(`${dateStr}: requested & awarded — ${quarter}`);stats.scholars++;}
     if(p.gear){m.gearRequests=(m.gearRequests||0)+1;m.gearNotes.push(`${dateStr}: gear interest noted`);stats.gear++;}
   });
-  saveData();
+  saveMembers();saveHikes();
   document.getElementById('log-result').innerHTML=`<div class="success-box">
     ✅ <strong>Hike logged.</strong><br><br>
     <span style="opacity:.85">${stats.applied} applied · ${stats.attended} attended · ${stats.replaced} replaced · ${stats.noshows} no-shows${stats.scholars?` · ${stats.scholars} scholarships`:''} ${stats.gear?` · ${stats.gear} gear interests`:''}${stats.newAdded?` · ${stats.newAdded} new members`:''}</span>
@@ -1234,7 +1398,7 @@ function confirmCheckout(){
   const co={id:'g'+Date.now(),member:pendingCheckout.member,item:pendingCheckout.item,date:new Date().toISOString().split('T')[0],hikeDate:pendingCheckout.hikeDate,note:pendingCheckout.note,returned:false,returnedAt:null};
   checkouts.push(co);
   if(m){m.gearRequests=(m.gearRequests||0)+1;m.gearOutstanding=(m.gearOutstanding||0)+1;if(!m.gearNotes)m.gearNotes=[];m.gearNotes.push(`${fmtDate(co.date)}: borrowed ${co.item}${co.note?' — '+co.note:''}`);}
-  saveData();closeModal();renderCheckoutLog();renderInventoryBars();
+  saveMembers();saveCheckouts();closeModal();renderCheckoutLog();renderInventoryBars();
   document.getElementById('co-who').value='';document.getElementById('co-note').value='';
   document.getElementById('co-availability').innerHTML='';
   notify(`${co.item} checked out to ${co.member}`);
@@ -1246,7 +1410,7 @@ function returnGear(id){
   co.returned=true;co.returnedAt=new Date().toISOString();
   const m=fuzzy(co.member);
   if(m){m.gearReturned=(m.gearReturned||0)+1;m.gearOutstanding=Math.max(0,(m.gearOutstanding||0)-1);(m.gearNotes||[]).push(`${fmtDate(co.date)}: returned ${co.item}`);}
-  saveData();renderCheckoutLog();renderInventoryBars();
+  saveMembers();saveCheckouts();renderCheckoutLog();renderInventoryBars();
   notify(`${co.item} returned by ${co.member}`);
 }
 
@@ -1281,7 +1445,7 @@ function saveMember(){
   const idx=members.findIndex(m=>norm(m.name)===norm(name));
   if(idx>=0){members[idx]={...members[idx],...patch};notify('Updated: '+members[idx].name);}
   else{members.push({...blank(name),...patch});notify('Added: '+name);}
-  saveData();clearMF();
+  saveMembers();clearMF();
 }
 function clearMF(){['m-name','m-major','m-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('m-year').value='';document.getElementById('m-driver').value='no';}
 
@@ -1315,7 +1479,7 @@ function bulkImport(e){
       if(idx>=0){members[idx]={...members[idx],...patch};updated++;}
       else{members.push({...blank(name),...patch});added++;}
     });
-    saveData();
+    saveMembers();
     document.getElementById('import-result').innerHTML=`<div class="success-box">✅ ${added} added, ${updated} updated.</div>`;
     notify(`Import done: ${added} added, ${updated} updated`);
   };
@@ -1336,7 +1500,7 @@ function fixRecord(){
   else if(out==='replaced'){if(reason)m.noShowNotes.push(`${dateStr}: replaced — ${reason}`);}
   else if(out==='noshow'){m.noShows=(m.noShows||0)+1;m.noShowNotes.push(`${dateStr}: no-show — No reason given`);}
   else if(out==='noshow_noted'){m.noShows=(m.noShows||0)+1;m.noShowNotes.push(`${dateStr}: no-show — ${reason||'No reason given'}`);}
-  saveData();notify(`Updated ${m.name}`);
+  saveMembers();notify(`Updated ${m.name}`);
   document.getElementById('f-who').value='';document.getElementById('f-reason').value='';
 }
 
@@ -1369,10 +1533,22 @@ function showInner(t){
   if(t==='inventory')renderInventoryFields();
 }
 
+function saveInventory(){
+  GEAR_ITEMS.forEach(g=>{const val=parseInt(document.getElementById('inv-'+g.replace(/\s/g,'_')).value)||0;inventory[g]=val;});
+  saveInventoryToSheet();renderInventoryBars();notify('Inventory saved');
+}
+
 function notify(msg){const n=document.getElementById('notif');n.textContent=msg;n.classList.add('show');clearTimeout(n._t);n._t=setTimeout(()=>n.classList.remove('show'),2600);}
 
-function initApp(){
-  loadData();
+function showLoading(on){
+  const el=document.getElementById('loading-overlay');
+  if(el) el.style.display=on?'flex':'none';
+}
+
+async function initApp(){
+  showLoading(true);
+  await loadData();
+  showLoading(false);
   document.getElementById('l-date').value=new Date().toISOString().split('T')[0];
   document.getElementById('co-date').value=new Date().toISOString().split('T')[0];
   document.getElementById('f-date').value=new Date().toISOString().split('T')[0];

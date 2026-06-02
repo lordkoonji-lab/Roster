@@ -307,7 +307,7 @@ tbody tr:hover td{background:var(--surface2)}
     <!-- ══ HIKERS DB ══ -->
     <div id="tab-db" style="display:none">
       <div class="sec-title">Hiker Database</div>
-      <div class="sec-sub">All tracked members. Read-only — edits go through Manage.</div>
+      <div class="sec-sub">All tracked hikers. Read-only — edits go through Manage.</div>
       <div class="stat-grid" id="db-stats"></div>
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
         <input type="text" id="db-q" placeholder="Search name or major…" oninput="renderDB()" style="flex:1;min-width:160px">
@@ -528,7 +528,7 @@ tbody tr:hover td{background:var(--surface2)}
             <div class="card-title">Add or edit a hiker</div>
             <div class="hint">Enter an existing hiker's name to update their profile. New names added fresh.</div>
             <div class="frow">
-              <div class="fg"><label>Full Name *</label><input id="m-name" placeholder="Alex Rivera"></div>
+              <div class="fg"><label>Full Name *</label><input id="m-name" placeholder="Hiker Name"></div>
               <div class="fg"><label>Year</label>
                 <select id="m-year"><option value="">—</option><option>Freshman</option><option>Sophomore</option><option>Junior</option><option>Senior</option><option>Grad Student</option><option>Faculty</option><option>Staff</option></select>
               </div>
@@ -572,7 +572,7 @@ tbody tr:hover td{background:var(--surface2)}
           <div class="card">
             <div class="card-title">Fix a hike outcome</div>
             <div class="frow">
-              <div class="fg"><label>Hiker name</label><input id="f-who" placeholder="Ellen Boling"></div>
+              <div class="fg"><label>Hiker name</label><input id="f-who" placeholder="Hiker"></div>
               <div class="fg"><label>Hike date</label><input type="date" id="f-date"></div>
             </div>
             <div class="fg"><label>Change outcome to</label>
@@ -593,7 +593,7 @@ tbody tr:hover td{background:var(--surface2)}
           <div class="card">
             <div class="card-title">Data tools</div>
             <div class="btns">
-              <button class="btn btn-g btn-sm" onclick="exportCSV()">📥 Export members CSV</button>
+              <button class="btn btn-g btn-sm" onclick="exportCSV()">📥 Export hikers CSV</button>
               <button class="btn btn-d btn-sm" onclick="nuke()">🗑 Clear all data</button>
             </div>
           </div>

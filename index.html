@@ -680,19 +680,20 @@ async function callScript(action, payload){
   if(action==='readAll'){
     const url=`${SCRIPT_URL}?action=readAll`;
     const r=await fetch(url);
-    if(!r.ok) throw new Error(`Script error: ${r.status}`);
-    const d=await r.json();
+    if(!r.ok) throw new Error(`Script read error: ${r.status}`);
+    const text=await r.text();
+    let d; try{d=JSON.parse(text);}catch(e){throw new Error(`Bad response: ${text.slice(0,120)}`);}
     if(d.error) throw new Error(d.error);
     return d;
   } else {
-    // writes go as POST with JSON body
     const r=await fetch(SCRIPT_URL,{
       method:'POST',
-      headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({sheet:payload.sheet, rows:payload.rows})
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({action:'write', sheet:payload.sheet, rows:payload.rows})
     });
-    if(!r.ok) throw new Error(`Script error: ${r.status}`);
-    const d=await r.json();
+    if(!r.ok) throw new Error(`Script write error: ${r.status}`);
+    const text=await r.text();
+    let d; try{d=JSON.parse(text);}catch(e){throw new Error(`Bad response: ${text.slice(0,120)}`);}
     if(d.error) throw new Error(d.error);
     return d;
   }

@@ -641,11 +641,10 @@ async function tryLogin(){
 function logout(){role=null;document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('pw-input').value='';document.getElementById('login-err').textContent='';showTab('roster');}
 
 // ════════════════════════════════════════
-// CONFIG — swap these when moving to peaks account
 // ════════════════════════════════════════
-const SHEET_ID   = '1kluEdpGcdfkROR8qeKNG3ZCcS2h6J5HSi82kfbgq3lo';
-const API_KEY    = 'AIzaSyCgNoEe6_-DU-WhSLNh-mm3sggyLa5g3ng';
-const BASE       = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}`;
+// CONFIG — swap URL when moving to peaks account
+// ════════════════════════════════════════
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbziX5t9V4tJvFRU6bKDO4vpUN1ws2xKLuRGdyeAXbaQIuZ1inTazV0I3s13ZRCLDaUvjw/exec';
 
 // ════════════════════════════════════════
 // DATA
@@ -657,13 +656,12 @@ let inventory={
 };
 let dashView='quarter';
 let pendingCheckout=null;
-let syncStatus='idle'; // idle | syncing | error
+let syncStatus='idle';
 
 const GEAR_ITEMS=['Hiking Boots','Rain Jacket','Trekking Poles','Gloves','Microspikes','Daypack'];
 const CURRENT_QUARTER='Spring 2026';
 const QUARTER_START=new Date('2026-03-01');
 
-// Member columns in order (must match Sheet headers)
 const M_COLS=['name','year','major','isDriver','notes','applied','attended','drivingHikes',
   'noShows','lastHike','lastActivity','noShowNotes','scholarRequested','scholarAwarded',
   'scholarNotes','gearRequests','gearReturned','gearOutstanding','gearNotes'];
@@ -677,50 +675,27 @@ function blank(name){
     gearRequests:0,gearReturned:0,gearOutstanding:0,gearNotes:[]};
 }
 
-// ── SHEETS API HELPERS ──────────────────
-async function sheetRead(range){
-  const url=`${BASE}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
-  const r=await fetch(url);
-  if(!r.ok) throw new Error(`Sheet read failed: ${r.status}`);
-  const d=await r.json();
-  return d.values||[];
-}
-
-async function sheetWrite(range,values){
-  const url=`${BASE}/values/${encodeURIComponent(range)}?valueInputOption=RAW&key=${API_KEY}`;
-  const r=await fetch(url,{
-    method:'PUT',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({range,majorDimension:'ROWS',values})
-  });
-  if(!r.ok){const e=await r.text();throw new Error(`Sheet write failed: ${r.status} ${e}`);}
-  return r.json();
-}
-
-async function sheetAppend(sheetName,values){
-  const range=`${sheetName}!A:A`;
-  const url=`${BASE}/values/${encodeURIComponent(range)}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS&key=${API_KEY}`;
-  const r=await fetch(url,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({range,majorDimension:'ROWS',values})
-  });
-  if(!r.ok){const e=await r.text();throw new Error(`Sheet append failed: ${r.status} ${e}`);}
-  return r.json();
-}
-
-async function sheetClearAndWrite(sheetName,headers,rows){
-  // Clear everything below header row then write all data
-  const clearUrl=`${BASE}/values/${encodeURIComponent(sheetName+'!A2:ZZ')}:clear?key=${API_KEY}`;
-  await fetch(clearUrl,{method:'POST',headers:{'Content-Type':'application/json'}});
-  if(rows.length===0) return;
-  const range=`${sheetName}!A2`;
-  const url=`${BASE}/values/${encodeURIComponent(range)}?valueInputOption=RAW&key=${API_KEY}`;
-  await fetch(url,{
-    method:'PUT',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({range,majorDimension:'ROWS',values:rows})
-  });
+// ── APPS SCRIPT CALLER ──────────────────
+async function callScript(action, payload){
+  if(action==='readAll'){
+    const url=`${SCRIPT_URL}?action=readAll`;
+    const r=await fetch(url);
+    if(!r.ok) throw new Error(`Script error: ${r.status}`);
+    const d=await r.json();
+    if(d.error) throw new Error(d.error);
+    return d;
+  } else {
+    // writes go as POST with JSON body
+    const r=await fetch(SCRIPT_URL,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({sheet:payload.sheet, rows:payload.rows})
+    });
+    if(!r.ok) throw new Error(`Script error: ${r.status}`);
+    const d=await r.json();
+    if(d.error) throw new Error(d.error);
+    return d;
+  }
 }
 
 // ── SERIALISE / DESERIALISE ─────────────
@@ -735,13 +710,14 @@ function memberToRow(m){
 function rowToMember(row){
   const m={};
   M_COLS.forEach((k,i)=>{
-    const v=row[i]||'';
+    const v=row[i]===undefined?'':row[i];
+    const s=String(v);
     if(k==='noShowNotes'||k==='scholarNotes'||k==='gearNotes'){
-      try{m[k]=v?JSON.parse(v):[]}catch{m[k]=v?[v]:[];}
+      try{m[k]=s?JSON.parse(s):[]}catch{m[k]=s?[s]:[];}
     } else if(['applied','attended','drivingHikes','noShows','scholarRequested','scholarAwarded','gearRequests','gearReturned','gearOutstanding'].includes(k)){
-      m[k]=parseInt(v)||0;
+      m[k]=parseInt(s)||0;
     } else {
-      m[k]=v||( ['lastHike','lastActivity'].includes(k)?null:'');
+      m[k]=s||(['lastHike','lastActivity'].includes(k)?null:'');
     }
   });
   if(!m.name) return null;
@@ -749,7 +725,7 @@ function rowToMember(row){
 }
 
 function hikeToRow(h){ return H_COLS.map(k=>h[k]===null||h[k]===undefined?'':String(h[k])); }
-function rowToHike(row){ const h={}; H_COLS.forEach((k,i)=>h[k]=row[i]||''); return h.id?h:null; }
+function rowToHike(row){ const h={}; H_COLS.forEach((k,i)=>h[k]=row[i]!==undefined?String(row[i]):''); return h.id?h:null; }
 
 function checkoutToRow(c){
   return C_COLS.map(k=>{
@@ -760,8 +736,8 @@ function checkoutToRow(c){
 function rowToCheckout(row){
   const c={};
   C_COLS.forEach((k,i)=>{
-    if(k==='returned') c[k]=row[i]==='TRUE';
-    else c[k]=row[i]||'';
+    if(k==='returned') c[k]=String(row[i])==='TRUE';
+    else c[k]=row[i]!==undefined?String(row[i]):'';
   });
   return c.id?c:null;
 }
@@ -777,76 +753,63 @@ function setSyncStatus(s,msg=''){
   else el.innerHTML='';
 }
 
-// ── LOAD FROM SHEETS ────────────────────
+// ── LOAD ALL DATA ───────────────────────
 async function loadData(){
   setSyncStatus('syncing');
   try{
-    const [mRows,hRows,cRows]=await Promise.all([
-      sheetRead('Members!A2:S'),
-      sheetRead('Hikes!A2:H'),
-      sheetRead('Checkouts!A2:H')
-    ]);
-    members=mRows.map(rowToMember).filter(Boolean);
-    hikes=hRows.map(rowToHike).filter(Boolean);
-    checkouts=cRows.map(rowToCheckout).filter(Boolean);
-
-    try{
-      const cfg=await sheetRead('Config!A2:B');
-      cfg.forEach(([k,v])=>{ if(inventory.hasOwnProperty(k)) inventory[k]=parseInt(v)||0; });
-    }catch(e){ /* no config sheet yet */ }
-
+    const all=await callScript('readAll',{});
+    members=(all.Members||[]).map(rowToMember).filter(Boolean);
+    hikes=(all.Hikes||[]).map(rowToHike).filter(Boolean);
+    checkouts=(all.Checkouts||[]).map(rowToCheckout).filter(Boolean);
+    (all.Config||[]).forEach(row=>{
+      const k=String(row[0]||''), v=String(row[1]||'');
+      if(inventory.hasOwnProperty(k)) inventory[k]=parseInt(v)||0;
+    });
     setSyncStatus('ok');
     setTimeout(()=>setSyncStatus('idle'),2000);
   }catch(e){
     console.error('loadData error',e);
     setSyncStatus('error',e.message);
-    // Show error in loading overlay instead of blank screen
     const lo=document.getElementById('loading-overlay');
     if(lo) lo.innerHTML=`
       <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:#f5f2ec">Connection error</div>
       <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#e05050;max-width:400px;text-align:center;line-height:1.6">${e.message}</div>
       <div style="font-size:12px;color:#9a9580;max-width:400px;text-align:center;line-height:1.6;margin-top:8px">
-        Check: Sheet is shared as <strong style="color:#f5f2ec">Anyone with link → Editor</strong><br>
-        Tab names are exactly <strong style="color:#f5f2ec">Members, Hikes, Checkouts, Config</strong><br>
-        API key restrictions allow this domain
+        Check Apps Script is deployed as <strong style="color:#f5f2ec">Anyone can access</strong><br>
+        Tab names are exactly <strong style="color:#f5f2ec">Members, Hikes, Checkouts, Config</strong>
       </div>
       <button onclick="location.reload()" style="margin-top:16px;padding:10px 24px;background:#2d5a27;color:#fff;border:none;border-radius:6px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer">Retry</button>`;
     members=[]; hikes=[]; checkouts=[];
   }
 }
 
-// ── SAVE ENTIRE MEMBERS SHEET ───────────
+// ── SAVE FUNCTIONS ──────────────────────
 async function saveMembers(){
   setSyncStatus('syncing');
   try{
-    await sheetClearAndWrite('Members',M_COLS,members.map(memberToRow));
+    await callScript('write',{sheet:'Members',rows:members.map(memberToRow)});
     setSyncStatus('ok');
     setTimeout(()=>setSyncStatus('idle'),2000);
   }catch(e){ setSyncStatus('error',e.message); console.error(e); }
 }
 
-// ── SAVE ENTIRE HIKES SHEET ─────────────
 async function saveHikes(){
-  try{ await sheetClearAndWrite('Hikes',H_COLS,hikes.map(hikeToRow)); }
+  try{ await callScript('write',{sheet:'Hikes',rows:hikes.map(hikeToRow)}); }
   catch(e){ setSyncStatus('error',e.message); console.error(e); }
 }
 
-// ── SAVE ENTIRE CHECKOUTS SHEET ─────────
 async function saveCheckouts(){
-  try{ await sheetClearAndWrite('Checkouts',C_COLS,checkouts.map(checkoutToRow)); }
+  try{ await callScript('write',{sheet:'Checkouts',rows:checkouts.map(checkoutToRow)}); }
   catch(e){ setSyncStatus('error',e.message); console.error(e); }
 }
 
-// ── SAVE INVENTORY TO CONFIG SHEET ──────
 async function saveInventoryToSheet(){
   try{
     const rows=GEAR_ITEMS.map(g=>[g,String(inventory[g]||0)]);
-    // ensure Config sheet has headers first call
-    await sheetClearAndWrite('Config',['item','count'],rows);
+    await callScript('write',{sheet:'Config',rows});
   }catch(e){ console.error('inventory save',e); }
 }
 
-// saveData = save everything (used after bulk operations)
 async function saveData(){
   await Promise.all([saveMembers(),saveHikes(),saveCheckouts()]);
 }

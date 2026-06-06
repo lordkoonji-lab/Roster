@@ -325,7 +325,7 @@ tbody tr:hover td{background:var(--surface2)}
       <div class="tbl-wrap">
         <table>
           <thead><tr>
-            <th>Name</th><th>Year</th><th>Major</th><th>Applied</th><th>Attended</th>
+            <th>Name</th><th>Student ID</th><th>Email</th><th>Phone</th><th>Year</th><th>Major</th><th>Applied</th><th>Attended</th>
             <th>No-shows</th><th>🚗</th><th>Rate</th><th>🎓 Req</th><th>🎓 Awd</th><th>🎒 Req</th><th>🎒 Out</th><th>Last Activity</th><th>Status</th>
           </tr></thead>
           <tbody id="db-body"></tbody>
@@ -529,12 +529,19 @@ tbody tr:hover td{background:var(--surface2)}
             <div class="hint">Enter an existing hiker's name to update their profile. New names added fresh.</div>
             <div class="frow">
               <div class="fg"><label>Full Name *</label><input id="m-name" placeholder="Hiker Name"></div>
+              <div class="fg"><label>Student ID</label><input id="m-studentid" placeholder="12345678"></div>
+            </div>
+            <div class="frow">
+              <div class="fg"><label>UW Email</label><input id="m-email" type="email" placeholder="netid@uw.edu"></div>
+              <div class="fg"><label>Phone</label><input id="m-phone" type="tel" placeholder="206-555-0123"></div>
+            </div>
+            <div class="frow">
               <div class="fg"><label>Year</label>
                 <select id="m-year"><option value="">—</option><option>Freshman</option><option>Sophomore</option><option>Junior</option><option>Senior</option><option>Grad Student</option><option>Faculty</option><option>Staff</option></select>
               </div>
+              <div class="fg"><label>Major</label><input id="m-major" placeholder="Biology"></div>
             </div>
             <div class="frow">
-              <div class="fg"><label>Major</label><input id="m-major" placeholder="Biology"></div>
               <div class="fg"><label>Regular driver?</label>
                 <select id="m-driver"><option value="no">No</option><option value="yes">Yes</option></select>
               </div>
@@ -550,7 +557,7 @@ tbody tr:hover td{background:var(--surface2)}
         <div id="inner-import" style="display:none">
           <div class="card">
             <div class="card-title">Bulk import hikers via CSV</div>
-            <div class="hint">Columns: <code style="font-size:11px;background:var(--surface2);padding:2px 5px;border-radius:3px">name, year, major, isDriver, notes</code> — header row required. Stats are never overwritten by import.</div>
+            <div class="hint">Columns: <code style="font-size:11px;background:var(--surface2);padding:2px 5px;border-radius:3px">name, studentId, email, phone, year, major, isDriver, notes</code> — header row required. Stats are never overwritten. Duplicate student IDs are skipped.</div>
             <div class="upload-zone" onclick="document.getElementById('import-csv').click()">
               <p>📂 Upload hiker CSV or <strong>click to browse</strong></p>
             </div>
@@ -662,14 +669,14 @@ const GEAR_ITEMS=['Hiking Boots','Rain Jacket','Trekking Poles','Gloves','Micros
 const CURRENT_QUARTER='Spring 2026';
 const QUARTER_START=new Date('2026-03-01');
 
-const M_COLS=['name','year','major','isDriver','notes','applied','attended','drivingHikes',
+const M_COLS=['name','studentId','email','phone','year','major','isDriver','notes','applied','attended','drivingHikes',
   'noShows','lastHike','lastActivity','noShowNotes','scholarRequested','scholarAwarded',
   'scholarNotes','gearRequests','gearReturned','gearOutstanding','gearNotes'];
 const H_COLS=['id','location','date','prof','lead','colead','price','quarter'];
 const C_COLS=['id','member','item','date','hikeDate','note','returned','returnedAt'];
 
 function blank(name){
-  return{name,year:'',major:'',isDriver:'no',notes:'',
+  return{name,studentId:'',email:'',phone:'',year:'',major:'',isDriver:'no',notes:'',
     applied:0,attended:0,drivingHikes:0,noShows:0,lastHike:null,lastActivity:null,noShowNotes:[],
     scholarRequested:0,scholarAwarded:0,scholarNotes:[],
     gearRequests:0,gearReturned:0,gearOutstanding:0,gearNotes:[]};
@@ -680,20 +687,19 @@ async function callScript(action, payload){
   if(action==='readAll'){
     const url=`${SCRIPT_URL}?action=readAll`;
     const r=await fetch(url);
-    if(!r.ok) throw new Error(`Script read error: ${r.status}`);
-    const text=await r.text();
-    let d; try{d=JSON.parse(text);}catch(e){throw new Error(`Bad response: ${text.slice(0,120)}`);}
+    if(!r.ok) throw new Error(`Script error: ${r.status}`);
+    const d=await r.json();
     if(d.error) throw new Error(d.error);
     return d;
   } else {
+    // writes go as POST with JSON body
     const r=await fetch(SCRIPT_URL,{
       method:'POST',
-      headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body:JSON.stringify({action:'write', sheet:payload.sheet, rows:payload.rows})
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({sheet:payload.sheet, rows:payload.rows})
     });
-    if(!r.ok) throw new Error(`Script write error: ${r.status}`);
-    const text=await r.text();
-    let d; try{d=JSON.parse(text);}catch(e){throw new Error(`Bad response: ${text.slice(0,120)}`);}
+    if(!r.ok) throw new Error(`Script error: ${r.status}`);
+    const d=await r.json();
     if(d.error) throw new Error(d.error);
     return d;
   }
@@ -994,7 +1000,7 @@ function renderDB(){
   const q=norm(document.getElementById('db-q').value);
   const f=document.getElementById('db-f').value;
   let list=[...members].filter(m=>{
-    if(q&&!norm(m.name).includes(q)&&!norm(m.major).includes(q))return false;
+    if(q&&!norm(m.name).includes(q)&&!norm(m.major||'').includes(q)&&!(m.studentId||'').includes(q)&&!norm(m.email||'').includes(q))return false;
     if(f==='never'&&m.attended>0)return false;
     if(f==='new'&&m.applied>0)return false;
     if(f==='inactive'&&daysAgo(m.lastActivity||m.lastHike)<90)return false;
@@ -1022,6 +1028,9 @@ function renderDB(){
     const dc=m.drivingHikes>=5?'5+':String(m.drivingHikes||0);
     return`<tr>
       <td style="font-weight:700">${m.name}</td>
+      <td class="mono">${m.studentId||'—'}</td>
+      <td style="font-size:12px">${m.email||'—'}</td>
+      <td class="mono">${m.phone||'—'}</td>
       <td>${m.year||'—'}</td><td>${m.major||'—'}</td>
       <td class="mono">${m.applied}</td><td class="mono">${m.attended}</td>
       <td class="mono">${m.noShows>0?`<span style="color:var(--orbd);font-weight:700">${m.noShows}</span>`:'0'}</td>
@@ -1411,16 +1420,34 @@ function closeModal(){document.getElementById('checkout-modal').classList.remove
 // ════════════════════════════════════════
 // MANAGE
 // ════════════════════════════════════════
-function saveMember(){
+async function saveMember(){
   const name=document.getElementById('m-name').value.trim();
   if(!name){notify('Name required');return;}
-  const patch={year:document.getElementById('m-year').value,major:document.getElementById('m-major').value.trim(),isDriver:document.getElementById('m-driver').value,notes:document.getElementById('m-notes').value.trim()};
-  const idx=members.findIndex(m=>norm(m.name)===norm(name));
+  const studentId=document.getElementById('m-studentid').value.trim();
+  // Duplicate student ID check
+  if(studentId){
+    const existing=members.find(m=>m.studentId&&m.studentId===studentId&&norm(m.name)!==norm(name));
+    if(existing){notify(`Student ID ${studentId} already belongs to ${existing.name}`);return;}
+  }
+  const patch={
+    studentId,
+    email:document.getElementById('m-email').value.trim(),
+    phone:document.getElementById('m-phone').value.trim(),
+    year:document.getElementById('m-year').value,
+    major:document.getElementById('m-major').value.trim(),
+    isDriver:document.getElementById('m-driver').value,
+    notes:document.getElementById('m-notes').value.trim()
+  };
+  const idx=members.findIndex(m=>norm(m.name)===norm(name)||(studentId&&m.studentId===studentId));
   if(idx>=0){members[idx]={...members[idx],...patch};notify('Updated: '+members[idx].name);}
   else{members.push({...blank(name),...patch});notify('Added: '+name);}
-  saveMembers();clearMF();
+  await saveMembers();clearMF();
 }
-function clearMF(){['m-name','m-major','m-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('m-year').value='';document.getElementById('m-driver').value='no';}
+function clearMF(){
+  ['m-name','m-studentid','m-email','m-phone','m-major','m-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('m-year').value='';
+  document.getElementById('m-driver').value='no';
+}
 
 function renderInventoryFields(){
   document.getElementById('inventory-fields').innerHTML=GEAR_ITEMS.map(g=>`
@@ -1428,28 +1455,42 @@ function renderInventoryFields(){
       <div class="fg" style="flex:2;margin-bottom:0"><label>${g}</label><input type="number" id="inv-${g.replace(/\s/g,'_')}" value="${inventory[g]||0}" min="0" placeholder="0"></div>
     </div>`).join('');
 }
-function bulkImport(e){
+async function bulkImport(e){
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
-  r.onload=ev=>{
+  r.onload=async ev=>{
     const lines=ev.target.result.split('\n').map(l=>l.trim()).filter(Boolean);
     if(!lines.length){notify('Empty file');return;}
     const headers=lines[0].toLowerCase().split(',').map(h=>h.replace(/"/g,'').trim());
-    const ni=headers.findIndex(h=>h.includes('name'));
+    const ni=headers.findIndex(h=>h.includes('name')||h.includes('full'));
     if(ni<0){notify('No name column found');return;}
-    let added=0,updated=0;
+    let added=0,updated=0,skipped=0;
     lines.slice(1).forEach(line=>{
       const cols=line.split(',').map(c=>c.replace(/"/g,'').trim());
       const name=cols[ni];if(!name)return;
       const get=key=>{const ki=headers.findIndex(h=>h===key||h.includes(key));return ki>=0?cols[ki]||'':'';}
-      const patch={year:get('year')||get('standing'),major:get('major'),isDriver:get('driver')||get('isdriver'),notes:get('notes')};
-      const idx=members.findIndex(m=>norm(m.name)===norm(name));
+      const sid=get('studentid')||get('student id')||get('id');
+      // Skip if duplicate student ID already exists under a different name
+      if(sid&&members.find(m=>m.studentId&&m.studentId===sid&&norm(m.name)!==norm(name))){skipped++;return;}
+      const patch={
+        studentId:sid,
+        email:get('email'),
+        phone:get('phone'),
+        year:get('year')||get('standing'),
+        major:get('major'),
+        isDriver:get('isdriver')||get('driver'),
+        notes:get('notes')
+      };
+      // Match by student ID first, then name
+      const idx=sid
+        ?members.findIndex(m=>m.studentId&&m.studentId===sid)
+        :members.findIndex(m=>norm(m.name)===norm(name));
       if(idx>=0){members[idx]={...members[idx],...patch};updated++;}
       else{members.push({...blank(name),...patch});added++;}
     });
-    saveMembers();
-    document.getElementById('import-result').innerHTML=`<div class="success-box">✅ ${added} added, ${updated} updated.</div>`;
-    notify(`Import done: ${added} added, ${updated} updated`);
+    await saveMembers();
+    document.getElementById('import-result').innerHTML=`<div class="success-box">✅ ${added} added, ${updated} updated, ${skipped} skipped (duplicate ID).</div>`;
+    notify(`Import: ${added} added, ${updated} updated, ${skipped} skipped`);
   };
   r.readAsText(f);
 }

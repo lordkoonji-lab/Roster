@@ -230,16 +230,13 @@ tbody tr:hover td{background:var(--surface2)}
 <!-- APP -->
 <div id="app">
   <header>
-    <div class="brand">Peaks <em>&</em> Professors</div>
-    <span id="qbadge" style="font-size:10px;background:#2a2824;color:#8a8578;padding:2px 7px;border-radius:3px;font-family:'IBM Plex Mono',monospace;margin-right:6px;flex:none"></span>
+    <div class="brand">Peaks <em>&</em> Professors <small id="role-label"></small></div>
     <nav>
       <button class="nb active" onclick="showTab('roster')">🏔 Roster</button>
       <button class="nb" onclick="showTab('db')">👟 Hikers</button>
-      <button class="nb" onclick="showTab('profs')">🎓 Professors</button>
-      <button class="nb" onclick="showTab('history')">📋 Hike History</button>
       <button class="nb" onclick="showTab('dashboard')">📊 Dashboard</button>
       <button class="nb" onclick="showTab('log')">📝 Log Hike</button>
-      <button class="nb" onclick="showTab('checkout')">🎒 Gear</button>
+      <button class="nb" onclick="showTab('checkout')">🎒 Gear Checkout</button>
       <button class="nb" onclick="showTab('manage')">⚙ Manage</button>
     </nav>
     <button class="logout-btn" onclick="logout()">Sign out</button>
@@ -604,126 +601,31 @@ tbody tr:hover td{background:var(--surface2)}
             <div class="card-title">Data tools</div>
             <div class="btns">
               <button class="btn btn-g btn-sm" onclick="exportCSV()">📥 Export hikers CSV</button>
-              <button class="btn btn-d btn-sm" onclick="nukeConfirm()">🗑 Clear all data</button>
+              <button class="btn btn-d btn-sm" onclick="nuke()">🗑 Clear all data</button>
             </div>
           </div>
         </div>
       </div>
     </div>
-
-    <!-- PROFESSORS -->
-    <div id="tab-profs" style="display:none">
-      <div class="sec-title">Professor & Guest Directory</div>
-      <div class="sec-sub">Everyone who has hiked with us. Added automatically when you log a hike. Click to expand and add notes.</div>
-      <div class="stat-grid" id="prof-stats"></div>
-      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-        <input type="text" id="prof-q" placeholder="Search name, department, org…" oninput="renderProfs()" style="flex:1;min-width:160px">
-        <select id="prof-f" onchange="renderProfs()" style="width:160px">
-          <option value="">All types</option>
-          <option value="Professor">Professors</option>
-          <option value="Guest">Guests</option>
-          <option value="Club">Clubs / Orgs</option>
-        </select>
-      </div>
-      <div id="prof-list"></div>
-      <div class="btns" style="margin-top:10px"><button class="btn btn-g btn-sm" onclick="openAddProf()">+ Add manually</button></div>
-    </div>
-
-    <!-- HIKE HISTORY -->
-    <div id="tab-history" style="display:none">
-      <div class="sec-title">Hike History</div>
-      <div class="sec-sub">All logged hikes. Click to expand and see the full roster. Click a hiker to look them up.</div>
-      <div class="stat-grid" id="hist-stats"></div>
-      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-        <input type="text" id="hist-q" placeholder="Search location or professor…" oninput="renderHistory()" style="flex:1;min-width:160px">
-        <select id="hist-sort" onchange="renderHistory()" style="width:155px">
-          <option value="recent">Most recent</option>
-          <option value="oldest">Oldest first</option>
-          <option value="distance">Distance (high)</option>
-          <option value="attended">Most attended</option>
-        </select>
-        <select id="hist-qf" onchange="renderHistory()" style="width:155px">
-          <option value="">All quarters</option>
-        </select>
-      </div>
-      <div id="hist-list"></div>
-    </div>
-
   </main>
 </div>
 
-<!-- MODALS -->
+<!-- GEAR CHECKOUT CONFIRM MODAL -->
 <div class="modal-overlay" id="checkout-modal">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('checkout-modal')">✕</button>
-    <div class="modal-title">Confirm Checkout</div>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modal-title">Confirm Checkout</div>
     <div id="modal-body"></div>
     <div class="btns" style="margin-top:14px">
       <button class="btn btn-p" onclick="confirmCheckout()">Confirm</button>
-      <button class="btn btn-g btn-sm" onclick="closeModal('checkout-modal')">Cancel</button>
+      <button class="btn btn-g btn-sm" onclick="closeModal()">Cancel</button>
     </div>
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-new-hiker">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modal-new-hiker')">✕</button>
-    <div class="modal-title">New Hikers — Incomplete Profiles</div>
-    <div class="hint">These hikers were just added. Send them the onboarding form to complete their profiles.</div>
-    <div id="new-hiker-list"></div>
-    <div class="btns" style="margin-top:12px">
-      <button class="btn btn-p btn-sm" onclick="copyNewEmails()">📋 Copy email list</button>
-      <button class="btn btn-g btn-sm" onclick="closeModal('modal-new-hiker')">Done</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-new-prof">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modal-new-prof')">✕</button>
-    <div class="modal-title">New Professor / Guest Detected</div>
-    <div class="hint">Add their details to the directory so future leads can reach them.</div>
-    <div id="new-prof-body"></div>
-    <div class="btns" style="margin-top:12px">
-      <button class="btn btn-p btn-sm" onclick="saveNewProfs()">Save to directory</button>
-      <button class="btn btn-g btn-sm" onclick="closeModal('modal-new-prof')">Skip</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-add-prof">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modal-add-prof')">✕</button>
-    <div class="modal-title">Add to Directory</div>
-    <div id="add-prof-body"></div>
-    <div class="btns" style="margin-top:12px">
-      <button class="btn btn-p btn-sm" onclick="saveAddProf()">Save</button>
-      <button class="btn btn-g btn-sm" onclick="closeModal('modal-add-prof')">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-nuke">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modal-nuke')">✕</button>
-    <div class="modal-title">⚠ Clear all data</div>
-    <div style="font-size:13px;line-height:1.7;margin-bottom:12px">This permanently deletes all members, hikes, checkouts and professors.<br><br>Type <strong>DELETE</strong> to confirm:</div>
-    <input type="text" id="nuke-inp" placeholder="Type DELETE here…" style="width:100%">
-    <div class="btns" style="margin-top:12px">
-      <button class="btn btn-d" onclick="executeNuke()">Delete all data</button>
-      <button class="btn btn-g btn-sm" onclick="closeModal('modal-nuke')">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<div id="loading-overlay" style="position:fixed;inset:0;background:var(--text);z-index:500;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;transition:opacity .5s">
-  <svg width="140" height="110" viewBox="0 0 140 110">
-    <polygon points="70,8 8,102 132,102" fill="#2a2824"/>
-    <polygon id="mtn-fill" points="70,102 70,102 70,102" fill="#2d5a27"/>
-  </svg>
-  <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:#f5f2ec">Peaks <span style="color:#8fc08a">&</span> Professors</div>
-  <div style="width:180px;height:3px;background:#2a2824;border-radius:2px;overflow:hidden"><div id="load-bar" style="height:100%;background:#2d5a27;border-radius:2px;width:0%;transition:width .35s"></div></div>
-  <div id="load-sub" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6a6560">Connecting…</div>
+<div id="loading-overlay" style="display:none;position:fixed;inset:0;background:rgba(26,24,20,.85);z-index:500;align-items:center;justify-content:center;flex-direction:column;gap:14px">
+  <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:20px;color:#f5f2ec">Peaks <span style="color:#8fc08a">&</span> Professors</div>
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#9a9580">Loading from Google Sheets…</div>
 </div>
 
 <div id="notif"></div>
@@ -755,63 +657,29 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbziX5t9V4tJvFRU6bKDO
 // DATA
 // ════════════════════════════════════════
 let members=[], rHikers=[], rSort='priority', outcomeData=[];
-let hikes=[], checkouts=[], profs=[], rosters=[];
-let inventory={'Hiking Boots':0,'Rain Jacket':0,'Trekking Poles':0,'Gloves':0,'Microspikes':0,'Daypack':0};
-let dashView='quarter', pendingCheckout=null, pendingNewProfs=[];
+let hikes=[], checkouts=[];
+let inventory={
+  'Hiking Boots':0,'Rain Jacket':0,'Trekking Poles':0,'Gloves':0,'Microspikes':0,'Daypack':0
+};
+let dashView='quarter';
+let pendingCheckout=null;
 let syncStatus='idle';
 
 const GEAR_ITEMS=['Hiking Boots','Rain Jacket','Trekking Poles','Gloves','Microspikes','Daypack'];
-const CURRENT_QUARTER=getCurrentQuarter();
+const CURRENT_QUARTER='Spring 2026';
+const QUARTER_START=new Date('2026-03-01');
 
-const M_COLS=['name','studentId','email','phone','year','major','isDriver','notes',
-  'cohortYear','gradQuarter','deleteQuarter','status',
-  'applied','attended','drivingHikes','noShows','lastHike','lastActivity',
-  'noShowNotes','manualNotes','scholarRequested','scholarAwarded',
+const M_COLS=['name','studentId','email','phone','year','major','isDriver','notes','applied','attended','drivingHikes',
+  'noShows','lastHike','lastActivity','noShowNotes','scholarRequested','scholarAwarded',
   'scholarNotes','gearRequests','gearReturned','gearOutstanding','gearNotes'];
-const H_COLS=['id','location','date','prof','lead','colead','price','quarter','distance','applicantCount'];
+const H_COLS=['id','location','date','prof','lead','colead','price','quarter'];
 const C_COLS=['id','member','item','date','hikeDate','note','returned','returnedAt'];
-const P_COLS=['id','name','type','department','org','email','notes','lastHike','lastLead','lastColead','lastLocation','hikeIds'];
-const R_COLS=['hikeId','memberName','outcome','scholarshipAwarded','gearRequested'];
 
 function blank(name){
   return{name,studentId:'',email:'',phone:'',year:'',major:'',isDriver:'no',notes:'',
-    cohortYear:'',gradQuarter:'',deleteQuarter:'',status:'active',
-    applied:0,attended:0,drivingHikes:0,noShows:0,lastHike:null,lastActivity:null,
-    noShowNotes:[],manualNotes:[],scholarRequested:0,scholarAwarded:0,scholarNotes:[],
+    applied:0,attended:0,drivingHikes:0,noShows:0,lastHike:null,lastActivity:null,noShowNotes:[],
+    scholarRequested:0,scholarAwarded:0,scholarNotes:[],
     gearRequests:0,gearReturned:0,gearOutstanding:0,gearNotes:[]};
-}
-function blankProf(name){
-  return{id:'p'+Date.now()+Math.random().toString(36).slice(2,5),name,type:'Professor',department:'',org:'',email:'',
-    notes:'',lastHike:null,lastLead:'',lastColead:'',lastLocation:'',hikeIds:[]};
-}
-
-// ── QUARTER / COHORT ──────────────────────
-function getCurrentQuarter(){
-  const now=new Date(),m=now.getMonth()+1,d=now.getDate(),y=now.getFullYear();
-  if(m<3||(m===3&&d<29)) return 'Winter '+y;
-  if(m<6||(m===6&&d<=20)) return 'Spring '+y;
-  if(m<10||(m===9&&d<30)) return m<=8?'Summer '+y:'Autumn '+y;
-  return 'Autumn '+y;
-}
-function calcCohort(year){
-  const qy=parseInt(getCurrentQuarter().split(' ')[1]);
-  const off={Freshman:0,Sophomore:1,Junior:2,Senior:3};
-  if(off[year]===undefined){
-    if(year==='Masters') return{cohortYear:qy,gradQuarter:'Spring '+(qy+2),deleteQuarter:'Autumn '+(qy+2)};
-    if(year==='PhD') return{cohortYear:qy,gradQuarter:'Spring '+(qy+5),deleteQuarter:'Autumn '+(qy+5)};
-    return{cohortYear:'',gradQuarter:'—',deleteQuarter:'—'};
-  }
-  const cy=qy-off[year];
-  return{cohortYear:cy,gradQuarter:'Spring '+(cy+4),deleteQuarter:'Autumn '+(cy+4)};
-}
-function isDeletionEligible(m){
-  if(!m.deleteQuarter||m.deleteQuarter==='—'||m.deleteQuarter==='')return false;
-  if(['Masters','PhD','Postdoc'].includes(m.year))return daysAgo(m.lastActivity||m.lastHike)>365;
-  const[dqn,dqy]=m.deleteQuarter.split(' ');
-  const now=new Date(),cy=now.getFullYear(),dqyi=parseInt(dqy);
-  if(dqyi<cy)return true;
-  if(dqyi===cy){const qo={Winter:0,Spring:1,Summer:2,Autumn:3};return qo[dqn]<=qo[getCurrentQuarter().split(' ')[0]];}
-  return false;
 }
 
 // ── APPS SCRIPT CALLER ──────────────────
@@ -837,65 +705,121 @@ async function callScript(action, payload){
   }
 }
 
-// ── SERIALISE ─────────────────────────────
-const NUM_COLS=['applied','attended','drivingHikes','noShows','scholarRequested','scholarAwarded',
-  'gearRequests','gearReturned','gearOutstanding','cohortYear','distance','applicantCount'];
-const ARR_COLS=['noShowNotes','manualNotes','scholarNotes','gearNotes','hikeIds'];
-function toRow(obj,cols){return cols.map(k=>{const v=obj[k];if(Array.isArray(v))return JSON.stringify(v);return v===null||v===undefined?'':String(v);});}
-function fromRow(row,cols){
-  const o={};
-  cols.forEach((k,i)=>{
-    const s=String(row[i]===undefined?'':row[i]);
-    if(ARR_COLS.includes(k)){try{o[k]=s?JSON.parse(s):[]}catch{o[k]=s?[s]:[]}}
-    else if(NUM_COLS.includes(k)){o[k]=parseFloat(s)||0}
-    else if(k==='returned'){o[k]=s==='TRUE'}
-    else{o[k]=s||(['lastHike','lastActivity'].includes(k)?null:'')}
+// ── SERIALISE / DESERIALISE ─────────────
+function memberToRow(m){
+  return M_COLS.map(k=>{
+    const v=m[k];
+    if(Array.isArray(v)) return JSON.stringify(v);
+    return v===null||v===undefined?'':String(v);
   });
-  return o;
 }
 
-// ── SYNC STATUS ──────────────────────────
+function rowToMember(row){
+  const m={};
+  M_COLS.forEach((k,i)=>{
+    const v=row[i]===undefined?'':row[i];
+    const s=String(v);
+    if(k==='noShowNotes'||k==='scholarNotes'||k==='gearNotes'){
+      try{m[k]=s?JSON.parse(s):[]}catch{m[k]=s?[s]:[];}
+    } else if(['applied','attended','drivingHikes','noShows','scholarRequested','scholarAwarded','gearRequests','gearReturned','gearOutstanding'].includes(k)){
+      m[k]=parseInt(s)||0;
+    } else {
+      m[k]=s||(['lastHike','lastActivity'].includes(k)?null:'');
+    }
+  });
+  if(!m.name) return null;
+  return m;
+}
+
+function hikeToRow(h){ return H_COLS.map(k=>h[k]===null||h[k]===undefined?'':String(h[k])); }
+function rowToHike(row){ const h={}; H_COLS.forEach((k,i)=>h[k]=row[i]!==undefined?String(row[i]):''); return h.id?h:null; }
+
+function checkoutToRow(c){
+  return C_COLS.map(k=>{
+    if(k==='returned') return c.returned?'TRUE':'FALSE';
+    return c[k]===null||c[k]===undefined?'':String(c[k]);
+  });
+}
+function rowToCheckout(row){
+  const c={};
+  C_COLS.forEach((k,i)=>{
+    if(k==='returned') c[k]=String(row[i])==='TRUE';
+    else c[k]=row[i]!==undefined?String(row[i]):'';
+  });
+  return c.id?c:null;
+}
+
+// ── SYNC INDICATOR ──────────────────────
 function setSyncStatus(s,msg=''){
   syncStatus=s;
   const el=document.getElementById('sync-status');
   if(!el) return;
   if(s==='syncing') el.innerHTML='<span style="color:#f0b060">⟳ Syncing…</span>';
-  else if(s==='ok') el.innerHTML='<span style="color:#5fba8a">✓ Saved</span>';
-  else if(s==='error') el.innerHTML='<span style="color:#e05050" title="'+msg+'">✗ Error</span>';
+  else if(s==='ok')    el.innerHTML='<span style="color:#5fba8a">✓ Saved</span>';
+  else if(s==='error') el.innerHTML=`<span style="color:#e05050" title="${msg}">✗ Sync error</span>`;
   else el.innerHTML='';
 }
 
-// ── LOAD ─────────────────────────────────
+// ── LOAD ALL DATA ───────────────────────
 async function loadData(){
-  setLP(10,'Connecting…');
+  setSyncStatus('syncing');
   try{
     const all=await callScript('readAll',{});
-    setLP(50,'Parsing data…');
-    members=(all.Members||[]).map(r=>fromRow(r,M_COLS)).filter(x=>x.name);
-    hikes=(all.Hikes||[]).map(r=>fromRow(r,H_COLS)).filter(x=>x.id);
-    rosters=(all.HikeRosters||[]).map(r=>fromRow(r,R_COLS)).filter(x=>x.hikeId);
-    checkouts=(all.Checkouts||[]).map(r=>fromRow(r,C_COLS)).filter(x=>x.id);
-    profs=(all.Professors||[]).map(r=>fromRow(r,P_COLS)).filter(x=>x.id);
-    setLP(85,'Loading config…');
-    (all.Config||[]).forEach(row=>{const k=String(row[0]||''),v=String(row[1]||'');if(inventory.hasOwnProperty(k))inventory[k]=parseInt(v)||0;});
-    setLP(100,'Ready');
-    setSyncStatus('ok');setTimeout(()=>setSyncStatus('idle'),2000);
+    members=(all.Members||[]).map(rowToMember).filter(Boolean);
+    hikes=(all.Hikes||[]).map(rowToHike).filter(Boolean);
+    checkouts=(all.Checkouts||[]).map(rowToCheckout).filter(Boolean);
+    (all.Config||[]).forEach(row=>{
+      const k=String(row[0]||''), v=String(row[1]||'');
+      if(inventory.hasOwnProperty(k)) inventory[k]=parseInt(v)||0;
+    });
+    setSyncStatus('ok');
+    setTimeout(()=>setSyncStatus('idle'),2000);
   }catch(e){
     console.error('loadData error',e);
     setSyncStatus('error',e.message);
-    setLP(100,'⚠ '+e.message);
-    members=[];hikes=[];rosters=[];checkouts=[];profs=[];
+    const lo=document.getElementById('loading-overlay');
+    if(lo) lo.innerHTML=`
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:#f5f2ec">Connection error</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#e05050;max-width:400px;text-align:center;line-height:1.6">${e.message}</div>
+      <div style="font-size:12px;color:#9a9580;max-width:400px;text-align:center;line-height:1.6;margin-top:8px">
+        Check Apps Script is deployed as <strong style="color:#f5f2ec">Anyone can access</strong><br>
+        Tab names are exactly <strong style="color:#f5f2ec">Members, Hikes, Checkouts, Config</strong>
+      </div>
+      <button onclick="location.reload()" style="margin-top:16px;padding:10px 24px;background:#2d5a27;color:#fff;border:none;border-radius:6px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer">Retry</button>`;
+    members=[]; hikes=[]; checkouts=[];
   }
 }
 
-// ── SAVES ────────────────────────────────
-async function saveMembers(){setSyncStatus('syncing');try{await callScript('write',{sheet:'Members',rows:members.map(m=>toRow(m,M_COLS))});setSyncStatus('ok');setTimeout(()=>setSyncStatus('idle'),2000);}catch(e){setSyncStatus('error',e.message);console.error(e);}}
-async function saveHikes(){try{await callScript('write',{sheet:'Hikes',rows:hikes.map(h=>toRow(h,H_COLS))});}catch(e){setSyncStatus('error',e.message);}}
-async function saveRosters(){try{await callScript('write',{sheet:'HikeRosters',rows:rosters.map(r=>toRow(r,R_COLS))});}catch(e){setSyncStatus('error',e.message);}}
-async function saveCheckouts(){try{await callScript('write',{sheet:'Checkouts',rows:checkouts.map(c=>toRow(c,C_COLS))});}catch(e){setSyncStatus('error',e.message);}}
-async function saveProfs(){try{await callScript('write',{sheet:'Professors',rows:profs.map(p=>toRow(p,P_COLS))});}catch(e){setSyncStatus('error',e.message);}}
-async function saveInventoryToSheet(){try{await callScript('write',{sheet:'Config',rows:GEAR_ITEMS.map(g=>[g,String(inventory[g]||0)])});}catch(e){console.error(e);}}
-async function saveData(){await Promise.all([saveMembers(),saveHikes(),saveRosters(),saveCheckouts(),saveProfs()]);}
+// ── SAVE FUNCTIONS ──────────────────────
+async function saveMembers(){
+  setSyncStatus('syncing');
+  try{
+    await callScript('write',{sheet:'Members',rows:members.map(memberToRow)});
+    setSyncStatus('ok');
+    setTimeout(()=>setSyncStatus('idle'),2000);
+  }catch(e){ setSyncStatus('error',e.message); console.error(e); }
+}
+
+async function saveHikes(){
+  try{ await callScript('write',{sheet:'Hikes',rows:hikes.map(hikeToRow)}); }
+  catch(e){ setSyncStatus('error',e.message); console.error(e); }
+}
+
+async function saveCheckouts(){
+  try{ await callScript('write',{sheet:'Checkouts',rows:checkouts.map(checkoutToRow)}); }
+  catch(e){ setSyncStatus('error',e.message); console.error(e); }
+}
+
+async function saveInventoryToSheet(){
+  try{
+    const rows=GEAR_ITEMS.map(g=>[g,String(inventory[g]||0)]);
+    await callScript('write',{sheet:'Config',rows});
+  }catch(e){ console.error('inventory save',e); }
+}
+
+async function saveData(){
+  await Promise.all([saveMembers(),saveHikes(),saveCheckouts()]);
+}
 
 // ════════════════════════════════════════
 // FUZZY MATCH
@@ -1046,30 +970,7 @@ function renderCards(){
     const extras=[];
     if(h._found&&h.scholarAwarded>0)extras.push(`<span style="font-size:9px;background:var(--pubg);color:var(--putx);border:1px solid var(--pubd);padding:2px 6px;border-radius:3px;font-weight:700">🎓 ×${h.scholarAwarded}</span>`);
     if(h._found&&h.gearOutstanding>0)extras.push(`<span style="font-size:9px;background:var(--y1bg);color:var(--y1tx);border:1px solid var(--y1bd);padding:2px 6px;border-radius:3px;font-weight:700">🎒 out</span>`);
-
-    // Expandable content
-    const nsNotes=(h.noShowNotes||[]),mnNotes=(h.manualNotes||[]);
-    const expandHtml=h._found?`<div class="hcard-expand" style="display:none;margin-top:10px;border-top:1px solid rgba(0,0,0,.1);padding-top:10px">
-      <div style="margin-bottom:8px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.5;margin-bottom:4px">Profile</div>
-        ${h.studentId?'<div style="font-size:11px;padding:2px 0"><strong style="opacity:.6">ID:</strong> '+h.studentId+'</div>':''}
-        ${h.email?'<div style="font-size:11px;padding:2px 0"><strong style="opacity:.6">Email:</strong> '+h.email+'</div>':''}
-        ${h.phone?'<div style="font-size:11px;padding:2px 0"><strong style="opacity:.6">Phone:</strong> '+h.phone+'</div>':''}
-        ${h.year?'<div style="font-size:11px;padding:2px 0"><strong style="opacity:.6">Year:</strong> '+h.year+'</div>':''}
-        ${h.major?'<div style="font-size:11px;padding:2px 0"><strong style="opacity:.6">Major:</strong> '+h.major+'</div>':''}
-        ${h.deleteQuarter&&h.deleteQuarter!=='—'?'<div style="font-size:11px;padding:2px 0"><strong style="opacity:.6">Delete quarter:</strong> '+h.deleteQuarter+'</div>':''}
-      </div>
-      ${nsNotes.length?'<div style="margin-bottom:8px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.5;margin-bottom:4px">No-show history</div>'+nsNotes.map(n=>'<div style="font-size:11px;padding:2px 0;border-bottom:1px solid rgba(0,0,0,.05)">'+n+'</div>').join('')+'</div>':''}
-      ${h.scholarAwarded>0?'<div style="margin-bottom:8px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.5;margin-bottom:4px">Scholarships</div><div style="font-size:11px">Requested: '+h.scholarRequested+' · Awarded: '+h.scholarAwarded+'</div></div>':''}
-      <div style="margin-bottom:4px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.5;margin-bottom:4px">Notes</div>
-        ${mnNotes.length?mnNotes.map(n=>'<div style="font-size:11px;padding:3px 0;border-bottom:1px solid rgba(0,0,0,.05)">'+(typeof n==='string'?n:n.text+'<div style="font-size:10px;opacity:.4">'+(n.by||'')+' · '+(n.date||'')+'</div>')+'</div>').join(''):'<div style="font-size:11px;color:var(--muted);font-style:italic">No notes yet</div>'}
-        <div style="display:flex;gap:6px;margin-top:8px">
-          <input type="text" id="ni-${(h.name||'').replace(/[^a-zA-Z]/g,'')}" placeholder="Add a note…" onclick="event.stopPropagation()" style="flex:1;font-size:11px;padding:4px 7px">
-          <button class="btn btn-g btn-sm" onclick="event.stopPropagation();addNote('${h.name}')">Add</button>
-        </div>
-      </div>
-    </div>`:'';
-
-    return`<div class="hcard ${cls}" onclick="this.querySelector('.hcard-expand')&&(this.querySelector('.hcard-expand').style.display=this.querySelector('.hcard-expand').style.display==='none'?'block':'none')">
+    return`<div class="hcard ${cls}">
       <div class="tag-row"><span class="htag">${h._found?priTag(h):'not in db'}</span>${badge}${extras.join('')}</div>
       <div class="hn">${h.name}</div>
       <div class="hreason">${h._found?priReason(h):'Not in database'}</div>
@@ -1078,7 +979,7 @@ function renderCards(){
         <div><span class="hv">${h.attended}</span><span class="hl">Attended</span></div>
         <div><span class="hv">${rate}</span><span class="hl">Rate</span></div>
         <div><span class="hv" style="font-size:11px">${h.lastHike?fmtDate(h.lastHike):'Never'}</span><span class="hl">Last hike</span></div>
-      </div>${expandHtml}
+      </div>${notesHtml}
     </div>`;
   }).join('');
   notify(`${s.length} applicant(s) shown`);
@@ -1086,120 +987,6 @@ function renderCards(){
 
 function resort(by,btn){rSort=by;document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(rHikers.length)renderCards();}
 function clearHikers(){rHikers=[];document.getElementById('hkr-in').value='';document.getElementById('roster-results').style.display='none';}
-
-async function addNote(name){
-  const key=name.replace(/[^a-zA-Z]/g,'');
-  const inp=document.getElementById('ni-'+key);
-  if(!inp||!inp.value.trim()){notify('Enter a note first');return;}
-  const m=members.find(x=>x.name===name);if(!m)return;
-  if(!m.manualNotes)m.manualNotes=[];
-  m.manualNotes.push({text:inp.value.trim(),by:role==='admin'?'Admin':'Lead',date:fmtDate(new Date())});
-  await saveMembers();inp.value='';notify('Note added');
-}
-
-function fuzzyProf(q){const nq=norm(q);return profs.find(p=>norm(p.name)===nq)||profs.find(p=>norm(p.name).includes(nq)||nq.includes(norm(p.name)))||null;}
-function fuzzyMatches(q){
-  const nq=norm(q);if(!nq||nq.length<2)return[];
-  const qw=nq.split(/\s+/);
-  return members.filter(m=>{if(norm(m.name)===nq)return false;const nw=norm(m.name).split(/\s+/);return qw.filter(w=>nw.some(i=>i.includes(w)||w.includes(i))).length/qw.length>=0.5;}).slice(0,4);
-}
-
-// ── PROFESSORS ────────────────────────────
-function renderProfs(){
-  const q=norm(document.getElementById('prof-q').value),f=document.getElementById('prof-f').value;
-  let list=[...profs].filter(p=>{if(q&&!norm(p.name).includes(q)&&!norm(p.department||'').includes(q)&&!norm(p.org||'').includes(q))return false;if(f&&p.type!==f)return false;return true;}).sort((a,b)=>(b.lastHike||'').localeCompare(a.lastHike||''));
-  document.getElementById('prof-stats').innerHTML=`
-    <div class="sbox"><span class="sv">${profs.length}</span><span class="sl">Total</span></div>
-    <div class="sbox"><span class="sv" style="color:var(--b1bd)">${profs.filter(p=>p.type==='Professor').length}</span><span class="sl">Professors</span></div>
-    <div class="sbox"><span class="sv">${profs.filter(p=>p.type==='Guest').length}</span><span class="sl">Guests</span></div>
-    <div class="sbox accent"><span class="sv">${profs.filter(p=>p.type==='Club').length}</span><span class="sl">Clubs</span></div>`;
-  const el=document.getElementById('prof-list');
-  if(!list.length){el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:20px 0">No professors or guests yet — added automatically when you log a hike.</div>';return;}
-  el.innerHTML=list.map(p=>{
-    const tc=p.type==='Professor'?'background:var(--b1bg);color:var(--b1tx);border:1px solid var(--b1bd)':p.type==='Club'?'background:var(--grbg);color:var(--grtx);border:1px solid var(--grbd)':'background:var(--y1bg);color:var(--y1tx);border:1px solid var(--y1bd)';
-    const hc=(p.hikeIds||[]).length;
-    const hikeHist=(p.hikeIds||[]).map(hid=>{const h=hikes.find(x=>x.id===hid);return h?'<div style="font-size:11px;padding:2px 0;border-bottom:1px solid rgba(0,0,0,.05)">'+fmtDate(h.date)+' — '+h.location+' · '+h.lead+(h.colead?' & '+h.colead:'')+'</div>':'';}).filter(Boolean).join('');
-    const notes=p.notes?p.notes.split('||').filter(Boolean):[];
-    return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:8px;cursor:pointer" onclick="const ex=this.querySelector('.pex');ex.style.display=ex.style.display==='none'?'block':'none'">
-      <div style="display:flex;align-items:flex-start;gap:10px">
-        <div style="flex:1"><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">${p.name}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:3px">${[p.department,p.org,p.email].filter(Boolean).join(' · ')||'No details yet'}</div>
-          ${p.lastHike?`<div style="font-size:11px;color:var(--muted);margin-top:4px">Last: ${fmtDate(p.lastHike)} · ${p.lastLocation||''} · ${p.lastLead||''}${p.lastColead?' & '+p.lastColead:''} · ${hc} hike${hc!==1?'s':''}</div>`:'<div style="font-size:11px;color:var(--muted);margin-top:4px">No hikes logged yet</div>'}
-        </div>
-        <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;text-transform:uppercase;${tc}">${p.type}</span>
-      </div>
-      <div class="pex" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px">
-        ${hikeHist?'<div style="margin-bottom:8px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;opacity:.5;margin-bottom:4px">Hike history</div>'+hikeHist+'</div>':''}
-        <div style="margin-bottom:4px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;opacity:.5;margin-bottom:4px">Notes</div>
-          ${notes.length?notes.map(n=>'<div style="font-size:11px;padding:3px 0;border-bottom:1px solid rgba(0,0,0,.05)">'+n+'</div>').join(''):'<div style="font-size:11px;color:var(--muted);font-style:italic">No notes yet</div>'}
-          <div style="display:flex;gap:6px;margin-top:8px"><input type="text" id="pn-${p.id}" placeholder="Add a note…" onclick="event.stopPropagation()" style="flex:1;font-size:11px;padding:4px 7px"><button class="btn btn-g btn-sm" onclick="event.stopPropagation();addProfNote('${p.id}')">Add</button></div>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-async function addProfNote(id){
-  const inp=document.getElementById('pn-'+id);if(!inp||!inp.value.trim()){notify('Enter a note');return;}
-  const p=profs.find(x=>x.id===id);if(!p)return;
-  const existing=p.notes?p.notes.split('||').filter(Boolean):[];
-  existing.push('['+fmtDate(new Date())+'] '+inp.value.trim());
-  p.notes=existing.join('||');
-  await saveProfs();inp.value='';notify('Note saved');renderProfs();
-}
-function profFormHtml(pfx){
-  return'<div style="display:flex;gap:10px;flex-wrap:wrap"><div class="fg" style="flex:1;min-width:120px"><label>Name *</label><input id="'+pfx+'-n" placeholder="Prof. Rodgers"></div><div class="fg" style="flex:1;min-width:120px"><label>Type</label><select id="'+pfx+'-t"><option value="Professor">Professor</option><option value="Guest">Guest / Professional</option><option value="Club">Club / Org</option></select></div></div><div style="display:flex;gap:10px;flex-wrap:wrap"><div class="fg" style="flex:1;min-width:120px"><label>Department / Org</label><input id="'+pfx+'-d" placeholder="Biology / UW Mountain Club"></div><div class="fg" style="flex:1;min-width:120px"><label>Email</label><input id="'+pfx+'-e" type="email" placeholder="prof@uw.edu"></div></div><div class="fg"><label>Notes</label><input id="'+pfx+'-notes" placeholder="Prefers shorter trails…"></div>';
-}
-function readProfForm(pfx){
-  return{name:(document.getElementById(pfx+'-n')||{}).value?.trim()||'',type:(document.getElementById(pfx+'-t')||{}).value||'Professor',department:(document.getElementById(pfx+'-d')||{}).value?.trim()||'',org:(document.getElementById(pfx+'-d')||{}).value?.trim()||'',email:(document.getElementById(pfx+'-e')||{}).value?.trim()||'',notes:(document.getElementById(pfx+'-notes')||{}).value?.trim()||'',hikeIds:[],lastHike:null,lastLead:'',lastColead:'',lastLocation:'',id:''};
-}
-function openAddProf(){document.getElementById('add-prof-body').innerHTML=profFormHtml('ap');openModal('modal-add-prof');}
-async function saveAddProf(){const p=readProfForm('ap');if(!p.name){notify('Name required');return;}p.id='p'+Date.now();profs.push(p);await saveProfs();closeModal('modal-add-prof');renderProfs();notify('Added to directory');}
-async function saveNewProfs(){
-  pendingNewProfs.forEach((pn,i)=>{const p=readProfForm('np'+i);if(!p.name)p.name=pn;const ex=profs.find(x=>norm(x.name)===norm(p.name));if(ex)Object.assign(ex,p);else{p.id='p'+Date.now()+i;profs.push(p);}});
-  await saveProfs();closeModal('modal-new-prof');notify('Professor details saved');
-}
-function copyNewEmails(){
-  const emails=members.filter(m=>!m.year&&m.email).map(m=>m.email).filter(Boolean);
-  if(!emails.length){notify('No emails to copy');return;}
-  navigator.clipboard.writeText(emails.join(', ')).then(()=>notify('Copied '+emails.length+' emails'));
-}
-
-// ── HIKE HISTORY ──────────────────────────
-function renderHistory(){
-  const q=norm(document.getElementById('hist-q').value);
-  const sort=document.getElementById('hist-sort').value;
-  const qf=document.getElementById('hist-qf').value;
-  let list=[...hikes].filter(h=>{if(q&&!norm(h.location||'').includes(q)&&!norm(h.prof||'').includes(q))return false;if(qf&&h.quarter!==qf)return false;return true;});
-  if(sort==='recent')list.sort((a,b)=>b.date.localeCompare(a.date));
-  else if(sort==='oldest')list.sort((a,b)=>a.date.localeCompare(b.date));
-  else if(sort==='distance')list.sort((a,b)=>(b.distance||0)-(a.distance||0));
-  else if(sort==='attended')list.sort((a,b)=>(b.applicantCount||0)-(a.applicantCount||0));
-  const quarters=[...new Set(hikes.map(h=>h.quarter).filter(Boolean))].sort();
-  const qsel=document.getElementById('hist-qf'),cv=qsel.value;
-  qsel.innerHTML='<option value="">All quarters</option>'+quarters.map(q=>`<option value="${q}"${q===cv?' selected':''}>${q}</option>`).join('');
-  document.getElementById('hist-stats').innerHTML=`<div class="sbox"><span class="sv">${list.length}</span><span class="sl">Shown</span></div><div class="sbox accent"><span class="sv">${hikes.length}</span><span class="sl">Total logged</span></div>`;
-  const el=document.getElementById('hist-list');
-  if(!list.length){el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:20px 0">No hikes logged yet.</div>';return;}
-  el.innerHTML=list.map(h=>{
-    const hr=rosters.filter(r=>r.hikeId===h.id);
-    const att=hr.filter(r=>r.outcome==='attended'),nas=hr.filter(r=>r.outcome==='applied'),nos=hr.filter(r=>r.outcome==='noshow');
-    return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:8px;cursor:pointer" onclick="const ex=this.querySelector('.hex');ex.style.display=ex.style.display==='none'?'block':'none'">
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <div style="flex:1"><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">${h.location||'Unknown'}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:3px">${h.prof||'No professor'} · Lead: ${h.lead||'—'}${h.colead?' & '+h.colead:''} · ${h.quarter||''}</div></div>
-        <div style="text-align:right"><div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)">${fmtDate(h.date)}</div>
-          <div style="font-size:11px;color:var(--muted)">${h.distance?h.distance+' mi · ':''}${att.length}/${h.applicantCount||'?'} attended</div></div>
-      </div>
-      <div class="hex" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px">
-        ${att.length?'<div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:5px">✅ Attended ('+att.length+')</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:5px;margin-bottom:8px">'+att.map(r=>'<div style="padding:5px 9px;border-radius:5px;font-size:12px;border:1px solid var(--grbd);background:var(--grbg);color:var(--grtx);cursor:pointer" onclick="event.stopPropagation();lookupFromHistory(\''+r.memberName+'\')">'+r.memberName+'</div>').join('')+'</div>':''}
-        ${nas.length?'<div style="font-size:11px;font-weight:700;color:var(--dftx);text-transform:uppercase;margin-bottom:5px">❌ Not selected ('+nas.length+')</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:5px;margin-bottom:8px">'+nas.map(r=>'<div style="padding:5px 9px;border-radius:5px;font-size:12px;border:1px solid var(--dfbd);background:var(--dfbg);color:var(--dftx);cursor:pointer" onclick="event.stopPropagation();lookupFromHistory(\''+r.memberName+'\')">'+r.memberName+'</div>').join('')+'</div>':''}
-        ${nos.length?'<div style="font-size:11px;font-weight:700;color:var(--ortx);text-transform:uppercase;margin-bottom:5px">⚠ No-shows ('+nos.length+')</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:5px">'+nos.map(r=>'<div style="padding:5px 9px;border-radius:5px;font-size:12px;border:1px solid var(--orbd);background:var(--orbg);color:var(--ortx);cursor:pointer" onclick="event.stopPropagation();lookupFromHistory(\''+r.memberName+'\')">'+r.memberName+'</div>').join('')+'</div>':''}
-        ${h.price?'<div style="font-size:11px;color:var(--muted);margin-top:7px">Price per hiker: $'+h.price+'</div>':''}
-      </div>
-    </div>`;
-  }).join('');
-}
-function lookupFromHistory(name){document.getElementById('hkr-in').value=name;showTab('roster');processHikers();}
 function loadDemo(){
   document.getElementById('drv-in').value="Lauren Lambert\nMilo Cox\nLeila Vierra";
   document.getElementById('hkr-in').value="Ishan Agrawal\nEllen Boling\nNora Matzen\nAakarsh Gupta\nShivam Modi\nTimofey Grechkin\nJoyce Zheng\nEthan Cho\nSabrina Leffler\nBrandon Okafor";

@@ -31,8 +31,25 @@ body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;font-s
 .login-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);display:block;margin-bottom:6px}
 .login-input{width:100%;background:var(--surface);border:1.5px solid var(--border);color:var(--text);border-radius:6px;padding:12px 14px;font-family:'Lato',sans-serif;font-size:15px;outline:none;transition:border .15s}
 .login-input:focus{border-color:var(--accent)}
-.login-btn{width:100%;margin-top:14px;padding:13px;border-radius:6px;background:var(--accent);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;border:none;cursor:pointer;transition:background .15s}
-.login-btn:hover{background:#234d1f}
+.login-btn {
+  width: 100%;
+  margin-top: 14px;
+  padding: 13px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  transition: background .15s;
+  /* Anti-clipping fixes below */
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .login-err{margin-top:10px;font-size:12px;color:var(--accent2);text-align:center;min-height:18px;font-weight:700}
 
 /* SHELL */
@@ -1792,7 +1809,8 @@ function setLP(pct, msg) {
     fill.setAttribute('y', newY);
   }
 }
-}function showLoading(on){
+
+function showLoading(on){
   const el=document.getElementById('loading-overlay');
   if(el) el.style.display=on?'flex':'none';
 }

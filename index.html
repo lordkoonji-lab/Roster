@@ -247,7 +247,7 @@ tbody tr:hover td{background:var(--surface2)}
 <!-- APP -->
 <div id="app">
   <header>
-    <div class="brand">Peaks <em>&</em> Professors</div>
+    <div class="brand">Peaks <em>&</em> Professors <small id="role-label"></small></div>
     <span id="qbadge" style="font-size:10px;background:#2a2824;color:#8a8578;padding:2px 7px;border-radius:3px;font-family:'IBM Plex Mono',monospace;margin-right:6px;flex:none"></span>
     <nav>
       <button class="nb active" onclick="showTab('roster')">🏔 Roster</button>
@@ -769,6 +769,8 @@ async function tryLogin(){
   document.getElementById('app').style.display='block';
   const roleLabel = document.getElementById('role-label');
   if(roleLabel) roleLabel.textContent = role === 'admin' ? '· Admin' : '· Trip Lead';
+  const qb=document.getElementById('qbadge');
+  if(qb) qb.textContent=CURRENT_QUARTER;
   await initApp();
 }
 function logout(){role=null;document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('pw-input').value='';document.getElementById('login-err').textContent='';showTab('roster');}
@@ -790,6 +792,16 @@ let syncStatus='idle';
 
 const GEAR_ITEMS=['Hiking Boots','Rain Jacket','Trekking Poles','Gloves','Microspikes','Daypack'];
 const CURRENT_QUARTER=getCurrentQuarter();
+
+// Calculate quarter start date for dashboard filtering
+function getQuarterStartDate(){
+  const now=new Date(),m=now.getMonth()+1,y=now.getFullYear();
+  if(m<3||(m===3&&now.getDate()<29)) return new Date(y,0,1); // Winter: Jan 1
+  if(m<6||(m===6&&now.getDate()<=20)) return new Date(y,2,29); // Spring: Mar 29
+  if(m<=8) return new Date(y,5,21); // Summer: Jun 21
+  return new Date(y,8,30); // Autumn: Sep 30
+}
+const QUARTER_START=getQuarterStartDate();
 
 const M_COLS=['name','studentId','email','phone','year','major','isDriver','notes',
   'cohortYear','gradQuarter','deleteQuarter','status',
@@ -1551,6 +1563,51 @@ function submitLog(){
     if(p.gear){m.gearRequests=(m.gearRequests||0)+1;m.gearNotes.push(`${dateStr}: gear interest noted`);stats.gear++;}
   });
   saveMembers();saveHikes();
+
+  // Save per-hike roster entries
+  currentOutcomes.forEach(p=>{
+    rosters.push({hikeId,memberName:p.name,outcome:p.outcome,scholarshipAwarded:p.scholarship?'yes':'',gearRequested:p.gear?'yes':''});
+  });
+  saveRosters();
+
+  // Detect new professors
+  const profStr=document.getElementById('l-prof').value;
+  if(profStr){
+    const profNames=profStr.split(',').map(s=>s.trim()).filter(Boolean);
+    const newProfNames=profNames.filter(pn=>!fuzzyProf(pn));
+    if(newProfNames.length){
+      pendingNewProfs=newProfNames;
+      document.getElementById('new-prof-body').innerHTML=newProfNames.map((pn,i)=>
+        '<div style="margin-bottom:14px;padding:10px;border:1px solid var(--border);border-radius:6px"><div style="font-weight:700;margin-bottom:8px">'+pn+'</div>'+profFormHtml('np'+i)+'</div>'
+      ).join('');
+      setTimeout(()=>{newProfNames.forEach((pn,i)=>{const el=document.getElementById('np'+i+'-n');if(el)el.value=pn;});},50);
+      openModal('modal-new-prof');
+    } else {
+      // Update existing professors
+      profNames.forEach(pn=>{
+        let p=fuzzyProf(pn);
+        if(p){
+          p.lastHike=document.getElementById('l-date').value;
+          p.lastLead=document.getElementById('l-lead').value;
+          p.lastColead=document.getElementById('l-colead').value;
+          p.lastLocation=document.getElementById('l-location').value;
+          if(!p.hikeIds)p.hikeIds=[];
+          if(!p.hikeIds.includes(hikeId))p.hikeIds.push(hikeId);
+        }
+      });
+      saveProfs();
+    }
+  }
+
+  // Show new hiker popup if any incomplete profiles
+  const newHikers=members.filter(m=>!m.year&&!m.email);
+  if(stats.newAdded>0&&newHikers.length){
+    document.getElementById('new-hiker-list').innerHTML=newHikers.slice(0,15).map(m=>
+      '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="font-weight:700;flex:1">'+m.name+'</span><span style="font-size:11px;color:var(--muted)">'+(m.email||'no email')+'</span></div>'
+    ).join('');
+    openModal('modal-new-hiker');
+  }
+
   document.getElementById('log-result').innerHTML=`<div class="success-box">
     ✅ <strong>Hike logged.</strong><br><br>
     <span style="opacity:.85">${stats.applied} applied · ${stats.attended} attended · ${stats.replaced} replaced · ${stats.noshows} no-shows${stats.scholars?` · ${stats.scholars} scholarships`:''} ${stats.gear?` · ${stats.gear} gear interests`:''}${stats.newAdded?` · ${stats.newAdded} new members`:''}</span>
@@ -1611,7 +1668,7 @@ function checkoutGear(){
   const out=checkouts.filter(c=>c.item===item&&!c.returned&&c.hikeDate===date).length;
   if(total>0&&out>=total){notify(`No ${item} available on this date`);return;}
   pendingCheckout={member:m.name,item,date,note,hikeDate:date};
-  document.getElementById('modal-title').textContent='Confirm Gear Checkout';
+  document.querySelector('#checkout-modal .modal-title').textContent='Confirm Gear Checkout';
   document.getElementById('modal-body').innerHTML=`
     <div style="font-size:13px;line-height:2">
       <div><strong>Member:</strong> ${m.name}</div>
@@ -1664,7 +1721,12 @@ function renderCheckoutLog(){
     :'<div style="color:var(--muted);font-size:12px;padding:12px 0">No checkout records match this filter.</div>';
 }
 
-function closeModal(){document.getElementById('checkout-modal').classList.remove('open');pendingCheckout=null;}
+function closeModal(id){
+  if(id){document.getElementById(id).classList.remove('open');}
+  else{document.getElementById('checkout-modal').classList.remove('open');}
+  pendingCheckout=null;
+}
+function openModal(id){document.getElementById(id).classList.add('open');}
 
 // ════════════════════════════════════════
 // MANAGE
@@ -1768,7 +1830,14 @@ function exportCSV(){
   const blob=new Blob([[h.join(','),...rows].join('\n')],{type:'text/csv'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='peaks_professors_members.csv';a.click();
 }
-function nuke(){if(!confirm('Delete ALL data?'))return;members=[];hikes=[];checkouts=[];saveData();renderDB();notify('All data cleared');}
+function nuke(){if(!confirm('Delete ALL data?'))return;members=[];hikes=[];checkouts=[];profs=[];rosters=[];saveData();renderDB();notify('All data cleared');}
+function nukeConfirm(){document.getElementById('nuke-inp').value='';openModal('modal-nuke');}
+function executeNuke(){
+  const v=document.getElementById('nuke-inp').value.trim();
+  if(v!=='DELETE'){notify('Type DELETE to confirm');return;}
+  members=[];hikes=[];checkouts=[];profs=[];rosters=[];
+  saveData();closeModal('modal-nuke');renderDB();notify('All data cleared');
+}
 
 // ════════════════════════════════════════
 // TABS
@@ -1778,6 +1847,8 @@ function showTab(t){
   TABS.forEach(id=>{const el=document.getElementById('tab-'+id);if(el)el.style.display=id===t?'block':'none';});
   document.querySelectorAll('.nb').forEach((b,i)=>b.classList.toggle('active',TABS[i]===t));
   if(t==='db')renderDB();
+  if(t==='profs')renderProfs();
+  if(t==='history')renderHistory();
   if(t==='dashboard')renderDashboard();
   if(t==='checkout'){renderInventoryBars();renderCheckoutLog();}
   if(t==='manage'){

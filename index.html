@@ -716,7 +716,7 @@ tbody tr:hover td{background:var(--surface2)}
   </div>
 </div>
 
-<div id="loading-overlay" style="position:fixed;inset:0;background:var(--text);z-index:500;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;transition:opacity .5s">
+<div id="loading-overlay" style="position:fixed;inset:0;background:var(--text);z-index:500;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;transition:opacity .5s">
   <svg width="140" height="110" viewBox="0 0 140 110">
     <polygon points="70,8 8,102 132,102" fill="#2a2824"/>
     <polygon id="mtn-fill" points="70,102 70,102 70,102" fill="#2d5a27"/>
@@ -740,8 +740,8 @@ async function tryLogin(){
   if(!role){document.getElementById('login-err').textContent='Incorrect password — try again.';document.getElementById('pw-input').value='';document.getElementById('pw-input').focus();return;}
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
-  document.getElementById('role-label').textContent=role==='admin'?'· Admin':'· Trip Lead';
-  await initApp();
+  const roleLabel = document.getElementById('role-label');
+  if(roleLabel) roleLabel.textContent = role === 'admin' ? '· Admin' : '· Trip Lead';
 }
 function logout(){role=null;document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('pw-input').value='';document.getElementById('login-err').textContent='';showTab('roster');}
 
@@ -1737,7 +1737,7 @@ function nuke(){if(!confirm('Delete ALL data?'))return;members=[];hikes=[];check
 // ════════════════════════════════════════
 // TABS
 // ════════════════════════════════════════
-const TABS=['roster','db','dashboard','log','checkout','manage'];
+const TABS=['roster','db','profs','history','dashboard','log','checkout','manage'];
 function showTab(t){
   TABS.forEach(id=>{const el=document.getElementById('tab-'+id);if(el)el.style.display=id===t?'block':'none';});
   document.querySelectorAll('.nb').forEach((b,i)=>b.classList.toggle('active',TABS[i]===t));
@@ -1761,7 +1761,23 @@ function saveInventory(){
 }
 
 function notify(msg){const n=document.getElementById('notif');n.textContent=msg;n.classList.add('show');clearTimeout(n._t);n._t=setTimeout(()=>n.classList.remove('show'),2600);}
-
+  
+function setLP(pct, msg) {
+  const bar = document.getElementById('load-bar');
+  if (bar) bar.style.width = pct + '%';
+  
+  const sub = document.getElementById('load-sub');
+  if (sub) sub.textContent = msg || '';
+  
+  const fill = document.getElementById('mtn-fill');
+  if (fill) {
+    const t = pct / 100;
+    const topY = Math.round(102 - 94 * t);
+    const lx = Math.round(8 + 56 * t);
+    const rx = Math.round(132 - 58 * t);
+    fill.setAttribute('points', '70,' + topY + ' ' + lx + ',102 ' + rx + ',102');
+  }
+}
 function showLoading(on){
   const el=document.getElementById('loading-overlay');
   if(el) el.style.display=on?'flex':'none';

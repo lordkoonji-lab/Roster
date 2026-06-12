@@ -54,16 +54,21 @@ body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;font-s
 
 /* SHELL */
 #app{display:none}
-header{background:var(--text);color:var(--bg);padding:0 24px;display:flex;align-items:center;border-bottom:3px solid var(--accent)}
-.brand{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;letter-spacing:-.5px;padding:13px 0;flex:1;white-space:nowrap}
+header{background:var(--text);color:var(--bg);border-bottom:3px solid var(--accent)}
+.header-top{display:flex;align-items:center;padding:10px 24px 0;gap:12px}
+.brand{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;letter-spacing:-.5px;white-space:nowrap}
 .brand em{color:#8fc08a;font-style:normal}
-.brand small{font-size:10px;opacity:.35;font-family:'Lato',sans-serif;font-weight:400;letter-spacing:.5px;margin-left:8px;text-transform:uppercase}
-nav{display:flex;height:100%;overflow-x:auto}
-.nb{padding:0 13px;background:none;border:none;color:#9a9580;font-family:'Lato',sans-serif;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-3px;transition:all .15s;white-space:nowrap}
+.brand-sub{font-size:10px;color:#6a6560;font-family:'IBM Plex Mono',monospace;margin-top:1px}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.header-nav{display:flex;padding:0 24px;gap:2px;overflow-x:auto;margin-top:6px}
+nav{display:flex;width:100%;gap:2px}
+.nb{padding:8px 13px;background:none;border:none;color:#9a9580;font-family:'Lato',sans-serif;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-3px;transition:all .15s;white-space:nowrap}
 .nb.active{color:var(--bg);border-bottom-color:var(--accent2)}
 .nb:hover:not(.active){color:#ccc}
-.logout-btn{margin-left:12px;padding:6px 12px;background:transparent;border:1px solid #3a3830;color:#9a9580;border-radius:5px;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
-.logout-btn:hover{border-color:#7a7568;color:var(--bg)}
+.header-btn{padding:5px 12px;background:transparent;border:1px solid #3a3830;color:#9a9580;border-radius:5px;font-family:'Lato',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.header-btn:hover{border-color:#7a7568;color:var(--bg)}
+.manage-btn{border-color:var(--accent);color:#8fc08a}
+.manage-btn:hover{color:#fff;border-color:#8fc08a}
 main{padding:22px 24px;max-width:1300px}
 .sec-title{font-family:'Syne',sans-serif;font-weight:700;font-size:20px;margin-bottom:3px}
 .sec-sub{color:var(--muted);font-size:12px;margin-bottom:18px;line-height:1.5}
@@ -247,20 +252,28 @@ tbody tr:hover td{background:var(--surface2)}
 <!-- APP -->
 <div id="app">
   <header>
-    <div class="brand">Peaks <em>&</em> Professors <small id="role-label"></small></div>
-    <span id="qbadge" style="font-size:10px;background:#2a2824;color:#8a8578;padding:2px 7px;border-radius:3px;font-family:'IBM Plex Mono',monospace;margin-right:6px;flex:none"></span>
-    <nav>
-      <button class="nb active" onclick="showTab('roster')">🏔 Roster</button>
-      <button class="nb" onclick="showTab('db')">👟 Hikers</button>
-      <button class="nb" onclick="showTab('profs')">🎓 Professors</button>
-      <button class="nb" onclick="showTab('history')">📋 Hike History</button>
-      <button class="nb" onclick="showTab('dashboard')">📊 Dashboard</button>
-      <button class="nb" onclick="showTab('log')">📝 Log Hike</button>
-      <button class="nb" onclick="showTab('checkout')">🎒 Gear</button>
-      <button class="nb" onclick="showTab('manage')">⚙ Manage</button>
-    </nav>
-    <button class="logout-btn" onclick="logout()">Sign out</button>
-    <span id="sync-status" style="margin-left:10px;font-size:11px;font-family:'IBM Plex Mono',monospace;white-space:nowrap"></span>
+    <div class="header-top">
+      <div>
+        <div class="brand">Peaks <em>&</em> Professors</div>
+        <div class="brand-sub"><span id="qbadge"></span> <span id="role-label" style="opacity:.5;margin-left:6px"></span></div>
+      </div>
+      <div class="header-right">
+        <span id="sync-status" style="font-size:11px;font-family:'IBM Plex Mono',monospace;white-space:nowrap"></span>
+        <button id="manage-nav-btn" class="header-btn manage-btn" onclick="showTab('manage')" style="display:none">⚙ Manage</button>
+        <button class="header-btn" onclick="logout()">Sign out</button>
+      </div>
+    </div>
+    <div class="header-nav">
+      <nav>
+        <button class="nb active" onclick="showTab('roster')">🏔 Roster</button>
+        <button class="nb" onclick="showTab('db')">👟 Hikers</button>
+        <button class="nb" onclick="showTab('profs')">🎓 Professors</button>
+        <button class="nb" onclick="showTab('history')">📋 Hike History</button>
+        <button class="nb" onclick="showTab('dashboard')">📊 Dashboard</button>
+        <button class="nb" onclick="showTab('log')">📝 Log Hike</button>
+        <button class="nb" onclick="showTab('checkout')">🎒 Gear</button>
+      </nav>
+    </div>
   </header>
 
   <main>
@@ -768,12 +781,15 @@ async function tryLogin(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
   const roleLabel = document.getElementById('role-label');
-  if(roleLabel) roleLabel.textContent = role === 'admin' ? '· Admin' : '· Trip Lead';
+  if(roleLabel) roleLabel.textContent = role === 'admin' ? 'Admin' : 'Trip Lead';
   const qb=document.getElementById('qbadge');
   if(qb) qb.textContent=CURRENT_QUARTER;
+  // Show manage button only for admin
+  const mb=document.getElementById('manage-nav-btn');
+  if(mb) mb.style.display=role==='admin'?'inline-block':'none';
   await initApp();
 }
-function logout(){role=null;document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('pw-input').value='';document.getElementById('login-err').textContent='';showTab('roster');}
+function logout(){role=null;document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('pw-input').value='';document.getElementById('login-err').textContent='';const mb=document.getElementById('manage-nav-btn');if(mb)mb.style.display='none';showTab('roster');}
 
 // ════════════════════════════════════════
 // ════════════════════════════════════════
@@ -1843,17 +1859,23 @@ function executeNuke(){
 // TABS
 // ════════════════════════════════════════
 const TABS=['roster','db','profs','history','dashboard','log','checkout','manage'];
+const NAV_TABS=['roster','db','profs','history','dashboard','log','checkout'];
 function showTab(t){
   TABS.forEach(id=>{const el=document.getElementById('tab-'+id);if(el)el.style.display=id===t?'block':'none';});
-  document.querySelectorAll('.nb').forEach((b,i)=>b.classList.toggle('active',TABS[i]===t));
+  document.querySelectorAll('.nb').forEach((b,i)=>b.classList.toggle('active',NAV_TABS[i]===t));
+  // Highlight manage button when active
+  const mb=document.getElementById('manage-nav-btn');
+  if(mb) mb.style.borderColor=t==='manage'?'var(--accent2)':'var(--accent)';
   if(t==='db')renderDB();
   if(t==='profs')renderProfs();
   if(t==='history')renderHistory();
   if(t==='dashboard')renderDashboard();
   if(t==='checkout'){renderInventoryBars();renderCheckoutLog();}
   if(t==='manage'){
-    if(role==='admin'){document.getElementById('manage-locked').style.display='none';document.getElementById('manage-content').style.display='block';renderInventoryFields();}
-    else{document.getElementById('manage-locked').style.display='block';document.getElementById('manage-content').style.display='none';}
+    if(role!=='admin'){showTab('roster');notify('Admin access required');return;}
+    document.getElementById('manage-locked').style.display='none';
+    document.getElementById('manage-content').style.display='block';
+    renderInventoryFields();
   }
 }
 function showInner(t){

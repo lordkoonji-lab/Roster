@@ -23,8 +23,11 @@
 body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;font-size:14px;min-height:100vh}
 
 /* LOGIN */
-#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--text)}
-.login-box{background:var(--bg);border-radius:12px;padding:40px 44px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--text);position:relative;overflow:hidden}
+.login-bg{position:absolute;inset:-20px;background-size:cover;background-position:center;filter:blur(6px);opacity:0;transition:opacity 2s ease-in-out}
+.login-bg.active{opacity:1}
+.login-overlay{position:absolute;inset:0;background:rgba(26,24,20,.55)}
+.login-box{background:var(--bg);border-radius:12px;padding:40px 44px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.4);position:relative;z-index:2}
 .login-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:24px;color:var(--text);margin-bottom:4px}
 .login-logo em{color:var(--accent);font-style:normal}
 .login-sub{font-size:12px;color:var(--muted);margin-bottom:32px}
@@ -34,7 +37,7 @@ body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;font-s
 .login-btn {
   width: 100%;
   margin-top: 14px;
-  padding: 13px;
+  padding: 14px 13px 16px;
   border-radius: 6px;
   background: var(--accent);
   color: #fff;
@@ -44,12 +47,10 @@ body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;font-s
   border: none;
   cursor: pointer;
   transition: background .15s;
-  /* Anti-clipping fixes below */
-  line-height: 1.2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  line-height: 1;
+  overflow: visible;
 }
+.login-btn:hover{background:#234d1f}
 .login-err{margin-top:10px;font-size:12px;color:var(--accent2);text-align:center;min-height:18px;font-weight:700}
 
 /* SHELL */
@@ -238,6 +239,10 @@ tbody tr:hover td{background:var(--surface2)}
 
 <!-- LOGIN -->
 <div id="login-screen">
+  <div class="login-bg active" id="bg-1" style="background-image:url('https://images.unsplash.com/photo-1707960051528-08a50f7b51c1?w=1920&q=80&auto=format&fit=crop')"></div>
+  <div class="login-bg" id="bg-2" style="background-image:url('https://images.unsplash.com/photo-1683936368715-a5571be96f1b?w=1920&q=80&auto=format&fit=crop')"></div>
+  <div class="login-bg" id="bg-3" style="background-image:url('https://images.unsplash.com/photo-1598550615273-3bd4325e517b?w=1920&q=80&auto=format&fit=crop')"></div>
+  <div class="login-overlay"></div>
   <div class="login-box">
     <div class="login-logo">Peaks <em>&</em> Professors</div>
     <div class="login-sub">University of Washington</div>
@@ -766,6 +771,19 @@ tbody tr:hover td{background:var(--surface2)}
 
 <script>
 // ════════════════════════════════════════
+// LOGIN BACKGROUND CYCLE
+// ════════════════════════════════════════
+(function(){
+  const bgs=['bg-1','bg-2','bg-3'];
+  let cur=0;
+  setInterval(()=>{
+    document.getElementById(bgs[cur]).classList.remove('active');
+    cur=(cur+1)%bgs.length;
+    document.getElementById(bgs[cur]).classList.add('active');
+  },6000); // 6 seconds per image
+})();
+
+// ════════════════════════════════════════
 // AUTH
 // ════════════════════════════════════════
 const PASSWORDS = {'Peaks&Profs2026':'lead','Peaks&ProfsAdmin2026':'admin'};
@@ -791,7 +809,7 @@ function logout(){role=null;document.getElementById('login-screen').style.displa
 // ════════════════════════════════════════
 // CONFIG — swap URL when moving to peaks account
 // ════════════════════════════════════════
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzhuBUzevZKPh0UseDax8o7dhUywFquak428NUrywXJrYEytHprP6EqMpqQ2ION7Sjw1Q/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbziX5t9V4tJvFRU6bKDO4vpUN1ws2xKLuRGdyeAXbaQIuZ1inTazV0I3s13ZRCLDaUvjw/exec';
 
 // ════════════════════════════════════════
 // DATA

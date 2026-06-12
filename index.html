@@ -718,11 +718,21 @@ tbody tr:hover td{background:var(--surface2)}
 
 <div id="loading-overlay" style="position:fixed;inset:0;background:var(--text);z-index:500;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;transition:opacity .5s">
   <svg width="140" height="110" viewBox="0 0 140 110">
-    <polygon points="70,8 8,102 132,102" fill="#2d5a27"/>
-    <polygon points="70,8 45,46 55,40 65,48 75,38 85,48 95,46" fill="#ffffff"/>
+    <defs>
+      <clipPath id="fill-mask">
+        <rect id="mtn-fill" x="0" y="110" width="140" height="110" style="transition: y 0.35s ease;"></rect>
+      </clipPath>
+    </defs>
+    
+    <polygon points="70,8 8,102 132,102" fill="#2a2824"/>
+    
+    <g clip-path="url(#fill-mask)">
+      <polygon points="70,8 8,102 132,102" fill="#2d5a27"/>
+      <polygon points="70,8 45,46 55,40 65,48 75,38 85,48 95,46" fill="#ffffff"/>
+    </g>
   </svg>
+  
   <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:#f5f2ec">Peaks <span style="color:#8fc08a">&</span> Professors</div>
-  <div style="width:180px;height:3px;background:#2a2824;border-radius:2px;overflow:hidden"><div id="load-bar" style="height:100%;background:#2d5a27;border-radius:2px;width:0%;transition:width .35s"></div></div>
   <div id="load-sub" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6a6560">Connecting…</div>
 </div>
 
@@ -1772,18 +1782,16 @@ function saveInventory(){
 function notify(msg){const n=document.getElementById('notif');n.textContent=msg;n.classList.add('show');clearTimeout(n._t);n._t=setTimeout(()=>n.classList.remove('show'),2600);}
   
 function setLP(pct, msg) {
-  const bar = document.getElementById('load-bar');
-  if (bar) bar.style.width = pct + '%';
-  
   const sub = document.getElementById('load-sub');
   if (sub) sub.textContent = msg || '';
   
   const fill = document.getElementById('mtn-fill');
   if (fill) {
-    // Moves the rectangle's Y coordinate up as percentage increases
-    const topY = 110 - (110 * (pct / 100));
-    fill.setAttribute('y', topY);
+    // Height is 110. y=110 means empty. y=0 means 100% full.
+    const newY = 110 - (110 * (pct / 100));
+    fill.setAttribute('y', newY);
   }
+}
 }function showLoading(on){
   const el=document.getElementById('loading-overlay');
   if(el) el.style.display=on?'flex':'none';

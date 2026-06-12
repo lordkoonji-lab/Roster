@@ -868,23 +868,31 @@ function setSyncStatus(s,msg=''){
 
 // ── LOAD ─────────────────────────────────
 async function loadData(){
-  setLP(10,'Connecting…');
+  setLP(10,'Connecting to database…');
   try{
     const all=await callScript('readAll',{});
-    setLP(50,'Parsing data…');
+    setLP(40,'Parsing roster data…');
+    
+    // Tiny artificial pause to let the bar catch up
+    await new Promise(r => setTimeout(r, 400));
+    
     members=(all.Members||[]).map(r=>fromRow(r,M_COLS)).filter(x=>x.name);
     hikes=(all.Hikes||[]).map(r=>fromRow(r,H_COLS)).filter(x=>x.id);
     rosters=(all.HikeRosters||[]).map(r=>fromRow(r,R_COLS)).filter(x=>x.hikeId);
     checkouts=(all.Checkouts||[]).map(r=>fromRow(r,C_COLS)).filter(x=>x.id);
+    
+    setLP(70,'Loading professors and gear…');
+    await new Promise(r => setTimeout(r, 400));
+    
     profs=(all.Professors||[]).map(r=>fromRow(r,P_COLS)).filter(x=>x.id);
-    setLP(85,'Loading config…');
     (all.Config||[]).forEach(row=>{const k=String(row[0]||''),v=String(row[1]||'');if(inventory.hasOwnProperty(k))inventory[k]=parseInt(v)||0;});
+    
     setLP(100,'Ready');
     setSyncStatus('ok');setTimeout(()=>setSyncStatus('idle'),2000);
   }catch(e){
     console.error('loadData error',e);
     setSyncStatus('error',e.message);
-    setLP(100,'⚠ '+e.message);
+    setLP(100,'⚠ Error loading data');
     members=[];hikes=[];rosters=[];checkouts=[];profs=[];
   }
 }
@@ -1786,8 +1794,16 @@ function showLoading(on){
 
 async function initApp(){
   showLoading(true);
-  await loadData();
+  
+  // Start a timer for 2 seconds (2000 milliseconds)
+  const minLoadingTime = new Promise(resolve => setTimeout(resolve, 3000));
+  
+  // Run both the data fetch AND the timer simultaneously
+  await Promise.all([loadData(), minLoadingTime]);
+  
+  // Only hide the loading screen after both finish
   showLoading(false);
+  
   document.getElementById('l-date').value=new Date().toISOString().split('T')[0];
   document.getElementById('co-date').value=new Date().toISOString().split('T')[0];
   document.getElementById('f-date').value=new Date().toISOString().split('T')[0];

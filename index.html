@@ -88,8 +88,12 @@ textarea{resize:vertical;min-height:90px;font-family:'IBM Plex Mono',monospace;f
 .btn-g{background:transparent;color:var(--muted);border:1px solid var(--border)}.btn-g:hover{color:var(--text);border-color:var(--muted)}
 .btn-sm{padding:5px 12px;font-size:12px}
 .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:8px}
-table{width:100%;border-collapse:collapse;font-size:13px}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:8px;-webkit-overflow-scrolling:touch;max-width:100%}
+.tbl-wrap::-webkit-scrollbar{height:8px}
+.tbl-wrap::-webkit-scrollbar-track{background:var(--surface2);border-radius:4px}
+.tbl-wrap::-webkit-scrollbar-thumb{background:var(--muted);border-radius:4px}
+.tbl-wrap::-webkit-scrollbar-thumb:hover{background:var(--text)}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:1200px}
 thead tr{background:var(--text);color:var(--bg)}
 th{padding:9px 12px;text-align:left;font-family:'Syne',sans-serif;font-weight:600;font-size:11px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
 td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
@@ -462,15 +466,9 @@ tbody tr:hover td{background:var(--surface2)}
       <div class="dash-section">
         <div class="dash-section-title">🎓 Scholarships</div>
         <div class="stat-grid" id="dash-scholar-stats"></div>
-        <div class="twocol">
-          <div class="chart-wrap">
-            <div class="chart-title">Scholarship spend per hike</div>
-            <canvas id="chart-scholar" height="180"></canvas>
-          </div>
-          <div class="card" style="margin-bottom:0">
-            <div class="card-title">Top scholarship recipients</div>
-            <div id="scholar-top-list"></div>
-          </div>
+        <div class="card" style="margin-bottom:0">
+          <div class="card-title">Top scholarship recipients</div>
+          <div id="scholar-top-list"></div>
         </div>
       </div>
 
@@ -487,10 +485,6 @@ tbody tr:hover td{background:var(--surface2)}
             <div class="card-title">Most requested gear</div>
             <div id="gear-popularity"></div>
           </div>
-        </div>
-        <div class="chart-wrap" style="margin-top:14px">
-          <div class="chart-title">Gear checkouts by day</div>
-          <canvas id="chart-gear" height="160"></canvas>
         </div>
       </div>
     </div>
@@ -954,7 +948,7 @@ function logout(){role=null;document.getElementById('login-screen').style.displa
 // ════════════════════════════════════════
 // CONFIG — swap URL when moving to peaks account
 // ════════════════════════════════════════
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwNaZGUwOmtg2xhSWAcjhKSBzCxzLgESqFGPc3HqcS-gB_UoK7yzrbAwOUlYxjRqp5Xcg/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbziX5t9V4tJvFRU6bKDO4vpUN1ws2xKLuRGdyeAXbaQIuZ1inTazV0I3s13ZRCLDaUvjw/exec';
 
 // ════════════════════════════════════════
 // DATA
@@ -1054,7 +1048,7 @@ async function callScript(action, payload){
 
 // ── SERIALISE ─────────────────────────────
 const NUM_COLS=['applied','attended','drivingHikes','noShows','streak','scholarRequested','scholarAwarded',
-  'gearRequests','gearReturned','gearOutstanding','cohortYear','distance','applicantCount','participantCount'];
+  'gearRequests','gearReturned','gearOutstanding','cohortYear','distance','applicantCount','participantCount','price'];
 const ARR_COLS=['noShowNotes','manualNotes','scholarNotes','gearNotes','hikeIds'];
 function toRow(obj,cols){return cols.map(k=>{const v=obj[k];if(Array.isArray(v))return JSON.stringify(v);return v===null||v===undefined?'':String(v);});}
 function fromRow(row,cols){
@@ -1063,7 +1057,7 @@ function fromRow(row,cols){
     const s=String(row[i]===undefined?'':row[i]);
     if(ARR_COLS.includes(k)){try{o[k]=s?JSON.parse(s):[]}catch{o[k]=s?[s]:[]}}
     else if(NUM_COLS.includes(k)){o[k]=parseFloat(s)||0}
-    else if(k==='returned'){o[k]=s==='TRUE'}
+    else if(k==='returned'){o[k]=s.toLowerCase()==='true'}
     else{o[k]=s||(['lastHike','lastActivity'].includes(k)?null:'')}
   });
   return o;
@@ -1596,45 +1590,20 @@ function renderDashboard(){
   // Hike calendar heatmap (always shows all hikes, not filtered by quarter)
   renderHeatmap(hikes);
 
-  // Scholarships
-  let scholarReq=0,scholarAwd=0,scholarDollars=0;
-  members.forEach(m=>{
-    if(dashView==='alltime'){
-      scholarReq+=(m.scholarRequested||0);
-      scholarAwd+=(m.scholarAwarded||0);
-    } else {
-      (m.scholarNotes||[]).forEach(n=>{
-        if(n.includes('2026')){ // rough quarter filter
-          if(n.includes('requested'))scholarReq++;
-          if(n.includes('awarded'))scholarAwd++;
-        }
-      });
-    }
+  // Scholarships — use actual member counts
+  let scholarReq=0,scholarAwd=0;
+  filteredMembers.forEach(m=>{
+    scholarReq+=(m.scholarRequested||0);
+    scholarAwd+=(m.scholarAwarded||0);
   });
-  // calculate dollars from hike prices
-  filteredHikes.forEach(h=>{
-    const hikeDollars=(h.price||0)*Math.round(scholarAwd/Math.max(filteredHikes.length,1));
-    scholarDollars+=hikeDollars;
-  });
-  // simpler: avg price × awards
   const avgPrice=filteredHikes.length>0?filteredHikes.reduce((s,h)=>s+(h.price||0),0)/filteredHikes.length:0;
-  scholarDollars=Math.round(avgPrice*scholarAwd*100)/100;
+  const scholarDollars=Math.round(avgPrice*scholarAwd*100)/100;
 
   document.getElementById('dash-scholar-stats').innerHTML=`
     <div class="sbox purple"><span class="sv">${scholarReq}</span><span class="sl">Requested</span></div>
     <div class="sbox accent"><span class="sv">${scholarAwd}</span><span class="sl">Awarded</span></div>
     <div class="sbox"><span class="sv">$${scholarDollars.toFixed(2)}</span><span class="sl">Total given out</span></div>
-    <div class="sbox"><span class="sv">${scholarReq>0?Math.round(scholarAwd/scholarReq*100):100}%</span><span class="sl">Approval rate</span></div>`;
-
-  // Scholar chart
-  drawBarChart('chart-scholar',
-    filteredHikes.map(h=>h.location.length>12?h.location.slice(0,12)+'…':h.location),
-    filteredHikes.map(h=>{
-      const awd=Math.round(scholarAwd/Math.max(filteredHikes.length,1));
-      return Math.round((h.price||0)*awd*100)/100;
-    }),
-    '#7a5abf','Scholarship spend ($)'
-  );
+    <div class="sbox"><span class="sv">${scholarReq>0?Math.round(scholarAwd/scholarReq*100):0}%</span><span class="sl">Approval rate</span></div>`;
 
   // Scholar top list
   const topScholars=[...members].filter(m=>m.scholarAwarded>0)
@@ -1686,19 +1655,6 @@ function renderDashboard(){
         <div style="height:100%;background:var(--accent);border-radius:4px;width:${maxG>0?Math.round(count/maxG*100):0}%"></div>
       </div>
     </div>`).join('');
-
-  // Gear checkout by day chart
-  const dayMap={};
-  filteredCheckouts.forEach(c=>{
-    const d=c.hikeDate||c.date;
-    if(d){dayMap[d]=(dayMap[d]||0)+1;}
-  });
-  const days=Object.keys(dayMap).sort();
-  drawBarChart('chart-gear',
-    days.map(d=>fmtDate(d)),
-    days.map(d=>dayMap[d]),
-    '#2d5a27','Gear items checked out'
-  );
 }
 
 function drawBarChart(canvasId,labels,values,color,label){
@@ -1891,18 +1847,40 @@ function clearLog(){
 function autoReturnGear(){
   const today=new Date().toISOString().split('T')[0];
   let changed=false;
+
+  // For each unreturned past-date checkout, check if same member+item
+  // has another checkout on the next day. If so, skip — gear chains forward.
   checkouts.forEach(c=>{
-    if(!c.returned&&c.hikeDate&&c.hikeDate<today){
-      c.returned=true;
-      c.returnedAt=c.hikeDate+'T18:00:00';
-      const m=fuzzy(c.member);
-      if(m){
-        m.gearReturned=(m.gearReturned||0)+1;
-        m.gearOutstanding=Math.max(0,(m.gearOutstanding||0)-1);
-      }
-      changed=true;
+    if(c.returned||!c.hikeDate||c.hikeDate>=today)return;
+
+    // Calculate next day after this checkout's hike
+    const nextDay=new Date(c.hikeDate);
+    nextDay.setDate(nextDay.getDate()+1);
+    const nextDayStr=nextDay.toISOString().split('T')[0];
+
+    // Does same member+item have a checkout for the next day?
+    const hasNextDay=checkouts.some(c2=>
+      c2!==c&&!c2.returned&&
+      c2.member===c.member&&c2.item===c.item&&
+      c2.hikeDate===nextDayStr
+    );
+
+    if(hasNextDay){
+      // Don't return — gear chains to next day's hike
+      return;
     }
+
+    // No next-day checkout → this is the last day, mark returned
+    c.returned=true;
+    c.returnedAt=c.hikeDate+'T18:00:00';
+    const m=fuzzy(c.member);
+    if(m){
+      m.gearReturned=(m.gearReturned||0)+1;
+      m.gearOutstanding=Math.max(0,(m.gearOutstanding||0)-1);
+    }
+    changed=true;
   });
+
   if(changed){saveCheckouts();saveMembers();}
 }
 

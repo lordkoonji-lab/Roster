@@ -231,6 +231,43 @@ tbody tr:hover td{background:var(--surface2)}
 .modal-close{float:right;background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);margin-top:-2px}
 .modal-close:hover{color:var(--text)}
 
+/* HEATMAP */
+.heatmap-wrap{margin-top:14px}
+.heatmap-grid{display:flex;flex-wrap:wrap;gap:3px}
+.heatmap-cell{width:28px;height:28px;border-radius:4px;cursor:pointer;position:relative;transition:transform .1s}
+.heatmap-cell:hover{transform:scale(1.3);z-index:2}
+.heatmap-tooltip{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 14px;border-radius:6px;font-size:11px;white-space:nowrap;z-index:100;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.3);min-width:160px}
+.heatmap-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--text)}
+.heatmap-cell:hover .heatmap-tooltip{display:block}
+.heatmap-months{display:flex;gap:3px;margin-bottom:4px;padding-left:0}
+.heatmap-month-label{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.heatmap-legend{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:10px;color:var(--muted)}
+.heatmap-legend-cell{width:14px;height:14px;border-radius:3px}
+
+/* HAMBURGER MENU */
+.hamburger{display:none;background:none;border:none;color:var(--bg);font-size:22px;cursor:pointer;padding:4px 8px;flex-shrink:0}
+.mobile-menu{display:none;position:absolute;top:100%;left:0;right:0;background:var(--text);border-bottom:3px solid var(--accent);z-index:200;flex-direction:column;padding:8px 0;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.mobile-menu.open{display:flex}
+.mobile-menu button{background:none;border:none;color:#9a9580;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;padding:12px 24px;text-align:left;cursor:pointer;border-bottom:1px solid #2a2824}
+.mobile-menu button:hover,.mobile-menu button.active{color:var(--bg);background:rgba(255,255,255,.04)}
+
+@media(max-width:900px){
+  header{flex-wrap:wrap;position:relative}
+  nav{display:none}
+  .hamburger{display:block}
+  .brand-block{margin-right:auto}
+  .header-right{gap:6px}
+  main{padding:14px 12px}
+  .twocol{grid-template-columns:1fr!important}
+  .frow{flex-direction:column}
+  .frow>.fg{min-width:100%}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .hcard-grid{grid-template-columns:1fr!important}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .sec-title{font-size:17px}
+  .heatmap-cell{width:22px;height:22px}
+}
+
 #notif{position:fixed;bottom:14px;right:14px;background:var(--text);color:var(--bg);padding:9px 16px;border-radius:6px;font-size:13px;font-weight:700;opacity:0;transform:translateY(6px);transition:all .2s;pointer-events:none;z-index:300;border-left:4px solid var(--accent)}
 #notif.show{opacity:1;transform:translateY(0)}
 </style>
@@ -274,6 +311,17 @@ tbody tr:hover td{background:var(--surface2)}
       <span id="sync-status" style="font-size:11px;font-family:'IBM Plex Mono',monospace;white-space:nowrap"></span>
       <button id="manage-nav-btn" class="header-btn manage-btn" onclick="showTab('manage')" style="display:none">⚙ Manage</button>
       <button class="header-btn" onclick="logout()">Sign out</button>
+      <button class="hamburger" onclick="toggleMobileMenu()" id="hamburger-btn">☰</button>
+    </div>
+    <div class="mobile-menu" id="mobile-menu">
+      <button onclick="mobileNav('roster')">🏔 Roster</button>
+      <button onclick="mobileNav('db')">👟 Hikers</button>
+      <button onclick="mobileNav('profs')">🎓 Professors</button>
+      <button onclick="mobileNav('history')">📋 History</button>
+      <button onclick="mobileNav('dashboard')">📊 Dashboard</button>
+      <button onclick="mobileNav('log')">📝 Log Hike</button>
+      <button onclick="mobileNav('checkout')">🎒 Gear</button>
+      <button id="manage-mobile-btn" onclick="mobileNav('manage')" style="display:none">⚙ Manage</button>
     </div>
   </header>
 
@@ -312,12 +360,19 @@ tbody tr:hover td{background:var(--surface2)}
         <div class="sep"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
           <div class="sec-title" style="font-size:17px;margin:0">Hiker Applicants</div>
-          <div class="sortbar">
-            <span>Sort:</span>
-            <button class="sbtn active" onclick="resort('priority',this)">Priority</button>
-            <button class="sbtn" onclick="resort('name',this)">Name</button>
-            <button class="sbtn" onclick="resort('applied',this)">Most Applied</button>
-            <button class="sbtn" onclick="resort('attended',this)">Most Attended</button>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 10px">
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);white-space:nowrap">Spots:</label>
+              <input type="number" id="suggest-spots" min="1" max="50" value="8" style="width:50px;padding:4px 6px;font-size:13px;border:1px solid var(--border);border-radius:4px;text-align:center">
+              <button class="btn btn-p btn-sm" onclick="suggestRoster()" style="white-space:nowrap">Suggest Roster</button>
+            </div>
+            <div class="sortbar">
+              <span>Sort:</span>
+              <button class="sbtn active" onclick="resort('priority',this)">Priority</button>
+              <button class="sbtn" onclick="resort('name',this)">Name</button>
+              <button class="sbtn" onclick="resort('applied',this)">Most Applied</button>
+              <button class="sbtn" onclick="resort('attended',this)">Most Attended</button>
+            </div>
           </div>
         </div>
         <div class="legend">
@@ -330,7 +385,12 @@ tbody tr:hover td{background:var(--surface2)}
           <div class="li"><div class="ld" style="background:var(--orbd)"></div>No-show on record</div>
           <div class="li"><div class="ld" style="background:var(--dfbd)"></div>Regular</div>
         </div>
+        <div id="suggest-banner" style="display:none;background:var(--accent);color:#fff;padding:10px 14px;border-radius:6px;margin-bottom:12px;font-size:13px;font-weight:700"></div>
         <div id="not-found-banner" class="banner" style="display:none"></div>
+        <div id="hkr-cards-suggested" class="cards-grid"></div>
+        <div id="suggest-divider" style="display:none;border-top:2px dashed var(--border);margin:16px 0;padding-top:12px">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px">Remaining applicants</div>
+        </div>
         <div class="cards-grid" id="hkr-cards"></div>
         <div style="margin-top:12px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:8px 12px;font-size:11px;color:var(--muted)">
           ⚠ Highlights are priority suggestions only. Final roster is always the trip lead's call.
@@ -382,6 +442,20 @@ tbody tr:hover td{background:var(--surface2)}
       <div class="dash-section">
         <div class="dash-section-title">🏔 Hike Summary</div>
         <div class="stat-grid" id="dash-hike-stats"></div>
+        <div class="heatmap-wrap">
+          <div class="chart-title" style="margin-bottom:8px">Hike activity by week</div>
+          <div id="heatmap-months" class="heatmap-months"></div>
+          <div id="heatmap" class="heatmap-grid"></div>
+          <div class="heatmap-legend">
+            <span>Less</span>
+            <div class="heatmap-legend-cell" style="background:var(--surface);border:1px solid var(--border)"></div>
+            <div class="heatmap-legend-cell" style="background:#c8e6c9"></div>
+            <div class="heatmap-legend-cell" style="background:#66bb6a"></div>
+            <div class="heatmap-legend-cell" style="background:#2e7d32"></div>
+            <div class="heatmap-legend-cell" style="background:#1b5e20"></div>
+            <span>More</span>
+          </div>
+        </div>
       </div>
 
       <!-- Scholarships -->
@@ -441,12 +515,7 @@ tbody tr:hover td{background:var(--surface2)}
         <div class="frow">
           <div class="fg"><label>Price per hiker ($)</label><input type="number" id="l-price" placeholder="8.66" step="0.01" min="0"></div>
           <div class="fg"><label>Quarter</label>
-            <select id="l-quarter">
-              <option value="Spring 2026">Spring 2026</option>
-              <option value="Fall 2026">Fall 2026</option>
-              <option value="Winter 2027">Winter 2027</option>
-              <option value="Spring 2027">Spring 2027</option>
-            </select>
+            <select id="l-quarter"></select>
           </div>
         </div>
       </div>
@@ -493,7 +562,7 @@ tbody tr:hover td{background:var(--surface2)}
     <!-- ══ GEAR CHECKOUT ══ -->
     <div id="tab-checkout" style="display:none">
       <div class="sec-title">Gear Checkout</div>
-      <div class="sec-sub">Check gear in and out for selected hikers. Gear auto-returns at 6pm on the hike day. Leads can also book for other dates.</div>
+      <div class="sec-sub">Check gear in and out for selected hikers. Gear is automatically marked as returned after the hike date. You can also manually return early.</div>
 
       <div class="twocol">
         <div class="card">
@@ -784,6 +853,80 @@ tbody tr:hover td{background:var(--surface2)}
 })();
 
 // ════════════════════════════════════════
+// MOBILE MENU
+// ════════════════════════════════════════
+function toggleMobileMenu(){
+  const m=document.getElementById('mobile-menu');
+  m.classList.toggle('open');
+}
+function mobileNav(t){
+  document.getElementById('mobile-menu').classList.remove('open');
+  showTab(t);
+}
+
+// ════════════════════════════════════════
+// HIKE HEATMAP
+// ════════════════════════════════════════
+function renderHeatmap(filteredHikes){
+  const el=document.getElementById('heatmap');
+  const monthsEl=document.getElementById('heatmap-months');
+  if(!el)return;
+
+  // Build 26 weeks (6 months) of week buckets
+  const now=new Date();
+  const weeks=[];
+  for(let i=25;i>=0;i--){
+    const weekStart=new Date(now);
+    weekStart.setDate(weekStart.getDate()-weekStart.getDay()-(i*7));
+    const weekEnd=new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate()+6);
+    weeks.push({start:new Date(weekStart),end:new Date(weekEnd),hikes:[]});
+  }
+
+  // Assign hikes to weeks
+  filteredHikes.forEach(h=>{
+    if(!h.date)return;
+    const hd=new Date(h.date);
+    weeks.forEach(w=>{
+      if(hd>=w.start&&hd<=w.end)w.hikes.push(h);
+    });
+  });
+
+  // Month labels
+  const monthNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let lastMonth=-1;
+  let monthHtml='';
+  weeks.forEach((w,i)=>{
+    const m=w.start.getMonth();
+    if(m!==lastMonth){
+      const span=weeks.filter(wk=>wk.start.getMonth()===m).length;
+      monthHtml+=`<span class="heatmap-month-label" style="width:${span*31}px">${monthNames[m]}</span>`;
+      lastMonth=m;
+    }
+  });
+  monthsEl.innerHTML=monthHtml;
+
+  // Render cells
+  const maxH=Math.max(...weeks.map(w=>w.hikes.length),1);
+  el.innerHTML=weeks.map((w,i)=>{
+    const count=w.hikes.length;
+    const colors=['var(--surface)','#c8e6c9','#66bb6a','#2e7d32','#1b5e20'];
+    const level=count===0?0:Math.min(Math.ceil(count/maxH*4),4);
+    const border=count===0?'border:1px solid var(--border)':'';
+    const startStr=w.start.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    const endStr=w.end.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    const details=count>0?w.hikes.map(h=>`<div style="margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,.15)"><strong>${h.location||'Unknown'}</strong><br>${fmtDate(h.date)} · ${h.participantCount||'?'} hikers${h.prof?' · '+h.prof:''}</div>`).join(''):'<div style="margin-top:4px;opacity:.6">No hikes this week</div>';
+    return`<div class="heatmap-cell" style="background:${colors[level]};${border}">
+      <div class="heatmap-tooltip">
+        <div style="font-weight:700;margin-bottom:2px">${startStr} — ${endStr}</div>
+        <div>${count} hike${count!==1?'s':''}</div>
+        ${details}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════
 // AUTH
 // ════════════════════════════════════════
 const PASSWORDS = {'Peaks&Profs2026':'lead','Peaks&ProfsAdmin2026':'admin'};
@@ -801,15 +944,17 @@ async function tryLogin(){
   // Show manage button only for admin
   const mb=document.getElementById('manage-nav-btn');
   if(mb) mb.style.display=role==='admin'?'inline-block':'none';
+  const mmb=document.getElementById('manage-mobile-btn');
+  if(mmb) mmb.style.display=role==='admin'?'block':'none';
   await initApp();
 }
-function logout(){role=null;document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('pw-input').value='';document.getElementById('login-err').textContent='';const mb=document.getElementById('manage-nav-btn');if(mb)mb.style.display='none';showTab('roster');}
+function logout(){role=null;document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('pw-input').value='';document.getElementById('login-err').textContent='';const mb=document.getElementById('manage-nav-btn');if(mb)mb.style.display='none';const mmb=document.getElementById('manage-mobile-btn');if(mmb)mmb.style.display='none';document.getElementById('mobile-menu').classList.remove('open');showTab('roster');}
 
 // ════════════════════════════════════════
 // ════════════════════════════════════════
 // CONFIG — swap URL when moving to peaks account
 // ════════════════════════════════════════
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzhuBUzevZKPh0UseDax8o7dhUywFquak428NUrywXJrYEytHprP6EqMpqQ2ION7Sjw1Q/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbziX5t9V4tJvFRU6bKDO4vpUN1ws2xKLuRGdyeAXbaQIuZ1inTazV0I3s13ZRCLDaUvjw/exec';
 
 // ════════════════════════════════════════
 // DATA
@@ -834,18 +979,18 @@ function getQuarterStartDate(){
 const QUARTER_START=getQuarterStartDate();
 
 const M_COLS=['name','studentId','email','phone','year','major','isDriver','notes',
-  'cohortYear','gradQuarter','deleteQuarter','status',
+  'cohortYear','gradQuarter','deleteQuarter','status','streak',
   'applied','attended','drivingHikes','noShows','lastHike','lastActivity',
   'noShowNotes','manualNotes','scholarRequested','scholarAwarded',
   'scholarNotes','gearRequests','gearReturned','gearOutstanding','gearNotes'];
-const H_COLS=['id','location','date','prof','lead','colead','price','quarter','distance','applicantCount'];
+const H_COLS=['id','location','date','prof','lead','colead','price','quarter','distance','applicantCount','participantCount'];
 const C_COLS=['id','member','item','date','hikeDate','note','returned','returnedAt'];
 const P_COLS=['id','name','type','department','org','email','notes','lastHike','lastLead','lastColead','lastLocation','hikeIds'];
 const R_COLS=['hikeId','memberName','outcome','scholarshipAwarded','gearRequested'];
 
 function blank(name){
   return{name,studentId:'',email:'',phone:'',year:'',major:'',isDriver:'no',notes:'',
-    cohortYear:'',gradQuarter:'',deleteQuarter:'',status:'active',
+    cohortYear:'',gradQuarter:'',deleteQuarter:'',status:'active',streak:0,
     applied:0,attended:0,drivingHikes:0,noShows:0,lastHike:null,lastActivity:null,
     noShowNotes:[],manualNotes:[],scholarRequested:0,scholarAwarded:0,scholarNotes:[],
     gearRequests:0,gearReturned:0,gearOutstanding:0,gearNotes:[]};
@@ -908,8 +1053,8 @@ async function callScript(action, payload){
 }
 
 // ── SERIALISE ─────────────────────────────
-const NUM_COLS=['applied','attended','drivingHikes','noShows','scholarRequested','scholarAwarded',
-  'gearRequests','gearReturned','gearOutstanding','cohortYear','distance','applicantCount'];
+const NUM_COLS=['applied','attended','drivingHikes','noShows','streak','scholarRequested','scholarAwarded',
+  'gearRequests','gearReturned','gearOutstanding','cohortYear','distance','applicantCount','participantCount'];
 const ARR_COLS=['noShowNotes','manualNotes','scholarNotes','gearNotes','hikeIds'];
 function toRow(obj,cols){return cols.map(k=>{const v=obj[k];if(Array.isArray(v))return JSON.stringify(v);return v===null||v===undefined?'':String(v);});}
 function fromRow(row,cols){
@@ -958,6 +1103,9 @@ async function loadData(){
     
     setLP(100,'Ready');
     setSyncStatus('ok');setTimeout(()=>setSyncStatus('idle'),2000);
+
+    // Auto-return gear past hike date (assumed returned by end of hike day)
+    autoReturnGear();
   }catch(e){
     console.error('loadData error',e);
     setSyncStatus('error',e.message);
@@ -1000,6 +1148,7 @@ function priClass(m){
   const da=daysAgo(m.lastActivity||m.lastHike);
   if(m.applied===0)return'c-te';
   if(m.attended===0&&m.applied>=4)return'c-b1';
+  if((m.streak||0)>=3)return'c-b1'; // 3+ streak = high priority
   if(m.attended===0)return'c-b2';
   if(da>180)return'c-y1';
   if(da>90)return'c-y2';
@@ -1010,20 +1159,24 @@ function priReason(m){
   if(!m)return'Not in database';
   if(m.noShows>0){const n=m.noShowNotes&&m.noShowNotes.length?m.noShowNotes[m.noShowNotes.length-1]:'No reason recorded';return`No-show ×${m.noShows} — ${n}`;}
   if(m.applied===0)return'New member — never applied yet';
-  if(m.attended===0&&m.applied>=4)return`Applied ${m.applied}× and never attended — high priority`;
-  if(m.attended===0)return`Applied ${m.applied}× — never attended`;
+  const sk=m.streak||0;
+  if(m.attended===0&&m.applied>=4)return`Applied ${m.applied}× and never attended — high priority`+(sk>=2?` · 🔥 ${sk}-hike streak`:'');
+  if(sk>=3)return`🔥 ${sk} consecutive apps without selection — high priority`;
+  if(m.attended===0)return`Applied ${m.applied}× — never attended`+(sk>=2?` · 🔥 ${sk}-hike streak`:'');
   const da=daysAgo(m.lastActivity||m.lastHike);
-  if(da>180)return`Last activity ${Math.round(da)} days ago`;
-  if(da>90)return`Inactive ~${Math.round(da/30)} months`;
+  if(da>180)return`Last activity ${Math.round(da)} days ago`+(sk>=2?` · 🔥 ${sk}-hike streak`:'');
+  if(da>90)return`Inactive ~${Math.round(da/30)} months`+(sk>=2?` · 🔥 ${sk}-hike streak`:'');
   const r=m.applied>0?m.attended/m.applied:0;
-  if(r>=0.4&&da<90)return'Active member, healthy attendance';
-  return'Regular member';
+  if(r>=0.4&&da<90)return'Active member, healthy attendance'+(sk>=2?` · 🔥 ${sk}-hike streak`:'');
+  return'Regular member'+(sk>=2?` · 🔥 ${sk}-hike streak`:'');
 }
 function priTag(m){
   if(!m)return'not in db';
   if(m.noShows>0)return`no-show ×${m.noShows}`;
+  const sk=m.streak||0;
   if(m.applied===0)return'new member';
   if(m.attended===0&&m.applied>=4)return'priority ↑';
+  if(sk>=3)return`🔥 ${sk}-streak`;
   if(m.attended===0)return'never attended';
   const da=daysAgo(m.lastActivity||m.lastHike);
   if(da>180)return'overdue';
@@ -1035,12 +1188,23 @@ function priTag(m){
 function priScore(m){
   if(!m)return-999;
   let s=0;
-  if(m.noShows>0)s-=m.noShows*15;
+  // No-shows are a serious problem — heavy penalty
+  if(m.noShows>0)s-=m.noShows*35;
+  // Brand new members get a bump to welcome them
   if(m.applied===0)s+=20;
-  else if(m.attended===0)s+=50+(m.applied*5);
-  const da=daysAgo(m.lastActivity||m.lastHike);
+  // Never attended despite applying — increasingly urgent
+  else if(m.attended===0)s+=50+(m.applied*8);
+  // Streak: consecutive apps without selection — should feel it fast
+  const sk=m.streak||0;
+  if(sk>=2)s+=sk*15;
+  // Attendance ratio — lower ratio = higher need
   const r=m.applied>0?m.attended/m.applied:0;
-  s+=(1-r)*25;s+=Math.min(da/30,20);
+  s+=(1-r)*30;
+  // Time since last activity — capped at 25 points
+  const da=daysAgo(m.lastActivity||m.lastHike);
+  s+=Math.min(da/25,25);
+  // Drivers get a small boost — they're valuable
+  if(m.isDriver==='yes'||m.drivingHikes>0)s+=5;
   return s;
 }
 function drvBadge(m){
@@ -1096,6 +1260,7 @@ function processHikers(){
   const raw=document.getElementById('hkr-in').value.trim();
   if(!raw){notify('Paste hiker names first');return;}
   rHikers=parseLines(raw).map(n=>{const m=fuzzy(n);return m?{...m,_found:true,_raw:n}:{...blank(n),_found:false,_raw:n};});
+  suggestN=0;
   renderCards();document.getElementById('roster-results').style.display='block';
 }
 
@@ -1110,10 +1275,12 @@ function renderCards(){
   if(nf.length){nb.style.display='block';nb.innerHTML=`<strong>${nf.length} not in database:</strong> ${nf.map(h=>h._raw).join(', ')} — add via Manage.`;}
   else nb.style.display='none';
 
-  document.getElementById('hkr-cards').innerHTML=s.map(h=>{
+  const cardHtmls=s.map(h=>{
     const cls=h._found?priClass(h):'c-df';
     const rate=h.applied>0?Math.round(h.attended/h.applied*100)+'%':'—';
     const badge=h._found?drvBadge(h):'';
+    const sk=h._found?(h.streak||0):0;
+    const streakBadge=sk>=2?`<span style="font-size:10px;background:#fff3e0;color:#e65100;border:1px solid #ffcc80;padding:1px 6px;border-radius:3px;font-weight:700">🔥 ×${sk}</span>`:'';
     let noteItems=[];
     if(h._found){
       (h.noShowNotes||[]).forEach(n=>noteItems.push({label:'No-show',text:n}));
@@ -1148,7 +1315,7 @@ function renderCards(){
     </div>`:'';
 
     return`<div class="hcard ${cls}" onclick="this.querySelector('.hcard-expand')&&(this.querySelector('.hcard-expand').style.display=this.querySelector('.hcard-expand').style.display==='none'?'block':'none')">
-      <div class="tag-row"><span class="htag">${h._found?priTag(h):'not in db'}</span>${badge}${extras.join('')}</div>
+      <div class="tag-row"><span class="htag">${h._found?priTag(h):'not in db'}</span>${badge}${streakBadge}${extras.join('')}</div>
       <div class="hn">${h.name}</div>
       <div class="hreason">${h._found?priReason(h):'Not in database'}</div>
       <div class="hstats">
@@ -1158,12 +1325,61 @@ function renderCards(){
         <div><span class="hv" style="font-size:11px">${h.lastHike?fmtDate(h.lastHike):'Never'}</span><span class="hl">Last hike</span></div>
       </div>${expandHtml}
     </div>`;
-  }).join('');
+  });
+
+  const sugBanner=document.getElementById('suggest-banner');
+  const sugDiv=document.getElementById('suggest-divider');
+  const sugCards=document.getElementById('hkr-cards-suggested');
+
+  if(suggestN>0&&cardHtmls.length>0){
+    const suggested=cardHtmls.slice(0,suggestN);
+    const remaining=cardHtmls.slice(suggestN);
+    const suggestedHikers=s.slice(0,suggestN).filter(h=>h._found);
+    const emails=suggestedHikers.map(h=>h.email).filter(Boolean);
+    sugBanner.style.display='block';
+    sugBanner.innerHTML=`✨ Suggested roster: top ${Math.min(suggestN,cardHtmls.length)} of ${cardHtmls.length} applicants (by priority score)`
+      +(emails.length?` <button onclick="copyEmails()" style="margin-left:10px;padding:3px 10px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);border-radius:4px;color:#fff;font-size:11px;font-weight:700;cursor:pointer">📋 Copy ${emails.length} email${emails.length!==1?'s':''}</button>`:'');
+    sugCards.innerHTML=suggested.join('');
+    if(remaining.length){
+      sugDiv.style.display='block';
+      document.getElementById('hkr-cards').innerHTML=remaining.join('');
+    } else {
+      sugDiv.style.display='none';
+      document.getElementById('hkr-cards').innerHTML='';
+    }
+  } else {
+    sugBanner.style.display='none';
+    sugDiv.style.display='none';
+    sugCards.innerHTML='';
+    document.getElementById('hkr-cards').innerHTML=cardHtmls.join('');
+  }
   notify(`${s.length} applicant(s) shown`);
 }
 
-function resort(by,btn){rSort=by;document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(rHikers.length)renderCards();}
-function clearHikers(){rHikers=[];document.getElementById('hkr-in').value='';document.getElementById('roster-results').style.display='none';}
+function resort(by,btn){rSort=by;document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');suggestN=0;if(rHikers.length)renderCards();}
+function clearHikers(){rHikers=[];suggestN=0;document.getElementById('hkr-in').value='';document.getElementById('roster-results').style.display='none';}
+
+let suggestN=0;
+function suggestRoster(){
+  const n=parseInt(document.getElementById('suggest-spots').value)||8;
+  if(!rHikers.length){notify('Load hikers first');return;}
+  suggestN=n;
+  rSort='priority'; // force priority sort for suggestions
+  document.querySelectorAll('.sbtn').forEach((b,i)=>b.classList.toggle('active',i===0));
+  renderCards();
+  notify(`Top ${n} suggested`);
+}
+function copyEmails(){
+  let sorted=[...rHikers];
+  sorted.sort((a,b)=>priScore(b._found?b:null)-priScore(a._found?a:null));
+  const emails=sorted.slice(0,suggestN).filter(h=>h._found&&h.email).map(h=>h.email);
+  if(!emails.length){notify('No emails found for suggested hikers');return;}
+  navigator.clipboard.writeText(emails.join(', ')).then(()=>notify(`Copied ${emails.length} emails`)).catch(()=>{
+    // Fallback
+    const ta=document.createElement('textarea');ta.value=emails.join(', ');document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
+    notify(`Copied ${emails.length} emails`);
+  });
+}
 
 async function addNote(name){
   const key=name.replace(/[^a-zA-Z]/g,'');
@@ -1266,7 +1482,7 @@ function renderHistory(){
         <div style="flex:1"><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">${h.location||'Unknown'}</div>
           <div style="font-size:11px;color:var(--muted);margin-top:3px">${h.prof||'No professor'} · Lead: ${h.lead||'—'}${h.colead?' & '+h.colead:''} · ${h.quarter||''}</div></div>
         <div style="text-align:right"><div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)">${fmtDate(h.date)}</div>
-          <div style="font-size:11px;color:var(--muted)">${h.distance?h.distance+' mi · ':''}${att.length}/${h.applicantCount||'?'} attended</div></div>
+          <div style="font-size:11px;color:var(--muted)">${h.distance?h.distance+' mi · ':''}${h.participantCount||att.length} participants · ${h.applicantCount||hr.length} applied</div></div>
       </div>
       <div class="hex" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px">
         ${att.length?'<div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:5px">✅ Attended ('+att.length+')</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:5px;margin-bottom:8px">'+att.map(r=>'<div style="padding:5px 9px;border-radius:5px;font-size:12px;border:1px solid var(--grbd);background:var(--grbg);color:var(--grtx);cursor:pointer" onclick="event.stopPropagation();lookupFromHistory(\''+r.memberName+'\')">'+r.memberName+'</div>').join('')+'</div>':''}
@@ -1369,11 +1585,16 @@ function renderDashboard(){
   const totalApplications=filteredMembers.reduce((s,m)=>s+(m.applied||0),0);
   const totalAttended=filteredMembers.reduce((s,m)=>s+(m.attended||0),0);
   const avgRate=totalApplications>0?Math.round(totalAttended/totalApplications*100):0;
+  const avgParticipants=filteredHikes.length>0?Math.round(filteredHikes.reduce((s,h)=>s+(h.participantCount||0),0)/filteredHikes.length):0;
   document.getElementById('dash-hike-stats').innerHTML=`
     <div class="sbox accent"><span class="sv">${filteredHikes.length}</span><span class="sl">Hikes</span></div>
     <div class="sbox"><span class="sv">${uniqueHikers.size}</span><span class="sl">Unique hikers</span></div>
+    <div class="sbox"><span class="sv">${avgParticipants}</span><span class="sl">Avg participants</span></div>
     <div class="sbox"><span class="sv">${filteredHikes.length>0?Math.round(totalApplications/filteredHikes.length):0}</span><span class="sl">Avg applicants</span></div>
-    <div class="sbox"><span class="sv">${avgRate}%</span><span class="sl">Avg attendance</span></div>`;
+    <div class="sbox"><span class="sv">${avgRate}%</span><span class="sl">Selection rate</span></div>`;
+
+  // Hike calendar heatmap (always shows all hikes, not filtered by quarter)
+  renderHeatmap(hikes);
 
   // Scholarships
   let scholarReq=0,scholarAwd=0,scholarDollars=0;
@@ -1586,12 +1807,23 @@ function submitLog(){
     if(!m.scholarNotes)m.scholarNotes=[];
     if(!m.gearNotes)m.gearNotes=[];
     m.applied=(m.applied||0)+1;stats.applied++;
-    if(p.outcome==='attended'){m.attended=(m.attended||0)+1;m.lastHike=date;m.lastActivity=date;stats.attended++;}
+    if(p.outcome==='attended'){
+      m.attended=(m.attended||0)+1;m.lastHike=date;m.lastActivity=date;stats.attended++;
+      m.streak=0; // reset streak on attendance
+    }
+    else if(p.outcome==='applied'){
+      m.streak=(m.streak||0)+1; // increment streak when not selected
+    }
     else if(p.outcome==='replaced'){if(p.note)m.noShowNotes.push(`${dateStr}: replaced — ${p.note}`);stats.replaced++;}
     else if(p.outcome==='noshow'){m.noShows=(m.noShows||0)+1;m.noShowNotes.push(`${dateStr}: no-show — ${p.note||'No reason given'}`);stats.noshows++;}
     if(p.scholarship){m.scholarRequested=(m.scholarRequested||0)+1;m.scholarAwarded=(m.scholarAwarded||0)+1;m.scholarNotes.push(`${dateStr}: requested & awarded — ${quarter}`);stats.scholars++;}
     if(p.gear){m.gearRequests=(m.gearRequests||0)+1;m.gearNotes.push(`${dateStr}: gear interest noted`);stats.gear++;}
   });
+
+  // Update hike's participant count (attended = participants, including drivers)
+  const hikeRef=hikes.find(h=>h.id===hikeId);
+  if(hikeRef) hikeRef.participantCount=stats.attended;
+
   saveMembers();saveHikes();
 
   // Save per-hike roster entries
@@ -1640,7 +1872,7 @@ function submitLog(){
 
   document.getElementById('log-result').innerHTML=`<div class="success-box">
     ✅ <strong>Hike logged.</strong><br><br>
-    <span style="opacity:.85">${stats.applied} applied · ${stats.attended} attended · ${stats.replaced} replaced · ${stats.noshows} no-shows${stats.scholars?` · ${stats.scholars} scholarships`:''} ${stats.gear?` · ${stats.gear} gear interests`:''}${stats.newAdded?` · ${stats.newAdded} new members`:''}</span>
+    <span style="opacity:.85">${stats.attended} participants · ${stats.applied} applied · ${stats.replaced} replaced · ${stats.noshows} no-shows${stats.scholars?` · ${stats.scholars} scholarships`:''} ${stats.gear?` · ${stats.gear} gear interests`:''}${stats.newAdded?` · ${stats.newAdded} new members`:''}</span>
   </div>`;
   notify('Hike saved!');
 }
@@ -1656,6 +1888,24 @@ function clearLog(){
 // ════════════════════════════════════════
 // GEAR CHECKOUT
 // ════════════════════════════════════════
+function autoReturnGear(){
+  const today=new Date().toISOString().split('T')[0];
+  let changed=false;
+  checkouts.forEach(c=>{
+    if(!c.returned&&c.hikeDate&&c.hikeDate<today){
+      c.returned=true;
+      c.returnedAt=c.hikeDate+'T18:00:00';
+      const m=fuzzy(c.member);
+      if(m){
+        m.gearReturned=(m.gearReturned||0)+1;
+        m.gearOutstanding=Math.max(0,(m.gearOutstanding||0)-1);
+      }
+      changed=true;
+    }
+  });
+  if(changed){saveCheckouts();saveMembers();}
+}
+
 function renderInventoryBars(){
   const nowOut={};
   GEAR_ITEMS.forEach(g=>{nowOut[g]=checkouts.filter(c=>c.item===g&&!c.returned).length;});
@@ -1704,7 +1954,7 @@ function checkoutGear(){
       <div><strong>Member:</strong> ${m.name}</div>
       <div><strong>Item:</strong> ${item}</div>
       <div><strong>Hike date:</strong> ${fmtDate(date)}</div>
-      <div><strong>Auto-returns:</strong> ${fmtDate(date)} at 6:00 PM</div>
+      <div><strong>Auto-returns:</strong> Assumed returned after ${fmtDate(date)}</div>
       ${note?`<div><strong>Note:</strong> ${note}</div>`:''}
     </div>`;
   document.getElementById('checkout-modal').classList.add('open');
@@ -1741,13 +1991,15 @@ function renderCheckoutLog(){
   list.sort((a,b)=>new Date(b.date)-new Date(a.date));
 
   document.getElementById('checkout-log').innerHTML=list.length
-    ?`<div>${list.map(c=>`<div class="checkout-item">
+    ?`<div>${list.map(c=>{
+        const isAutoReturn=c.returned&&c.returnedAt&&c.returnedAt.includes('T18:00:00');
+        return`<div class="checkout-item">
         <div class="co-name">${c.member}</div>
         <div class="co-gear">${c.item}${c.note?' — '+c.note:''}</div>
         <div class="co-date">${fmtDate(c.hikeDate)}</div>
-        <span class="co-status ${c.returned?'co-ret':'co-out'}">${c.returned?'Returned':'Out'}</span>
+        <span class="co-status ${c.returned?'co-ret':'co-out'}">${c.returned?(isAutoReturn?'Auto-returned':'Returned'):'Out'}</span>
         ${!c.returned?`<button class="btn btn-g btn-sm" onclick="returnGear('${c.id}')" style="margin-left:8px">Mark returned</button>`:''}
-      </div>`).join('')}</div>`
+      </div>`;}).join('')}</div>`
     :'<div style="color:var(--muted);font-size:12px;padding:12px 0">No checkout records match this filter.</div>';
 }
 
@@ -1855,10 +2107,19 @@ function fixRecord(){
 }
 
 function exportCSV(){
-  const h=['name','year','major','isDriver','notes','applied','attended','drivingHikes','noShows','lastHike','scholarRequested','scholarAwarded','gearRequests','gearReturned','gearOutstanding'];
-  const rows=members.map(m=>h.map(k=>`"${(m[k]||'').toString().replace(/"/g,'""')}"`).join(','));
+  const h=['name','studentId','email','phone','year','major','isDriver','notes',
+    'cohortYear','gradQuarter','deleteQuarter','status','streak',
+    'applied','attended','drivingHikes','noShows','lastHike','lastActivity',
+    'scholarRequested','scholarAwarded','gearRequests','gearReturned','gearOutstanding'];
+  const rows=members.map(m=>h.map(k=>{
+    const v=m[k];
+    if(v===null||v===undefined)return'""';
+    if(Array.isArray(v))return`"${JSON.stringify(v).replace(/"/g,'""')}"`;
+    return`"${String(v).replace(/"/g,'""')}"`;
+  }).join(','));
   const blob=new Blob([[h.join(','),...rows].join('\n')],{type:'text/csv'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='peaks_professors_members.csv';a.click();
+  notify(`Exported ${members.length} members`);
 }
 function nuke(){if(!confirm('Delete ALL data?'))return;members=[];hikes=[];checkouts=[];profs=[];rosters=[];saveData();renderDB();notify('All data cleared');}
 function nukeConfirm(){document.getElementById('nuke-inp').value='';openModal('modal-nuke');}
@@ -1937,6 +2198,23 @@ async function initApp(){
   document.getElementById('l-date').value=new Date().toISOString().split('T')[0];
   document.getElementById('co-date').value=new Date().toISOString().split('T')[0];
   document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+
+  // Auto-generate quarter dropdown (current + next 3)
+  const qNames=['Winter','Spring','Summer','Autumn'];
+  const now=new Date(),cy=now.getFullYear(),cm=now.getMonth();
+  const curQi=cm<3?0:cm<6?1:cm<9?2:3;
+  const qSel=document.getElementById('l-quarter');
+  if(qSel){
+    qSel.innerHTML='';
+    for(let i=0;i<4;i++){
+      const qi=(curQi+i)%4;
+      const yr=cy+Math.floor((curQi+i)/4);
+      const opt=document.createElement('option');
+      opt.value=`${qNames[qi]} ${yr}`;opt.textContent=`${qNames[qi]} ${yr}`;
+      qSel.appendChild(opt);
+    }
+  }
+
   renderDB();
 }
 </script>

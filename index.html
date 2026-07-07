@@ -20,12 +20,12 @@
   --dfbg:#f0ede8;--dfbd:#c8c3b8;--dftx:#5a5550;
   --pubg:#ede8f7;--pubd:#7a5abf;--putx:#2d1a5c;
 }
-body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;font-size:14px;min-height:100vh}
+body{background:var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800' viewBox='0 0 800 800'%3E%3Cg fill='none' stroke='%232d5a27' stroke-opacity='.05' stroke-width='1.2'%3E%3Cpath d='M120,220 C140,150 260,140 300,200 C340,260 260,320 190,300 C130,285 105,260 120,220 Z'/%3E%3Cpath d='M160,220 C175,175 250,170 278,210 C305,250 250,285 200,272 C165,262 150,248 160,220 Z'/%3E%3Cpath d='M195,222 C205,196 245,193 260,218 C273,240 245,257 218,250 C200,245 190,238 195,222 Z'/%3E%3Cpath d='M520,600 C540,520 680,510 730,580 C775,645 690,720 600,700 C540,687 505,650 520,600 Z'/%3E%3Cpath d='M560,600 C575,548 665,542 700,590 C730,632 675,678 615,662 C575,652 550,635 560,600 Z'/%3E%3Cpath d='M598,600 C607,572 655,568 672,596 C686,620 660,640 630,633 C610,628 592,620 598,600 Z'/%3E%3Cpath d='M0,430 C120,400 220,470 340,440 C460,410 540,470 660,445 C720,432 770,440 800,430'/%3E%3Cpath d='M0,470 C130,445 230,505 350,478 C470,452 555,508 670,485 C730,472 775,478 800,470'/%3E%3C/g%3E%3C/svg%3E") fixed;color:var(--text);font-family:'Lato',sans-serif;font-size:14px;min-height:100vh}
 
 /* LOGIN */
 #login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--text);position:relative;overflow:hidden}
 .login-bg{position:absolute;inset:-20px;background-size:cover;background-position:center;filter:blur(6px);opacity:0;transition:opacity 2s ease-in-out}
-.login-bg.active{opacity:1}
+.login-bg.active{opacity:1;animation:kenburns 16s ease-in-out infinite alternate}
 .login-overlay{position:absolute;inset:0;background:rgba(26,24,20,.55)}
 .login-box{background:var(--bg);border-radius:12px;padding:40px 44px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.4);position:relative;z-index:2}
 .login-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:24px;color:var(--text);margin-bottom:4px}
@@ -55,7 +55,8 @@ body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;font-s
 
 /* SHELL */
 #app{display:none}
-header{background:var(--text);color:var(--bg);display:flex;align-items:stretch;border-bottom:3px solid var(--accent);padding:0 20px;gap:0}
+header{background:var(--text);color:var(--bg);display:flex;align-items:stretch;border-bottom:3px solid var(--accent);padding:0 20px;gap:0;position:relative}
+header::after{content:'';position:absolute;left:0;right:0;bottom:0;height:16px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='16' viewBox='0 0 240 16'%3E%3Cpolygon points='0,16 22,5 40,12 62,2 84,13 104,7 128,16' fill='%23f5f2ec' fill-opacity='.045'/%3E%3Cpolygon points='104,16 134,4 152,10 178,1 202,12 224,6 240,16' fill='%23f5f2ec' fill-opacity='.08'/%3E%3C/svg%3E") repeat-x bottom}
 .brand-block{display:flex;flex-direction:column;justify-content:center;padding:8px 0;flex-shrink:0;margin-right:16px}
 .brand{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;letter-spacing:-.5px;white-space:nowrap}
 .brand em{color:#8fc08a;font-style:normal}
@@ -272,6 +273,38 @@ tbody tr:hover td{background:var(--surface2)}
   .heatmap-cell{width:22px;height:22px}
 }
 
+
+/* ── AMBIENCE & POLISH ── */
+@keyframes kenburns{from{transform:scale(1)}to{transform:scale(1.09)}}
+@keyframes tabIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes cardIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.tab-anim{animation:tabIn .28s ease both}
+.hcard{animation:cardIn .3s ease both}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:none}
+.sbox{transition:transform .15s,box-shadow .15s}
+.sbox:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(26,24,20,.08)}
+button:focus-visible,.nb:focus-visible,.login-btn:focus-visible,input:focus-visible+.pw-toggle{outline:2px solid var(--accent2);outline-offset:2px}
+#notif.warn{border-left-color:var(--y1bd)}
+#notif.err{border-left-color:#e05050}
+.tbl-wrap{max-height:72vh;overflow:auto}
+th{position:sticky;top:0;z-index:3;background:var(--text)}
+th:first-child{left:0;z-index:4}
+td:first-child{position:sticky;left:0;background:var(--bg);z-index:1}
+.upload-zone.drag{border-color:var(--accent);background:#eef5ed;transform:scale(1.01)}
+.heatmap-cell.show-tip .heatmap-tooltip{display:block}
+.empty-state{text-align:center;padding:34px 16px;color:var(--muted)}
+.empty-state .es-icon{font-size:30px;margin-bottom:8px}
+.empty-state .es-msg{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px}
+.empty-state .es-hint{font-size:12px;line-height:1.6}
+.pw-wrap{position:relative}
+.pw-wrap .login-input{padding-right:40px}
+.pw-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:15px;opacity:.55;padding:2px 4px;line-height:1}
+.pw-toggle:hover{opacity:1}
+#save-err{display:none;position:fixed;bottom:14px;left:14px;z-index:310;background:#fdecea;border:1px solid #e05050;color:#7c1d12;border-radius:8px;padding:10px 14px;font-size:12px;font-weight:700;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.15)}
+#save-err button{padding:4px 12px;border-radius:4px;border:1px solid #e05050;background:#fff;color:#7c1d12;font-weight:700;cursor:pointer;font-size:12px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
 #notif{position:fixed;bottom:14px;right:14px;background:var(--text);color:var(--bg);padding:9px 16px;border-radius:6px;font-size:13px;font-weight:700;opacity:0;transform:translateY(6px);transition:all .2s;pointer-events:none;z-index:300;border-left:4px solid var(--accent)}
 #notif.show{opacity:1;transform:translateY(0)}
 </style>
@@ -288,8 +321,11 @@ tbody tr:hover td{background:var(--surface2)}
     <div class="login-logo">Peaks <em>&</em> Professors</div>
     <div class="login-sub">University of Washington</div>
     <label class="login-lbl">Password</label>
-    <input class="login-input" type="password" id="pw-input" placeholder="••••••••••••"
-      onkeydown="if(event.key==='Enter')tryLogin()">
+    <div class="pw-wrap">
+      <input class="login-input" type="password" id="pw-input" placeholder="••••••••••••" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter')tryLogin()">
+      <button type="button" class="pw-toggle" onclick="togglePw(this)" aria-label="Show password">👁</button>
+    </div>
     <button class="login-btn" onclick="tryLogin()">Sign In</button>
     <div class="login-err" id="login-err"></div>
   </div>
@@ -314,6 +350,7 @@ tbody tr:hover td{background:var(--surface2)}
     <div class="header-right">
       <span id="sync-status" style="font-size:11px;font-family:'IBM Plex Mono',monospace;white-space:nowrap"></span>
       <button id="manage-nav-btn" class="header-btn manage-btn" onclick="showTab('manage')" style="display:none">⚙ Manage</button>
+      <button class="header-btn" onclick="refreshData()" title="Pull the latest data from the sheet">↻ Refresh</button>
       <button class="header-btn" onclick="logout()">Sign out</button>
       <button class="hamburger" onclick="toggleMobileMenu()" id="hamburger-btn">☰</button>
     </div>
@@ -349,7 +386,7 @@ tbody tr:hover td{background:var(--surface2)}
         <div class="card">
           <div class="card-title">🥾 Hikers — paste or upload</div>
           <div class="hint">Paste names one per line, or upload your <strong>Google Form CSV</strong>.</div>
-          <div class="upload-zone" onclick="document.getElementById('csv-roster').click()">
+          <div class="upload-zone" id="zone-roster" onclick="document.getElementById('csv-roster').click()">
             <p>📂 Drop Google Form CSV here or <strong>click to browse</strong></p>
           </div>
           <input type="file" id="csv-roster" accept=".csv" style="display:none" onchange="handleCSV(event,'hkr-in')">
@@ -367,7 +404,7 @@ tbody tr:hover td{background:var(--surface2)}
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <div style="display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 10px">
               <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);white-space:nowrap">Spots:</label>
-              <input type="number" id="suggest-spots" min="1" max="50" value="8" style="width:50px;padding:4px 6px;font-size:13px;border:1px solid var(--border);border-radius:4px;text-align:center">
+              <input type="number" id="suggest-spots" min="1" max="50" value="8" onkeydown="if(event.key==='Enter')suggestRoster()" style="width:50px;padding:4px 6px;font-size:13px;border:1px solid var(--border);border-radius:4px;text-align:center">
               <button class="btn btn-p btn-sm" onclick="suggestRoster()" style="white-space:nowrap">Suggest Roster</button>
             </div>
             <div class="sortbar">
@@ -408,7 +445,7 @@ tbody tr:hover td{background:var(--surface2)}
       <div class="sec-sub">All tracked hikers. Read-only — edits go through Manage.</div>
       <div class="stat-grid" id="db-stats"></div>
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-        <input type="text" id="db-q" placeholder="Search name or major…" oninput="renderDB()" style="flex:1;min-width:160px">
+        <input type="text" id="db-q" placeholder="Search name or major…" oninput="renderDBDebounced()" style="flex:1;min-width:160px">
         <select id="db-f" onchange="renderDB()" style="width:180px">
           <option value="">All members</option>
           <option value="never">Never attended</option>
@@ -517,7 +554,7 @@ tbody tr:hover td{background:var(--surface2)}
         <div class="step-header"><div class="step-num">2</div>
           <div><div class="step-title">All applicants</div><div class="step-sub">Everyone who filled out the form</div></div>
         </div>
-        <div class="upload-zone" onclick="document.getElementById('log-csv').click()">
+        <div class="upload-zone" id="zone-log" onclick="document.getElementById('log-csv').click()">
           <p>📂 Upload Google Form CSV or <strong>click to browse</strong></p>
         </div>
         <input type="file" id="log-csv" accept=".csv" style="display:none" onchange="handleCSV(event,'l-applied')">
@@ -655,7 +692,7 @@ tbody tr:hover td{background:var(--surface2)}
           <div class="card">
             <div class="card-title">Bulk import hikers via CSV</div>
             <div class="hint">Columns: <code style="font-size:11px;background:var(--surface2);padding:2px 5px;border-radius:3px">name, studentId, email, phone, year, major, isDriver, notes</code> — header row required. Stats are never overwritten. Duplicate student IDs are skipped.</div>
-            <div class="upload-zone" onclick="document.getElementById('import-csv').click()">
+            <div class="upload-zone" id="zone-import" onclick="document.getElementById('import-csv').click()">
               <p>📂 Upload hiker CSV or <strong>click to browse</strong></p>
             </div>
             <input type="file" id="import-csv" accept=".csv" style="display:none" onchange="bulkImport(event)">
@@ -711,7 +748,7 @@ tbody tr:hover td{background:var(--surface2)}
       <div class="sec-sub">Everyone who has hiked with us. Added automatically when you log a hike. Click to expand and add notes.</div>
       <div class="stat-grid" id="prof-stats"></div>
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-        <input type="text" id="prof-q" placeholder="Search name, department, org…" oninput="renderProfs()" style="flex:1;min-width:160px">
+        <input type="text" id="prof-q" placeholder="Search name, department, org…" oninput="renderProfsDebounced()" style="flex:1;min-width:160px">
         <select id="prof-f" onchange="renderProfs()" style="width:160px">
           <option value="">All types</option>
           <option value="Professor">Professors</option>
@@ -729,7 +766,7 @@ tbody tr:hover td{background:var(--surface2)}
       <div class="sec-sub">All logged hikes. Click to expand and see the full roster. Click a hiker to look them up.</div>
       <div class="stat-grid" id="hist-stats"></div>
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-        <input type="text" id="hist-q" placeholder="Search location or professor…" oninput="renderHistory()" style="flex:1;min-width:160px">
+        <input type="text" id="hist-q" placeholder="Search location or professor…" oninput="renderHistoryDebounced()" style="flex:1;min-width:160px">
         <select id="hist-sort" onchange="renderHistory()" style="width:155px">
           <option value="recent">Most recent</option>
           <option value="oldest">Oldest first</option>
@@ -748,7 +785,7 @@ tbody tr:hover td{background:var(--surface2)}
 
 <!-- MODALS -->
 <div class="modal-overlay" id="checkout-modal">
-  <div class="modal-box">
+  <div class="modal-box" role="dialog" aria-modal="true">
     <button class="modal-close" onclick="closeModal('checkout-modal')">✕</button>
     <div class="modal-title">Confirm Checkout</div>
     <div id="modal-body"></div>
@@ -760,7 +797,7 @@ tbody tr:hover td{background:var(--surface2)}
 </div>
 
 <div class="modal-overlay" id="modal-new-hiker">
-  <div class="modal-box">
+  <div class="modal-box" role="dialog" aria-modal="true">
     <button class="modal-close" onclick="closeModal('modal-new-hiker')">✕</button>
     <div class="modal-title">New Hikers — Incomplete Profiles</div>
     <div class="hint">These hikers were just added. Send them the onboarding form to complete their profiles.</div>
@@ -773,7 +810,7 @@ tbody tr:hover td{background:var(--surface2)}
 </div>
 
 <div class="modal-overlay" id="modal-new-prof">
-  <div class="modal-box">
+  <div class="modal-box" role="dialog" aria-modal="true">
     <button class="modal-close" onclick="closeModal('modal-new-prof')">✕</button>
     <div class="modal-title">New Professor / Guest Detected</div>
     <div class="hint">Add their details to the directory so future leads can reach them.</div>
@@ -786,7 +823,7 @@ tbody tr:hover td{background:var(--surface2)}
 </div>
 
 <div class="modal-overlay" id="modal-add-prof">
-  <div class="modal-box">
+  <div class="modal-box" role="dialog" aria-modal="true">
     <button class="modal-close" onclick="closeModal('modal-add-prof')">✕</button>
     <div class="modal-title">Add to Directory</div>
     <div id="add-prof-body"></div>
@@ -798,7 +835,7 @@ tbody tr:hover td{background:var(--surface2)}
 </div>
 
 <div class="modal-overlay" id="modal-nuke">
-  <div class="modal-box">
+  <div class="modal-box" role="dialog" aria-modal="true">
     <button class="modal-close" onclick="closeModal('modal-nuke')">✕</button>
     <div class="modal-title">⚠ Clear all data</div>
     <div style="font-size:13px;line-height:1.7;margin-bottom:12px">This permanently deletes all members, hikes, checkouts and professors.<br><br>Type <strong>DELETE</strong> to confirm:</div>
@@ -829,6 +866,8 @@ tbody tr:hover td{background:var(--surface2)}
   <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:#f5f2ec">Peaks <span style="color:#8fc08a">&</span> Professors</div>
   <div id="load-sub" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6a6560">Connecting…</div>
 </div>
+
+<div id="save-err"><span>⚠ Some changes couldn't be saved to the sheet.</span><button onclick="retrySaves()">Retry now</button></div>
 
 <div id="notif"></div>
 
@@ -879,8 +918,8 @@ function renderHeatmap(filteredHikes){
 
   // Assign hikes to weeks
   filteredHikes.forEach(h=>{
-    if(!h.date)return;
-    const hd=new Date(h.date);
+    const hd=parseDate(h.date);
+    if(!hd)return;
     weeks.forEach(w=>{
       if(hd>=w.start&&hd<=w.end)w.hikes.push(h);
     });
@@ -909,8 +948,8 @@ function renderHeatmap(filteredHikes){
     const border=count===0?'border:1px solid var(--border)':'';
     const startStr=w.start.toLocaleDateString('en-US',{month:'short',day:'numeric'});
     const endStr=w.end.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-    const details=count>0?w.hikes.map(h=>`<div style="margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,.15)"><strong>${h.location||'Unknown'}</strong><br>${fmtDate(h.date)} · ${h.participantCount||'?'} hikers${h.prof?' · '+h.prof:''}</div>`).join(''):'<div style="margin-top:4px;opacity:.6">No hikes this week</div>';
-    return`<div class="heatmap-cell" style="background:${colors[level]};${border}">
+    const details=count>0?w.hikes.map(h=>`<div style="margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,.15)"><strong>${esc(h.location||'Unknown')}</strong><br>${fmtDate(h.date)} · ${h.participantCount||'?'} hikers${h.prof?' · '+esc(h.prof):''}</div>`).join(''):'<div style="margin-top:4px;opacity:.6">No hikes this week</div>';
+    return`<div class="heatmap-cell" style="background:${colors[level]};${border}" onclick="document.querySelectorAll('.heatmap-cell.show-tip').forEach(x=>{if(x!==this)x.classList.remove('show-tip')});this.classList.toggle('show-tip')">
       <div class="heatmap-tooltip">
         <div style="font-weight:700;margin-bottom:2px">${startStr} — ${endStr}</div>
         <div>${count} hike${count!==1?'s':''}</div>
@@ -923,12 +962,82 @@ function renderHeatmap(filteredHikes){
 // ════════════════════════════════════════
 // AUTH
 // ════════════════════════════════════════
-const PASSWORDS = {'Peaks&Profs2026':'lead','Peaks&ProfsAdmin2026':'admin'};
+// Passwords are stored as SHA-256 hashes so they can't be read from View Source.
+const PASSWORD_HASHES = {
+  'e156e1cf6c21ddb552195a434bebeff6f5807398fcd7cce80db4c25f196efdda':'lead',
+  'ae2c4df35a2f375b2d13c170149a982cb95c11ba6aff553d802555e6196dbbd1':'admin'
+};
 let role = null;
+
+async function sha256Hex(str){
+  if(window.crypto&&crypto.subtle){
+    try{
+      const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
+      return[...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+    }catch(e){/* non-secure context — fall through to the JS implementation */}
+  }
+  return fallbackSha256(str);
+}
+
+// Pure-JS SHA-256 fallback for contexts where crypto.subtle is unavailable (e.g. plain http).
+function fallbackSha256(str){
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  let H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const bytes=[];
+  for(let i=0;i<str.length;i++){
+    let c=str.charCodeAt(i);
+    if(c<128)bytes.push(c);
+    else if(c<2048){bytes.push(192|c>>6,128|c&63);}
+    else if(c<0xd800||c>=0xe000){bytes.push(224|c>>12,128|c>>6&63,128|c&63);}
+    else{c=0x10000+((c&0x3ff)<<10)+(str.charCodeAt(++i)&0x3ff);bytes.push(240|c>>18,128|c>>12&63,128|c>>6&63,128|c&63);}
+  }
+  const bitLen=bytes.length*8;
+  bytes.push(0x80);
+  while(bytes.length%64!==56)bytes.push(0);
+  for(let i=7;i>=0;i--)bytes.push(bitLen/Math.pow(2,i*8)&0xff);
+  const rr=(x,n)=>(x>>>n)|(x<<(32-n));
+  const w=new Array(64);
+  for(let i=0;i<bytes.length;i+=64){
+    for(let t=0;t<16;t++)w[t]=(bytes[i+t*4]<<24)|(bytes[i+t*4+1]<<16)|(bytes[i+t*4+2]<<8)|bytes[i+t*4+3];
+    for(let t=16;t<64;t++){
+      const s0=rr(w[t-15],7)^rr(w[t-15],18)^(w[t-15]>>>3);
+      const s1=rr(w[t-2],17)^rr(w[t-2],19)^(w[t-2]>>>10);
+      w[t]=(w[t-16]+s0+w[t-7]+s1)|0;
+    }
+    let[a,b,c,d,e,f,g,h]=H;
+    for(let t=0;t<64;t++){
+      const S1=rr(e,6)^rr(e,11)^rr(e,25);
+      const ch=(e&f)^(~e&g);
+      const t1=(h+S1+ch+K[t]+w[t])|0;
+      const S0=rr(a,2)^rr(a,13)^rr(a,22);
+      const maj=(a&b)^(a&c)^(b&c);
+      const t2=(S0+maj)|0;
+      h=g;g=f;f=e;e=(d+t1)|0;d=c;c=b;b=a;a=(t1+t2)|0;
+    }
+    H=[H[0]+a|0,H[1]+b|0,H[2]+c|0,H[3]+d|0,H[4]+e|0,H[5]+f|0,H[6]+g|0,H[7]+h|0];
+  }
+  return H.map(x=>(x>>>0).toString(16).padStart(8,'0')).join('');
+}
+
+function togglePw(btn){
+  const inp=document.getElementById('pw-input');
+  inp.type=inp.type==='password'?'text':'password';
+  btn.textContent=inp.type==='password'?'👁':'🙈';
+  btn.setAttribute('aria-label',inp.type==='password'?'Show password':'Hide password');
+  inp.focus();
+}
+
 async function tryLogin(){
   const pw=document.getElementById('pw-input').value;
-  role=PASSWORDS[pw]||null;
-  if(!role){document.getElementById('login-err').textContent='Incorrect password — try again.';document.getElementById('pw-input').value='';document.getElementById('pw-input').focus();return;}
+  const hash=await sha256Hex(pw);
+  const r=PASSWORD_HASHES[hash]||null;
+  if(!r){document.getElementById('login-err').textContent='Incorrect password — try again.';document.getElementById('pw-input').value='';document.getElementById('pw-input').focus();return;}
+  sessionStorage.setItem('pp_role',r); // survive refreshes for this tab
+  await enterApp(r);
+}
+
+async function enterApp(r){
+  role=r;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
   const roleLabel = document.getElementById('role-label');
@@ -942,13 +1051,13 @@ async function tryLogin(){
   if(mmb) mmb.style.display=role==='admin'?'block':'none';
   await initApp();
 }
-function logout(){role=null;document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('pw-input').value='';document.getElementById('login-err').textContent='';const mb=document.getElementById('manage-nav-btn');if(mb)mb.style.display='none';const mmb=document.getElementById('manage-mobile-btn');if(mmb)mmb.style.display='none';document.getElementById('mobile-menu').classList.remove('open');showTab('roster');}
+function logout(){role=null;sessionStorage.removeItem('pp_role');document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('pw-input').value='';document.getElementById('login-err').textContent='';const mb=document.getElementById('manage-nav-btn');if(mb)mb.style.display='none';const mmb=document.getElementById('manage-mobile-btn');if(mmb)mmb.style.display='none';document.getElementById('mobile-menu').classList.remove('open');showTab('roster');const pw=document.getElementById('pw-input');if(pw)pw.focus();}
 
 // ════════════════════════════════════════
 // ════════════════════════════════════════
 // CONFIG — swap URL when moving to peaks account
 // ════════════════════════════════════════
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwNaZGUwOmtg2xhSWAcjhKSBzCxzLgESqFGPc3HqcS-gB_UoK7yzrbAwOUlYxjRqp5Xcg/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbziX5t9V4tJvFRU6bKDO4vpUN1ws2xKLuRGdyeAXbaQIuZ1inTazV0I3s13ZRCLDaUvjw/exec';
 
 // ════════════════════════════════════════
 // DATA
@@ -957,6 +1066,7 @@ let members=[], rHikers=[], rSort='priority', outcomeData=[];
 let hikes=[], checkouts=[], profs=[], rosters=[];
 let inventory={'Hiking Boots':0,'Rain Jacket':0,'Trekking Poles':0,'Gloves':0,'Microspikes':0,'Daypack':0};
 let dashView='quarter', pendingCheckout=null, pendingNewProfs=[];
+let currentTab='roster';
 let syncStatus='idle';
 
 const GEAR_ITEMS=['Hiking Boots','Rain Jacket','Trekking Poles','Gloves','Microspikes','Daypack'];
@@ -992,6 +1102,46 @@ function blank(name){
 function blankProf(name){
   return{id:'p'+Date.now()+Math.random().toString(36).slice(2,5),name,type:'Professor',department:'',org:'',email:'',
     notes:'',lastHike:null,lastLead:'',lastColead:'',lastLocation:'',hikeIds:[]};
+}
+
+// ── HELPERS ────────────────────────
+// HTML-escape any user-entered text before it goes into innerHTML.
+function esc(s){return String(s===null||s===undefined?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+// Safely embed a string as a JS argument inside an inline onclick="" attribute.
+function jarg(s){return esc(JSON.stringify(String(s===null||s===undefined?'':s)));}
+// Parse YYYY-MM-DD as LOCAL time. new Date('2026-07-04') parses as UTC midnight,
+// which displays as the previous day in US timezones — this fixes that everywhere.
+function parseDate(d){
+  if(!d)return null;
+  if(d instanceof Date)return isNaN(d)?null:d;
+  const m=String(d).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m)return new Date(+m[1],+m[2]-1,+m[3]);
+  const dt=new Date(d);
+  return isNaN(dt)?null:dt;
+}
+// Today as YYYY-MM-DD in LOCAL time (toISOString is UTC and rolls over early in the evening).
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function debounce(fn,ms){let t;return function(...a){clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms);};}
+function emptyState(icon,msg,hint){return `<div class="empty-state"><div class="es-icon">${icon}</div><div class="es-msg">${msg}</div><div class="es-hint">${hint||''}</div></div>`;}
+// Count-up animation for stat numbers (skipped if the user prefers reduced motion).
+function animateStats(scope){
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  (scope||document).querySelectorAll('.sv').forEach(el=>{
+    const raw=el.textContent;
+    const m=raw.match(/^(\$?)(\d+(?:\.\d+)?)(%?)$/);
+    if(!m)return;
+    const target=parseFloat(m[2]);
+    if(!target)return;
+    const decimals=(m[2].split('.')[1]||'').length;
+    const dur=550,start=performance.now();
+    function step(now){
+      const p=Math.min((now-start)/dur,1);
+      const eased=1-Math.pow(1-p,3);
+      el.textContent=m[1]+(target*eased).toFixed(decimals)+m[3];
+      if(p<1)requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
 }
 
 // ── QUARTER / COHORT ──────────────────────
@@ -1080,18 +1230,12 @@ async function loadData(){
   try{
     const all=await callScript('readAll',{});
     setLP(40,'Parsing roster data…');
-    
-    // Tiny artificial pause to let the bar catch up
-    await new Promise(r => setTimeout(r, 400));
-    
     members=(all.Members||[]).map(r=>fromRow(r,M_COLS)).filter(x=>x.name);
     hikes=(all.Hikes||[]).map(r=>fromRow(r,H_COLS)).filter(x=>x.id);
     rosters=(all.HikeRosters||[]).map(r=>fromRow(r,R_COLS)).filter(x=>x.hikeId);
     checkouts=(all.Checkouts||[]).map(r=>fromRow(r,C_COLS)).filter(x=>x.id);
     
     setLP(70,'Loading professors and gear…');
-    await new Promise(r => setTimeout(r, 400));
-    
     profs=(all.Professors||[]).map(r=>fromRow(r,P_COLS)).filter(x=>x.id);
     (all.Config||[]).forEach(row=>{const k=String(row[0]||''),v=String(row[1]||'');if(inventory.hasOwnProperty(k))inventory[k]=parseInt(v)||0;});
     
@@ -1104,18 +1248,40 @@ async function loadData(){
     console.error('loadData error',e);
     setSyncStatus('error',e.message);
     setLP(100,'⚠ Error loading data');
-    members=[];hikes=[];rosters=[];checkouts=[];profs=[];
+    // Only reset if this is the first load — a failed refresh keeps existing data intact
+    if(!members.length&&!hikes.length){members=[];hikes=[];rosters=[];checkouts=[];profs=[];}
+    throw e;
   }
 }
 
 // ── SAVES ────────────────────────────────
-async function saveMembers(){setSyncStatus('syncing');try{await callScript('write',{sheet:'Members',rows:members.map(m=>toRow(m,M_COLS))});setSyncStatus('ok');setTimeout(()=>setSyncStatus('idle'),2000);}catch(e){setSyncStatus('error',e.message);console.error(e);}}
-async function saveHikes(){try{await callScript('write',{sheet:'Hikes',rows:hikes.map(h=>toRow(h,H_COLS))});}catch(e){setSyncStatus('error',e.message);}}
-async function saveRosters(){try{await callScript('write',{sheet:'HikeRosters',rows:rosters.map(r=>toRow(r,R_COLS))});}catch(e){setSyncStatus('error',e.message);}}
-async function saveCheckouts(){try{await callScript('write',{sheet:'Checkouts',rows:checkouts.map(c=>toRow(c,C_COLS))});}catch(e){setSyncStatus('error',e.message);}}
-async function saveProfs(){try{await callScript('write',{sheet:'Professors',rows:profs.map(p=>toRow(p,P_COLS))});}catch(e){setSyncStatus('error',e.message);}}
-async function saveInventoryToSheet(){try{await callScript('write',{sheet:'Config',rows:GEAR_ITEMS.map(g=>[g,String(inventory[g]||0)])});}catch(e){console.error(e);}}
+// Failed writes are tracked per sheet and surfaced with a visible Retry banner,
+// so unsaved changes can never silently disappear on a page refresh.
+let failedSheets=new Set();
+function saveErrBanner(show){const el=document.getElementById('save-err');if(el)el.style.display=show?'flex':'none';}
+function markSaveOk(sheet){failedSheets.delete(sheet);if(!failedSheets.size)saveErrBanner(false);}
+function markSaveFail(sheet,e){failedSheets.add(sheet);setSyncStatus('error',(e&&e.message)||'');saveErrBanner(true);console.error('Save failed:',sheet,e);}
+async function saveSheet(sheet,rows){
+  try{await callScript('write',{sheet,rows});markSaveOk(sheet);return true;}
+  catch(e){markSaveFail(sheet,e);return false;}
+}
+async function saveMembers(){setSyncStatus('syncing');const ok=await saveSheet('Members',members.map(m=>toRow(m,M_COLS)));if(ok){setSyncStatus('ok');setTimeout(()=>setSyncStatus('idle'),2000);}}
+async function saveHikes(){await saveSheet('Hikes',hikes.map(h=>toRow(h,H_COLS)));}
+async function saveRosters(){await saveSheet('HikeRosters',rosters.map(r=>toRow(r,R_COLS)));}
+async function saveCheckouts(){await saveSheet('Checkouts',checkouts.map(c=>toRow(c,C_COLS)));}
+async function saveProfs(){await saveSheet('Professors',profs.map(p=>toRow(p,P_COLS)));}
+async function saveInventoryToSheet(){await saveSheet('Config',GEAR_ITEMS.map(g=>[g,String(inventory[g]||0)]));}
 async function saveData(){await Promise.all([saveMembers(),saveHikes(),saveRosters(),saveCheckouts(),saveProfs()]);}
+const SHEET_SAVERS={Members:saveMembers,Hikes:saveHikes,HikeRosters:saveRosters,Checkouts:saveCheckouts,Professors:saveProfs,Config:saveInventoryToSheet};
+async function retrySaves(){
+  const list=[...failedSheets];
+  if(!list.length){saveErrBanner(false);return;}
+  failedSheets.clear();saveErrBanner(false);
+  setSyncStatus('syncing');
+  for(const sh of list){if(SHEET_SAVERS[sh])await SHEET_SAVERS[sh]();}
+  if(!failedSheets.size){setSyncStatus('ok');setTimeout(()=>setSyncStatus('idle'),2000);notify('All changes saved');}
+  else notify("Still can't reach the sheet — check your connection",'err');
+}
 
 // ════════════════════════════════════════
 // FUZZY MATCH
@@ -1135,7 +1301,7 @@ function fuzzy(q){
 // ════════════════════════════════════════
 // PRIORITY
 // ════════════════════════════════════════
-function daysAgo(d){if(!d)return Infinity;return(Date.now()-new Date(d).getTime())/86400000;}
+function daysAgo(d){const dt=parseDate(d);if(!dt)return Infinity;return(Date.now()-dt.getTime())/86400000;}
 function priClass(m){
   if(!m)return'c-df';
   if(m.noShows>0)return'c-or';
@@ -1206,7 +1372,7 @@ function drvBadge(m){
   const c=m.drivingHikes>=5?'5+':String(m.drivingHikes||0);
   return`<span class="drvbadge">🚗 ×${c}</span>`;
 }
-function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+function fmtDate(d){const dt=parseDate(d);if(!dt)return'—';return dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
 function ps(pc){
   const map={'c-b1':'background:var(--b1bg);color:var(--b1tx);border:1px solid var(--b1bd)','c-b2':'background:var(--b2bg);color:var(--b2tx);border:1px solid var(--b2bd)','c-te':'background:var(--tebg);color:var(--tetx);border:1px solid var(--tebd)','c-y1':'background:var(--y1bg);color:var(--y1tx);border:1px solid var(--y1bd)','c-y2':'background:var(--y2bg);color:var(--y2tx);border:1px solid var(--y2bd)','c-gr':'background:var(--grbg);color:var(--grtx);border:1px solid var(--grbd)','c-or':'background:var(--orbg);color:var(--ortx);border:1px solid var(--orbd)','c-df':'background:var(--dfbg);color:var(--dftx);border:1px solid var(--dfbd)'};
   return map[pc]||map['c-df'];
@@ -1215,19 +1381,57 @@ function ps(pc){
 // ════════════════════════════════════════
 // CSV
 // ════════════════════════════════════════
+// Proper CSV parser: handles quoted fields, commas inside quotes, escaped quotes ("")
+// and newlines inside quotes — all of which Google Form exports contain regularly.
+function parseCSV(text){
+  const rows=[];let row=[],field='',inQ=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(inQ){
+      if(ch==='"'){if(text[i+1]==='"'){field+='"';i++;}else inQ=false;}
+      else field+=ch;
+    }else if(ch==='"'){inQ=true;}
+    else if(ch===','){row.push(field);field='';}
+    else if(ch==='\n'||ch==='\r'){
+      if(ch==='\r'&&text[i+1]==='\n')i++;
+      row.push(field);field='';
+      if(row.some(c=>c.trim()!==''))rows.push(row);
+      row=[];
+    }else field+=ch;
+  }
+  row.push(field);
+  if(row.some(c=>c.trim()!==''))rows.push(row);
+  return rows;
+}
+function findNameColumn(headers){
+  let ni=headers.findIndex(h=>h==='name'||h==='full name'||h==='fullname');
+  if(ni<0)ni=headers.findIndex(h=>h.includes('name')||h.includes('full'));
+  return ni;
+}
 function parseCSVNames(text){
-  const lines=text.split('\n').map(l=>l.trim()).filter(Boolean);
-  if(!lines.length)return[];
-  const headers=lines[0].toLowerCase().split(',');
-  const ni=headers.findIndex(h=>h.includes('name')||h.includes('full'));
-  if(ni>=0)return lines.slice(1).map(l=>l.split(',')[ni].replace(/"/g,'').trim()).filter(Boolean);
-  return lines.map(l=>l.split(',')[0].replace(/"/g,'').trim()).filter(Boolean);
+  const rows=parseCSV(text);
+  if(!rows.length)return[];
+  const headers=rows[0].map(h=>h.toLowerCase().trim());
+  const ni=findNameColumn(headers);
+  if(ni>=0)return rows.slice(1).map(r=>(r[ni]||'').trim()).filter(Boolean);
+  // No header row detected — treat the first column as names
+  return rows.map(r=>(r[0]||'').trim()).filter(Boolean);
 }
 function handleCSV(e,tid){
   const f=e.target.files[0];if(!f)return;
+  readCSVInto(f,tid);
+  e.target.value=''; // allow re-uploading the same file
+}
+function readCSVInto(file,tid){
   const r=new FileReader();
-  r.onload=ev=>{const n=parseCSVNames(ev.target.result);document.getElementById(tid).value=n.join('\n');notify(`Loaded ${n.length} names`);};
-  r.readAsText(f);
+  r.onload=ev=>{
+    const n=parseCSVNames(ev.target.result);
+    if(!n.length){notify('No names found in that file','warn');return;}
+    document.getElementById(tid).value=n.join('\n');
+    notify(`Loaded ${n.length} names from CSV`);
+  };
+  r.onerror=()=>notify('Could not read that file','err');
+  r.readAsText(file);
 }
 function parseLines(raw){return raw.split(/[\n,]/).map(l=>l.trim()).filter(l=>l.length>1);}
 
@@ -1236,12 +1440,12 @@ function parseLines(raw){return raw.split(/[\n,]/).map(l=>l.trim()).filter(l=>l.
 // ════════════════════════════════════════
 function processDrivers(){
   const raw=document.getElementById('drv-in').value.trim();
-  if(!raw){notify('Paste driver names first');return;}
+  if(!raw){notify('Paste driver names first','warn');return;}
   document.getElementById('drv-out').innerHTML=parseLines(raw).map(n=>{
     const m=fuzzy(n);
     const dc=m?(m.drivingHikes>=5?'5+':String(m.drivingHikes||0)):'0';
     return`<div class="dcard">
-      <div><div class="dname">${m?m.name:n}</div><div class="dmeta">${m?[m.year,m.notes].filter(Boolean).join(' · '):'Not in database'}</div></div>
+      <div><div class="dname">${esc(m?m.name:n)}</div><div class="dmeta">${esc(m?[m.year,m.notes].filter(Boolean).join(' · '):'Not in database')}</div></div>
       ${m&&m.drivingHikes>0?`<span style="font-size:11px;opacity:.4;margin-right:6px">🚗 ×${dc}</span>`:''}
       <span class="dconfirm">DRIVER ✓</span>
     </div>`;
@@ -1252,7 +1456,7 @@ function clearDrivers(){document.getElementById('drv-in').value='';document.getE
 
 function processHikers(){
   const raw=document.getElementById('hkr-in').value.trim();
-  if(!raw){notify('Paste hiker names first');return;}
+  if(!raw){notify('Paste hiker names first','warn');return;}
   rHikers=parseLines(raw).map(n=>{const m=fuzzy(n);return m?{...m,_found:true,_raw:n}:{...blank(n),_found:false,_raw:n};});
   suggestN=0;
   renderCards();document.getElementById('roster-results').style.display='block';
@@ -1266,10 +1470,10 @@ function renderCards(){
   else if(rSort==='attended')s.sort((a,b)=>(a.attended||0)-(b.attended||0));
   const nf=s.filter(h=>!h._found);
   const nb=document.getElementById('not-found-banner');
-  if(nf.length){nb.style.display='block';nb.innerHTML=`<strong>${nf.length} not in database:</strong> ${nf.map(h=>h._raw).join(', ')} — add via Manage.`;}
+  if(nf.length){nb.style.display='block';nb.innerHTML=`<strong>${nf.length} not in database:</strong> ${esc(nf.map(h=>h._raw).join(', '))} — add via Manage.`;}
   else nb.style.display='none';
 
-  const cardHtmls=s.map(h=>{
+  const cardHtmls=s.map((h,ci)=>{
     const cls=h._found?priClass(h):'c-df';
     const rate=h.applied>0?Math.round(h.attended/h.applied*100)+'%':'—';
     const badge=h._found?drvBadge(h):'';
@@ -1281,7 +1485,7 @@ function renderCards(){
       (h.scholarNotes||[]).forEach(n=>noteItems.push({label:'Scholarship',text:n}));
       (h.gearNotes||[]).forEach(n=>noteItems.push({label:'Gear',text:n}));
     }
-    const notesHtml=noteItems.length?`<div class="card-notes">${noteItems.map(n=>`<div class="note-item"><span class="note-label">${n.label}</span>${n.text}</div>`).join('')}</div>`:'';
+    const notesHtml=noteItems.length?`<div class="card-notes">${noteItems.map(n=>`<div class="note-item"><span class="note-label">${n.label}</span>${esc(n.text)}</div>`).join('')}</div>`:'';
     const extras=[];
     if(h._found&&h.scholarAwarded>0)extras.push(`<span style="font-size:9px;background:var(--pubg);color:var(--putx);border:1px solid var(--pubd);padding:2px 6px;border-radius:3px;font-weight:700">🎓 ×${h.scholarAwarded}</span>`);
     if(h._found&&h.gearOutstanding>0)extras.push(`<span style="font-size:9px;background:var(--y1bg);color:var(--y1tx);border:1px solid var(--y1bd);padding:2px 6px;border-radius:3px;font-weight:700">🎒 out</span>`);
@@ -1290,28 +1494,28 @@ function renderCards(){
     const nsNotes=(h.noShowNotes||[]),mnNotes=(h.manualNotes||[]);
     const expandHtml=h._found?`<div class="hcard-expand" style="display:none;margin-top:10px;border-top:1px solid rgba(0,0,0,.1);padding-top:10px">
       <div style="margin-bottom:8px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.5;margin-bottom:4px">Profile</div>
-        ${h.studentId?'<div style="font-size:11px;padding:2px 0"><strong style="opacity:.6">ID:</strong> '+h.studentId+'</div>':''}
-        ${h.email?'<div style="font-size:11px;padding:2px 0"><strong style="opacity:.6">Email:</strong> '+h.email+'</div>':''}
-        ${h.phone?'<div style="font-size:11px;padding:2px 0"><strong style="opacity:.6">Phone:</strong> '+h.phone+'</div>':''}
-        ${h.year?'<div style="font-size:11px;padding:2px 0"><strong style="opacity:.6">Year:</strong> '+h.year+'</div>':''}
-        ${h.major?'<div style="font-size:11px;padding:2px 0"><strong style="opacity:.6">Major:</strong> '+h.major+'</div>':''}
+        ${h.studentId?'<div style="font-size:11px;padding:2px 0"><strong style="opacity:.6">ID:</strong> '+esc(h.studentId)+'</div>':''}
+        ${h.email?'<div style="font-size:11px;padding:2px 0"><strong style="opacity:.6">Email:</strong> '+esc(h.email)+'</div>':''}
+        ${h.phone?'<div style="font-size:11px;padding:2px 0"><strong style="opacity:.6">Phone:</strong> '+esc(h.phone)+'</div>':''}
+        ${h.year?'<div style="font-size:11px;padding:2px 0"><strong style="opacity:.6">Year:</strong> '+esc(h.year)+'</div>':''}
+        ${h.major?'<div style="font-size:11px;padding:2px 0"><strong style="opacity:.6">Major:</strong> '+esc(h.major)+'</div>':''}
         ${h.deleteQuarter&&h.deleteQuarter!=='—'?'<div style="font-size:11px;padding:2px 0"><strong style="opacity:.6">Delete quarter:</strong> '+h.deleteQuarter+'</div>':''}
       </div>
-      ${nsNotes.length?'<div style="margin-bottom:8px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.5;margin-bottom:4px">No-show history</div>'+nsNotes.map(n=>'<div style="font-size:11px;padding:2px 0;border-bottom:1px solid rgba(0,0,0,.05)">'+n+'</div>').join('')+'</div>':''}
+      ${nsNotes.length?'<div style="margin-bottom:8px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.5;margin-bottom:4px">No-show history</div>'+nsNotes.map(n=>'<div style="font-size:11px;padding:2px 0;border-bottom:1px solid rgba(0,0,0,.05)">'+esc(n)+'</div>').join('')+'</div>':''}
       ${h.scholarAwarded>0?'<div style="margin-bottom:8px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.5;margin-bottom:4px">Scholarships</div><div style="font-size:11px">Requested: '+h.scholarRequested+' · Awarded: '+h.scholarAwarded+'</div></div>':''}
       <div style="margin-bottom:4px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.5;margin-bottom:4px">Notes</div>
-        ${mnNotes.length?mnNotes.map(n=>'<div style="font-size:11px;padding:3px 0;border-bottom:1px solid rgba(0,0,0,.05)">'+(typeof n==='string'?n:n.text+'<div style="font-size:10px;opacity:.4">'+(n.by||'')+' · '+(n.date||'')+'</div>')+'</div>').join(''):'<div style="font-size:11px;color:var(--muted);font-style:italic">No notes yet</div>'}
+        ${mnNotes.length?mnNotes.map(n=>'<div style="font-size:11px;padding:3px 0;border-bottom:1px solid rgba(0,0,0,.05)">'+(typeof n==='string'?esc(n):esc(n.text)+'<div style="font-size:10px;opacity:.4">'+esc(n.by||'')+' · '+esc(n.date||'')+'</div>')+'</div>').join(''):'<div style="font-size:11px;color:var(--muted);font-style:italic">No notes yet</div>'}
         <div style="display:flex;gap:6px;margin-top:8px">
           <input type="text" id="ni-${(h.name||'').replace(/[^a-zA-Z]/g,'')}" placeholder="Add a note…" onclick="event.stopPropagation()" style="flex:1;font-size:11px;padding:4px 7px">
-          <button class="btn btn-g btn-sm" onclick="event.stopPropagation();addNote('${h.name}')">Add</button>
+          <button class="btn btn-g btn-sm" onclick="event.stopPropagation();addNote(${jarg(h.name)})">Add</button>
         </div>
       </div>
     </div>`:'';
 
-    return`<div class="hcard ${cls}" onclick="this.querySelector('.hcard-expand')&&(this.querySelector('.hcard-expand').style.display=this.querySelector('.hcard-expand').style.display==='none'?'block':'none')">
-      <div class="tag-row"><span class="htag">${h._found?priTag(h):'not in db'}</span>${badge}${streakBadge}${extras.join('')}</div>
-      <div class="hn">${h.name}</div>
-      <div class="hreason">${h._found?priReason(h):'Not in database'}</div>
+    return`<div class="hcard ${cls}" style="animation-delay:${Math.min(ci*22,330)}ms" onclick="this.querySelector('.hcard-expand')&&(this.querySelector('.hcard-expand').style.display=this.querySelector('.hcard-expand').style.display==='none'?'block':'none')">
+      <div class="tag-row"><span class="htag">${esc(h._found?priTag(h):'not in db')}</span>${badge}${streakBadge}${extras.join('')}</div>
+      <div class="hn">${esc(h.name)}</div>
+      <div class="hreason">${esc(h._found?priReason(h):'Not in database')}</div>
       <div class="hstats">
         <div><span class="hv">${h.applied}</span><span class="hl">Applied</span></div>
         <div><span class="hv">${h.attended}</span><span class="hl">Attended</span></div>
@@ -1347,16 +1551,15 @@ function renderCards(){
     sugCards.innerHTML='';
     document.getElementById('hkr-cards').innerHTML=cardHtmls.join('');
   }
-  notify(`${s.length} applicant(s) shown`);
 }
 
 function resort(by,btn){rSort=by;document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');suggestN=0;if(rHikers.length)renderCards();}
-function clearHikers(){rHikers=[];suggestN=0;document.getElementById('hkr-in').value='';document.getElementById('roster-results').style.display='none';}
+function clearHikers(){if(rHikers.length&&!confirm('Clear the hiker list and results?'))return;rHikers=[];suggestN=0;document.getElementById('hkr-in').value='';document.getElementById('roster-results').style.display='none';}
 
 let suggestN=0;
 function suggestRoster(){
   const n=parseInt(document.getElementById('suggest-spots').value)||8;
-  if(!rHikers.length){notify('Load hikers first');return;}
+  if(!rHikers.length){notify('Load hikers first','warn');return;}
   suggestN=n;
   rSort='priority'; // force priority sort for suggestions
   document.querySelectorAll('.sbtn').forEach((b,i)=>b.classList.toggle('active',i===0));
@@ -1367,7 +1570,7 @@ function copyEmails(){
   let sorted=[...rHikers];
   sorted.sort((a,b)=>priScore(b._found?b:null)-priScore(a._found?a:null));
   const emails=sorted.slice(0,suggestN).filter(h=>h._found&&h.email).map(h=>h.email);
-  if(!emails.length){notify('No emails found for suggested hikers');return;}
+  if(!emails.length){notify('No emails found for suggested hikers','warn');return;}
   navigator.clipboard.writeText(emails.join(', ')).then(()=>notify(`Copied ${emails.length} emails`)).catch(()=>{
     // Fallback
     const ta=document.createElement('textarea');ta.value=emails.join(', ');document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
@@ -1378,7 +1581,7 @@ function copyEmails(){
 async function addNote(name){
   const key=name.replace(/[^a-zA-Z]/g,'');
   const inp=document.getElementById('ni-'+key);
-  if(!inp||!inp.value.trim()){notify('Enter a note first');return;}
+  if(!inp||!inp.value.trim()){notify('Enter a note first','warn');return;}
   const m=members.find(x=>x.name===name);if(!m)return;
   if(!m.manualNotes)m.manualNotes=[];
   m.manualNotes.push({text:inp.value.trim(),by:role==='admin'?'Admin':'Lead',date:fmtDate(new Date())});
@@ -1402,24 +1605,24 @@ function renderProfs(){
     <div class="sbox"><span class="sv">${profs.filter(p=>p.type==='Guest').length}</span><span class="sl">Guests</span></div>
     <div class="sbox accent"><span class="sv">${profs.filter(p=>p.type==='Club').length}</span><span class="sl">Clubs</span></div>`;
   const el=document.getElementById('prof-list');
-  if(!list.length){el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:20px 0">No professors or guests yet — added automatically when you log a hike.</div>';return;}
+  if(!list.length){el.innerHTML=profs.length?emptyState('🔍','No matches','Try a different search or filter.'):emptyState('🎓','No professors or guests yet','They\'re added automatically when you log a hike — or add one manually below.');return;}
   el.innerHTML=list.map(p=>{
     const tc=p.type==='Professor'?'background:var(--b1bg);color:var(--b1tx);border:1px solid var(--b1bd)':p.type==='Club'?'background:var(--grbg);color:var(--grtx);border:1px solid var(--grbd)':'background:var(--y1bg);color:var(--y1tx);border:1px solid var(--y1bd)';
     const hc=(p.hikeIds||[]).length;
-    const hikeHist=(p.hikeIds||[]).map(hid=>{const h=hikes.find(x=>x.id===hid);return h?'<div style="font-size:11px;padding:2px 0;border-bottom:1px solid rgba(0,0,0,.05)">'+fmtDate(h.date)+' — '+h.location+' · '+h.lead+(h.colead?' & '+h.colead:'')+'</div>':'';}).filter(Boolean).join('');
+    const hikeHist=(p.hikeIds||[]).map(hid=>{const h=hikes.find(x=>x.id===hid);return h?'<div style="font-size:11px;padding:2px 0;border-bottom:1px solid rgba(0,0,0,.05)">'+fmtDate(h.date)+' — '+esc(h.location)+' · '+esc(h.lead)+(h.colead?' & '+esc(h.colead):'')+'</div>':'';}).filter(Boolean).join('');
     const notes=p.notes?p.notes.split('||').filter(Boolean):[];
     return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:8px;cursor:pointer" onclick="const ex=this.querySelector('.pex');ex.style.display=ex.style.display==='none'?'block':'none'">
       <div style="display:flex;align-items:flex-start;gap:10px">
-        <div style="flex:1"><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">${p.name}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:3px">${[p.department,p.org,p.email].filter(Boolean).join(' · ')||'No details yet'}</div>
-          ${p.lastHike?`<div style="font-size:11px;color:var(--muted);margin-top:4px">Last: ${fmtDate(p.lastHike)} · ${p.lastLocation||''} · ${p.lastLead||''}${p.lastColead?' & '+p.lastColead:''} · ${hc} hike${hc!==1?'s':''}</div>`:'<div style="font-size:11px;color:var(--muted);margin-top:4px">No hikes logged yet</div>'}
+        <div style="flex:1"><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">${esc(p.name)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px">${esc([p.department,p.org,p.email].filter(Boolean).join(' · ')||'No details yet')}</div>
+          ${p.lastHike?`<div style="font-size:11px;color:var(--muted);margin-top:4px">Last: ${fmtDate(p.lastHike)} · ${esc(p.lastLocation||'')} · ${esc(p.lastLead||'')}${p.lastColead?' & '+esc(p.lastColead):''} · ${hc} hike${hc!==1?'s':''}</div>`:'<div style="font-size:11px;color:var(--muted);margin-top:4px">No hikes logged yet</div>'}
         </div>
         <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;text-transform:uppercase;${tc}">${p.type}</span>
       </div>
       <div class="pex" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px">
         ${hikeHist?'<div style="margin-bottom:8px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;opacity:.5;margin-bottom:4px">Hike history</div>'+hikeHist+'</div>':''}
         <div style="margin-bottom:4px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;opacity:.5;margin-bottom:4px">Notes</div>
-          ${notes.length?notes.map(n=>'<div style="font-size:11px;padding:3px 0;border-bottom:1px solid rgba(0,0,0,.05)">'+n+'</div>').join(''):'<div style="font-size:11px;color:var(--muted);font-style:italic">No notes yet</div>'}
+          ${notes.length?notes.map(n=>'<div style="font-size:11px;padding:3px 0;border-bottom:1px solid rgba(0,0,0,.05)">'+esc(n)+'</div>').join(''):'<div style="font-size:11px;color:var(--muted);font-style:italic">No notes yet</div>'}
           <div style="display:flex;gap:6px;margin-top:8px"><input type="text" id="pn-${p.id}" placeholder="Add a note…" onclick="event.stopPropagation()" style="flex:1;font-size:11px;padding:4px 7px"><button class="btn btn-g btn-sm" onclick="event.stopPropagation();addProfNote('${p.id}')">Add</button></div>
         </div>
       </div>
@@ -1427,7 +1630,7 @@ function renderProfs(){
   }).join('');
 }
 async function addProfNote(id){
-  const inp=document.getElementById('pn-'+id);if(!inp||!inp.value.trim()){notify('Enter a note');return;}
+  const inp=document.getElementById('pn-'+id);if(!inp||!inp.value.trim()){notify('Enter a note','warn');return;}
   const p=profs.find(x=>x.id===id);if(!p)return;
   const existing=p.notes?p.notes.split('||').filter(Boolean):[];
   existing.push('['+fmtDate(new Date())+'] '+inp.value.trim());
@@ -1448,7 +1651,7 @@ async function saveNewProfs(){
 }
 function copyNewEmails(){
   const emails=members.filter(m=>!m.year&&m.email).map(m=>m.email).filter(Boolean);
-  if(!emails.length){notify('No emails to copy');return;}
+  if(!emails.length){notify('No emails to copy','warn');return;}
   navigator.clipboard.writeText(emails.join(', ')).then(()=>notify('Copied '+emails.length+' emails'));
 }
 
@@ -1461,38 +1664,33 @@ function renderHistory(){
   if(sort==='recent')list.sort((a,b)=>b.date.localeCompare(a.date));
   else if(sort==='oldest')list.sort((a,b)=>a.date.localeCompare(b.date));
   else if(sort==='distance')list.sort((a,b)=>(b.distance||0)-(a.distance||0));
-  else if(sort==='attended')list.sort((a,b)=>(b.applicantCount||0)-(a.applicantCount||0));
+  else if(sort==='attended')list.sort((a,b)=>(b.participantCount||0)-(a.participantCount||0));
   const quarters=[...new Set(hikes.map(h=>h.quarter).filter(Boolean))].sort();
   const qsel=document.getElementById('hist-qf'),cv=qsel.value;
   qsel.innerHTML='<option value="">All quarters</option>'+quarters.map(q=>`<option value="${q}"${q===cv?' selected':''}>${q}</option>`).join('');
   document.getElementById('hist-stats').innerHTML=`<div class="sbox"><span class="sv">${list.length}</span><span class="sl">Shown</span></div><div class="sbox accent"><span class="sv">${hikes.length}</span><span class="sl">Total logged</span></div>`;
   const el=document.getElementById('hist-list');
-  if(!list.length){el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:20px 0">No hikes logged yet.</div>';return;}
+  if(!list.length){el.innerHTML=hikes.length?emptyState('🔍','No hikes match','Try a different search, sort, or quarter filter.'):emptyState('🥾','No hikes logged yet','Log your first hike from the 📝 Log Hike tab and it will show up here.');return;}
   el.innerHTML=list.map(h=>{
     const hr=rosters.filter(r=>r.hikeId===h.id);
     const att=hr.filter(r=>r.outcome==='attended'),nas=hr.filter(r=>r.outcome==='applied'),nos=hr.filter(r=>r.outcome==='noshow');
     return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:8px;cursor:pointer" onclick="const ex=this.querySelector('.hex');ex.style.display=ex.style.display==='none'?'block':'none'">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <div style="flex:1"><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">${h.location||'Unknown'}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:3px">${h.prof||'No professor'} · Lead: ${h.lead||'—'}${h.colead?' & '+h.colead:''} · ${h.quarter||''}</div></div>
+        <div style="flex:1"><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">${esc(h.location||'Unknown')}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px">${esc(h.prof||'No professor')} · Lead: ${esc(h.lead||'—')}${h.colead?' & '+esc(h.colead):''} · ${esc(h.quarter||'')}</div></div>
         <div style="text-align:right"><div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)">${fmtDate(h.date)}</div>
           <div style="font-size:11px;color:var(--muted)">${h.distance?h.distance+' mi · ':''}${h.participantCount||att.length} participants · ${h.applicantCount||hr.length} applied</div></div>
       </div>
       <div class="hex" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px">
-        ${att.length?'<div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:5px">✅ Attended ('+att.length+')</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:5px;margin-bottom:8px">'+att.map(r=>'<div style="padding:5px 9px;border-radius:5px;font-size:12px;border:1px solid var(--grbd);background:var(--grbg);color:var(--grtx);cursor:pointer" onclick="event.stopPropagation();lookupFromHistory(\''+r.memberName+'\')">'+r.memberName+'</div>').join('')+'</div>':''}
-        ${nas.length?'<div style="font-size:11px;font-weight:700;color:var(--dftx);text-transform:uppercase;margin-bottom:5px">❌ Not selected ('+nas.length+')</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:5px;margin-bottom:8px">'+nas.map(r=>'<div style="padding:5px 9px;border-radius:5px;font-size:12px;border:1px solid var(--dfbd);background:var(--dfbg);color:var(--dftx);cursor:pointer" onclick="event.stopPropagation();lookupFromHistory(\''+r.memberName+'\')">'+r.memberName+'</div>').join('')+'</div>':''}
-        ${nos.length?'<div style="font-size:11px;font-weight:700;color:var(--ortx);text-transform:uppercase;margin-bottom:5px">⚠ No-shows ('+nos.length+')</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:5px">'+nos.map(r=>'<div style="padding:5px 9px;border-radius:5px;font-size:12px;border:1px solid var(--orbd);background:var(--orbg);color:var(--ortx);cursor:pointer" onclick="event.stopPropagation();lookupFromHistory(\''+r.memberName+'\')">'+r.memberName+'</div>').join('')+'</div>':''}
+        ${att.length?'<div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:5px">✅ Attended ('+att.length+')</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:5px;margin-bottom:8px">'+att.map(r=>'<div style="padding:5px 9px;border-radius:5px;font-size:12px;border:1px solid var(--grbd);background:var(--grbg);color:var(--grtx);cursor:pointer" onclick="event.stopPropagation();lookupFromHistory('+jarg(r.memberName)+')">'+esc(r.memberName)+'</div>').join('')+'</div>':''}
+        ${nas.length?'<div style="font-size:11px;font-weight:700;color:var(--dftx);text-transform:uppercase;margin-bottom:5px">❌ Not selected ('+nas.length+')</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:5px;margin-bottom:8px">'+nas.map(r=>'<div style="padding:5px 9px;border-radius:5px;font-size:12px;border:1px solid var(--dfbd);background:var(--dfbg);color:var(--dftx);cursor:pointer" onclick="event.stopPropagation();lookupFromHistory('+jarg(r.memberName)+')">'+esc(r.memberName)+'</div>').join('')+'</div>':''}
+        ${nos.length?'<div style="font-size:11px;font-weight:700;color:var(--ortx);text-transform:uppercase;margin-bottom:5px">⚠ No-shows ('+nos.length+')</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:5px">'+nos.map(r=>'<div style="padding:5px 9px;border-radius:5px;font-size:12px;border:1px solid var(--orbd);background:var(--orbg);color:var(--ortx);cursor:pointer" onclick="event.stopPropagation();lookupFromHistory('+jarg(r.memberName)+')">'+esc(r.memberName)+'</div>').join('')+'</div>':''}
         ${h.price?'<div style="font-size:11px;color:var(--muted);margin-top:7px">Price per hiker: $'+h.price+'</div>':''}
       </div>
     </div>`;
   }).join('');
 }
 function lookupFromHistory(name){document.getElementById('hkr-in').value=name;showTab('roster');processHikers();}
-function loadDemo(){
-  document.getElementById('drv-in').value="Lauren Lambert\nMilo Cox\nLeila Vierra";
-  document.getElementById('hkr-in').value="Ishan Agrawal\nEllen Boling\nNora Matzen\nAakarsh Gupta\nShivam Modi\nTimofey Grechkin\nJoyce Zheng\nEthan Cho\nSabrina Leffler\nBrandon Okafor";
-  processDrivers();processHikers();
-}
 
 // ════════════════════════════════════════
 // HIKERS DB
@@ -1528,11 +1726,11 @@ function renderDB(){
     const rate=m.applied>0?Math.round(m.attended/m.applied*100):0;
     const dc=m.drivingHikes>=5?'5+':String(m.drivingHikes||0);
     return`<tr>
-      <td style="font-weight:700">${m.name}</td>
-      <td class="mono">${m.studentId||'—'}</td>
-      <td style="font-size:12px">${m.email||'—'}</td>
-      <td class="mono">${m.phone||'—'}</td>
-      <td>${m.year||'—'}</td><td>${m.major||'—'}</td>
+      <td style="font-weight:700">${esc(m.name)}</td>
+      <td class="mono">${esc(m.studentId||'—')}</td>
+      <td style="font-size:12px">${esc(m.email||'—')}</td>
+      <td class="mono">${esc(m.phone||'—')}</td>
+      <td>${esc(m.year||'—')}</td><td>${esc(m.major||'—')}</td>
       <td class="mono">${m.applied}</td><td class="mono">${m.attended}</td>
       <td class="mono">${m.noShows>0?`<span style="color:var(--orbd);font-weight:700">${m.noShows}</span>`:'0'}</td>
       <td class="mono">${m.drivingHikes>0?`🚗 ×${dc}`:'—'}</td>
@@ -1555,10 +1753,11 @@ function setDashView(v,btn){
   document.querySelectorAll('.vtbtn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderDashboard();
+  animateStats(document.getElementById('tab-dashboard'));
 }
 
 function filterByView(arr,dateKey){
-  if(dashView==='quarter') return arr.filter(x=>new Date(x[dateKey])>=QUARTER_START);
+  if(dashView==='quarter') return arr.filter(x=>{const d=parseDate(x[dateKey]);return d&&d>=QUARTER_START;});
   return arr;
 }
 
@@ -1570,7 +1769,7 @@ function renderDashboard(){
   const filteredCheckouts=filterByView(checkouts,'date');
   const filteredMembers=members.filter(m=>{
     if(dashView==='alltime')return true;
-    return m.lastActivity&&new Date(m.lastActivity)>=QUARTER_START;
+    const d=parseDate(m.lastActivity);return d&&d>=QUARTER_START;
   });
 
   // Hike summary
@@ -1610,10 +1809,10 @@ function renderDashboard(){
     .sort((a,b)=>(b.scholarAwarded||0)-(a.scholarAwarded||0)).slice(0,6);
   document.getElementById('scholar-top-list').innerHTML=topScholars.length
     ?topScholars.map(m=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px">
-        <span style="font-weight:700">${m.name}</span>
+        <span style="font-weight:700">${esc(m.name)}</span>
         <span style="color:var(--muted)">🎓 ×${m.scholarAwarded} awarded</span>
       </div>`).join('')
-    :'<div style="color:var(--muted);font-size:12px;padding:10px 0">No scholarship data yet</div>';
+    :emptyState('🎓','No scholarship data yet','Tick the scholarship box when logging a hike to start tracking.');
 
   // Gear stats
   const totalGearOut=filteredCheckouts.filter(c=>!c.returned).length;
@@ -1657,55 +1856,22 @@ function renderDashboard(){
     </div>`).join('');
 }
 
-function drawBarChart(canvasId,labels,values,color,label){
-  const canvas=document.getElementById(canvasId);
-  if(!canvas)return;
-  const ctx=canvas.getContext('2d');
-  const W=canvas.offsetWidth||600;
-  const H=200;
-  canvas.width=W;canvas.height=H;
-  ctx.clearRect(0,0,W,H);
-  if(!labels.length){ctx.fillStyle='#aaa';ctx.font='13px Lato';ctx.fillText('No data yet',W/2-40,H/2);return;}
-  const pad={t:10,r:10,b:50,l:40};
-  const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
-  const maxV=Math.max(...values,1);
-  const bw=Math.min(cw/labels.length-8,60);
-  ctx.strokeStyle='#d8d3c8';ctx.lineWidth=1;
-  [0,.25,.5,.75,1].forEach(f=>{
-    const y=pad.t+ch*(1-f);
-    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cw,y);ctx.stroke();
-    ctx.fillStyle='#7a7568';ctx.font='10px IBM Plex Mono';
-    ctx.fillText(Math.round(maxV*f),2,y+4);
-  });
-  labels.forEach((lbl,i)=>{
-    const x=pad.l+(i+0.5)*(cw/labels.length);
-    const barH=ch*(values[i]/maxV);
-    const y=pad.t+ch-barH;
-    ctx.fillStyle=color+'cc';
-    ctx.beginPath();ctx.roundRect(x-bw/2,y,bw,barH,3);ctx.fill();
-    ctx.fillStyle='#1a1814';ctx.font='10px Lato';ctx.textAlign='center';
-    ctx.save();ctx.translate(x,H-10);ctx.rotate(-0.4);ctx.fillText(lbl,0,0);ctx.restore();
-    if(values[i]>0){ctx.fillStyle=color;ctx.font='bold 11px IBM Plex Mono';ctx.fillText(values[i],x,y-4);}
-  });
-  ctx.textAlign='left';
-}
-
 // ════════════════════════════════════════
 // LOG HIKE
 // ════════════════════════════════════════
 let currentOutcomes=[];
 function buildOutcomeList(){
   const raw=document.getElementById('l-applied').value.trim();
-  if(!raw){notify('Paste the applicant list first');return;}
+  if(!raw){notify('Paste the applicant list first','warn');return;}
   const names=parseLines(raw);
-  if(!names.length){notify('No names found');return;}
+  if(!names.length){notify('No names found','warn');return;}
   currentOutcomes=names.map(n=>({name:n,outcome:'applied',note:'',scholarship:false,gear:false}));
   document.getElementById('outcome-list').innerHTML=currentOutcomes.map((p,i)=>{
     const m=fuzzy(p.name);
     const meta=m?[m.year,priTag(m)].filter(Boolean).join(' · '):'not in database';
     return`<div class="person-entry">
       <div class="pe-top">
-        <div style="flex:1;min-width:130px"><div class="pe-name">${p.name}</div><div class="pe-meta">${meta}</div></div>
+        <div style="flex:1;min-width:130px"><div class="pe-name">${esc(p.name)}</div><div class="pe-meta">${esc(meta)}</div></div>
         <div class="pe-outcomes">
           <button class="oc-btn" onclick="setOC(${i},'attended',this)">✅ Attended</button>
           <button class="oc-btn sel-applied" onclick="setOC(${i},'applied',this)">❌ Not selected</button>
@@ -1747,12 +1913,12 @@ function submitLog(){
   const date=document.getElementById('l-date').value;
   const price=parseFloat(document.getElementById('l-price').value)||0;
   const quarter=document.getElementById('l-quarter').value;
-  if(!date){notify('Set a hike date');return;}
-  if(!currentOutcomes.length){notify('Load applicants first');return;}
+  if(!date){notify('Set a hike date','warn');return;}
+  if(!currentOutcomes.length){notify('Load applicants first','warn');return;}
 
   // save hike record
   const hikeId='h'+Date.now();
-  hikes.push({id:hikeId,location:document.getElementById('l-location').value||'Unknown',date,prof:document.getElementById('l-prof').value,lead:document.getElementById('l-lead').value,colead:document.getElementById('l-colead').value,price,quarter});
+  hikes.push({id:hikeId,location:document.getElementById('l-location').value||'Unknown',date,prof:document.getElementById('l-prof').value,lead:document.getElementById('l-lead').value,colead:document.getElementById('l-colead').value,price,quarter,applicantCount:currentOutcomes.length});
 
   let stats={applied:0,attended:0,replaced:0,noshows:0,newAdded:0,scholars:0,gear:0};
   const dateStr=fmtDate(date);
@@ -1796,7 +1962,7 @@ function submitLog(){
     if(newProfNames.length){
       pendingNewProfs=newProfNames;
       document.getElementById('new-prof-body').innerHTML=newProfNames.map((pn,i)=>
-        '<div style="margin-bottom:14px;padding:10px;border:1px solid var(--border);border-radius:6px"><div style="font-weight:700;margin-bottom:8px">'+pn+'</div>'+profFormHtml('np'+i)+'</div>'
+        '<div style="margin-bottom:14px;padding:10px;border:1px solid var(--border);border-radius:6px"><div style="font-weight:700;margin-bottom:8px">'+esc(pn)+'</div>'+profFormHtml('np'+i)+'</div>'
       ).join('');
       setTimeout(()=>{newProfNames.forEach((pn,i)=>{const el=document.getElementById('np'+i+'-n');if(el)el.value=pn;});},50);
       openModal('modal-new-prof');
@@ -1821,7 +1987,7 @@ function submitLog(){
   const newHikers=members.filter(m=>!m.year&&!m.email);
   if(stats.newAdded>0&&newHikers.length){
     document.getElementById('new-hiker-list').innerHTML=newHikers.slice(0,15).map(m=>
-      '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="font-weight:700;flex:1">'+m.name+'</span><span style="font-size:11px;color:var(--muted)">'+(m.email||'no email')+'</span></div>'
+      '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="font-weight:700;flex:1">'+esc(m.name)+'</span><span style="font-size:11px;color:var(--muted)">'+esc(m.email||'no email')+'</span></div>'
     ).join('');
     openModal('modal-new-hiker');
   }
@@ -1834,6 +2000,8 @@ function submitLog(){
 }
 
 function clearLog(){
+  const dirty=currentOutcomes.length>0||['l-location','l-prof','l-lead','l-colead','l-applied'].some(id=>document.getElementById(id).value.trim());
+  if(dirty&&!confirm('Clear the entire hike log form?'))return;
   ['l-location','l-date','l-prof','l-lead','l-colead','l-applied','l-price'].forEach(id=>document.getElementById(id).value='');
   currentOutcomes=[];
   document.getElementById('outcome-section').style.display='none';
@@ -1845,7 +2013,7 @@ function clearLog(){
 // GEAR CHECKOUT
 // ════════════════════════════════════════
 function autoReturnGear(){
-  const today=new Date().toISOString().split('T')[0];
+  const today=todayStr();
   let changed=false;
 
   // For each unreturned past-date checkout, check if same member+item
@@ -1919,21 +2087,21 @@ function checkoutGear(){
   const item=document.getElementById('co-item').value;
   const date=document.getElementById('co-date').value;
   const note=document.getElementById('co-note').value.trim();
-  if(!who){notify('Enter a member name');return;}
+  if(!who){notify('Enter a member name','warn');return;}
   const m=fuzzy(who);
-  if(!m){notify('Member not found');return;}
+  if(!m){notify('Member not found — check the spelling or add them in Manage','warn');return;}
   const total=inventory[item]||0;
   const out=checkouts.filter(c=>c.item===item&&!c.returned&&c.hikeDate===date).length;
-  if(total>0&&out>=total){notify(`No ${item} available on this date`);return;}
+  if(total>0&&out>=total){notify(`No ${item} available on this date`,'warn');return;}
   pendingCheckout={member:m.name,item,date,note,hikeDate:date};
   document.querySelector('#checkout-modal .modal-title').textContent='Confirm Gear Checkout';
   document.getElementById('modal-body').innerHTML=`
     <div style="font-size:13px;line-height:2">
-      <div><strong>Member:</strong> ${m.name}</div>
-      <div><strong>Item:</strong> ${item}</div>
+      <div><strong>Member:</strong> ${esc(m.name)}</div>
+      <div><strong>Item:</strong> ${esc(item)}</div>
       <div><strong>Hike date:</strong> ${fmtDate(date)}</div>
       <div><strong>Auto-returns:</strong> Assumed returned after ${fmtDate(date)}</div>
-      ${note?`<div><strong>Note:</strong> ${note}</div>`:''}
+      ${note?`<div><strong>Note:</strong> ${esc(note)}</div>`:''}
     </div>`;
   document.getElementById('checkout-modal').classList.add('open');
 }
@@ -1941,7 +2109,7 @@ function checkoutGear(){
 function confirmCheckout(){
   if(!pendingCheckout)return;
   const m=fuzzy(pendingCheckout.member);
-  const co={id:'g'+Date.now(),member:pendingCheckout.member,item:pendingCheckout.item,date:new Date().toISOString().split('T')[0],hikeDate:pendingCheckout.hikeDate,note:pendingCheckout.note,returned:false,returnedAt:null};
+  const co={id:'g'+Date.now(),member:pendingCheckout.member,item:pendingCheckout.item,date:todayStr(),hikeDate:pendingCheckout.hikeDate,note:pendingCheckout.note,returned:false,returnedAt:null};
   checkouts.push(co);
   if(m){m.gearRequests=(m.gearRequests||0)+1;m.gearOutstanding=(m.gearOutstanding||0)+1;if(!m.gearNotes)m.gearNotes=[];m.gearNotes.push(`${fmtDate(co.date)}: borrowed ${co.item}${co.note?' — '+co.note:''}`);}
   saveMembers();saveCheckouts();closeModal();renderCheckoutLog();renderInventoryBars();
@@ -1962,23 +2130,23 @@ function returnGear(id){
 
 function renderCheckoutLog(){
   const f=document.getElementById('co-filter').value;
-  const today=new Date().toISOString().split('T')[0];
+  const today=todayStr();
   let list=[...checkouts];
   if(f==='active')list=list.filter(c=>!c.returned);
   else if(f==='today')list=list.filter(c=>c.date===today||c.hikeDate===today);
-  list.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  list.sort((a,b)=>(parseDate(b.date)||0)-(parseDate(a.date)||0));
 
   document.getElementById('checkout-log').innerHTML=list.length
     ?`<div>${list.map(c=>{
         const isAutoReturn=c.returned&&c.returnedAt&&c.returnedAt.includes('T18:00:00');
         return`<div class="checkout-item">
-        <div class="co-name">${c.member}</div>
-        <div class="co-gear">${c.item}${c.note?' — '+c.note:''}</div>
+        <div class="co-name">${esc(c.member)}</div>
+        <div class="co-gear">${esc(c.item)}${c.note?' — '+esc(c.note):''}</div>
         <div class="co-date">${fmtDate(c.hikeDate)}</div>
         <span class="co-status ${c.returned?'co-ret':'co-out'}">${c.returned?(isAutoReturn?'Auto-returned':'Returned'):'Out'}</span>
         ${!c.returned?`<button class="btn btn-g btn-sm" onclick="returnGear('${c.id}')" style="margin-left:8px">Mark returned</button>`:''}
       </div>`;}).join('')}</div>`
-    :'<div style="color:var(--muted);font-size:12px;padding:12px 0">No checkout records match this filter.</div>';
+    :(checkouts.length?emptyState('🔍','Nothing matches this filter','Try switching to “All activity”.'):emptyState('🎒','No gear checked out yet','Use the form on the left to check gear out to a hiker.'));
 }
 
 function closeModal(id){
@@ -1986,19 +2154,24 @@ function closeModal(id){
   else{document.getElementById('checkout-modal').classList.remove('open');}
   pendingCheckout=null;
 }
-function openModal(id){document.getElementById(id).classList.add('open');}
+function openModal(id){
+  const o=document.getElementById(id);
+  o.classList.add('open');
+  const first=o.querySelector('input,select,textarea');
+  if(first)setTimeout(()=>first.focus(),40);
+}
 
 // ════════════════════════════════════════
 // MANAGE
 // ════════════════════════════════════════
 async function saveMember(){
   const name=document.getElementById('m-name').value.trim();
-  if(!name){notify('Name required');return;}
+  if(!name){notify('Name required','warn');return;}
   const studentId=document.getElementById('m-studentid').value.trim();
   // Duplicate student ID check
   if(studentId){
     const existing=members.find(m=>m.studentId&&m.studentId===studentId&&norm(m.name)!==norm(name));
-    if(existing){notify(`Student ID ${studentId} already belongs to ${existing.name}`);return;}
+    if(existing){notify(`Student ID ${studentId} already belongs to ${existing.name}`,'warn');return;}
   }
   const patch={
     studentId,
@@ -2028,30 +2201,37 @@ function renderInventoryFields(){
 }
 async function bulkImport(e){
   const f=e.target.files[0];if(!f)return;
+  bulkImportFile(f);
+  e.target.value=''; // allow re-uploading the same file
+}
+function bulkImportFile(f){
   const r=new FileReader();
   r.onload=async ev=>{
-    const lines=ev.target.result.split('\n').map(l=>l.trim()).filter(Boolean);
-    if(!lines.length){notify('Empty file');return;}
-    const headers=lines[0].toLowerCase().split(',').map(h=>h.replace(/"/g,'').trim());
-    const ni=headers.findIndex(h=>h.includes('name')||h.includes('full'));
-    if(ni<0){notify('No name column found');return;}
+    // parseCSV handles quoted fields, commas and newlines inside quotes —
+    // exactly what Google Form / Sheets exports produce
+    const rows=parseCSV(ev.target.result);
+    if(!rows.length){notify('Empty file','warn');return;}
+    const headers=rows[0].map(h=>h.toLowerCase().trim());
+    const ni=findNameColumn(headers);
+    if(ni<0){notify('No name column found — the CSV needs a header row with a “name” column','err');return;}
     let added=0,updated=0,skipped=0;
-    lines.slice(1).forEach(line=>{
-      const cols=line.split(',').map(c=>c.replace(/"/g,'').trim());
-      const name=cols[ni];if(!name)return;
-      const get=key=>{const ki=headers.findIndex(h=>h===key||h.includes(key));return ki>=0?cols[ki]||'':'';}
+    rows.slice(1).forEach(cols=>{
+      const name=(cols[ni]||'').trim();if(!name)return;
+      const get=key=>{const ki=headers.findIndex(h=>h===key||h.includes(key));return ki>=0?(cols[ki]||'').trim():'';};
       const sid=get('studentid')||get('student id')||get('id');
       // Skip if duplicate student ID already exists under a different name
       if(sid&&members.find(m=>m.studentId&&m.studentId===sid&&norm(m.name)!==norm(name))){skipped++;return;}
-      const patch={
-        studentId:sid,
-        email:get('email'),
-        phone:get('phone'),
-        year:get('year')||get('standing'),
-        major:get('major'),
-        isDriver:get('isdriver')||get('driver'),
-        notes:get('notes')
-      };
+      // Only patch fields the CSV actually provides — a partial CSV
+      // updates what it has and never blanks out existing profile data
+      const patch={};
+      const setIf=(k,v)=>{if(v)patch[k]=v;};
+      setIf('studentId',sid);
+      setIf('email',get('email'));
+      setIf('phone',get('phone'));
+      setIf('year',get('year')||get('standing'));
+      setIf('major',get('major'));
+      setIf('isDriver',get('isdriver')||get('driver'));
+      setIf('notes',get('notes'));
       // Match by student ID first, then name
       const idx=sid
         ?members.findIndex(m=>m.studentId&&m.studentId===sid)
@@ -2062,7 +2242,9 @@ async function bulkImport(e){
     await saveMembers();
     document.getElementById('import-result').innerHTML=`<div class="success-box">✅ ${added} added, ${updated} updated, ${skipped} skipped (duplicate ID).</div>`;
     notify(`Import: ${added} added, ${updated} updated, ${skipped} skipped`);
+    renderDB();
   };
+  r.onerror=()=>notify('Could not read that file','err');
   r.readAsText(f);
 }
 
@@ -2070,10 +2252,10 @@ function fixRecord(){
   const q=document.getElementById('f-who').value.trim();
   const out=document.getElementById('f-out').value;
   const reason=document.getElementById('f-reason').value.trim();
-  const date=document.getElementById('f-date').value||new Date().toISOString().split('T')[0];
+  const date=document.getElementById('f-date').value||todayStr();
   const dateStr=fmtDate(date);
-  if(!q){notify('Enter a name');return;}
-  const m=fuzzy(q);if(!m){notify('Not found');return;}
+  if(!q){notify('Enter a name','warn');return;}
+  const m=fuzzy(q);if(!m){notify('Not found — check the spelling','warn');return;}
   if(!m.noShowNotes)m.noShowNotes=[];
   if(out==='attended'){m.attended=(m.attended||0)+1;m.lastHike=date;m.lastActivity=date;}
   else if(out==='applied'){m.applied=(m.applied||0)+1;}
@@ -2099,14 +2281,18 @@ function exportCSV(){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='peaks_professors_members.csv';a.click();
   notify(`Exported ${members.length} members`);
 }
-function nuke(){if(!confirm('Delete ALL data?'))return;members=[];hikes=[];checkouts=[];profs=[];rosters=[];saveData();renderDB();notify('All data cleared');}
 function nukeConfirm(){document.getElementById('nuke-inp').value='';openModal('modal-nuke');}
 function executeNuke(){
   const v=document.getElementById('nuke-inp').value.trim();
-  if(v!=='DELETE'){notify('Type DELETE to confirm');return;}
+  if(v!=='DELETE'){notify('Type DELETE to confirm','warn');return;}
   members=[];hikes=[];checkouts=[];profs=[];rosters=[];
   saveData();closeModal('modal-nuke');renderDB();notify('All data cleared');
 }
+
+// Debounced search — tables re-render 150ms after you stop typing, not per keystroke
+const renderDBDebounced=debounce(renderDB,150);
+const renderProfsDebounced=debounce(renderProfs,150);
+const renderHistoryDebounced=debounce(renderHistory,150);
 
 // ════════════════════════════════════════
 // TABS
@@ -2114,7 +2300,13 @@ function executeNuke(){
 const TABS=['roster','db','profs','history','dashboard','log','checkout','manage'];
 const NAV_TABS=['roster','db','profs','history','dashboard','log','checkout'];
 function showTab(t){
-  TABS.forEach(id=>{const el=document.getElementById('tab-'+id);if(el)el.style.display=id===t?'block':'none';});
+  currentTab=t;
+  TABS.forEach(id=>{
+    const el=document.getElementById('tab-'+id);
+    if(!el)return;
+    if(id===t){el.style.display='block';el.classList.remove('tab-anim');void el.offsetWidth;el.classList.add('tab-anim');}
+    else el.style.display='none';
+  });
   document.querySelectorAll('.nb').forEach((b,i)=>b.classList.toggle('active',NAV_TABS[i]===t));
   // Highlight manage button when active
   const mb=document.getElementById('manage-nav-btn');
@@ -2125,10 +2317,25 @@ function showTab(t){
   if(t==='dashboard')renderDashboard();
   if(t==='checkout'){renderInventoryBars();renderCheckoutLog();}
   if(t==='manage'){
-    if(role!=='admin'){showTab('roster');notify('Admin access required');return;}
+    if(role!=='admin'){showTab('roster');notify('Admin access required','warn');return;}
     document.getElementById('manage-locked').style.display='none';
     document.getElementById('manage-content').style.display='block';
     renderInventoryFields();
+  }
+  const tabEl=document.getElementById('tab-'+t);
+  if(tabEl)animateStats(tabEl);
+}
+
+// Re-pull everything from the sheet without logging out
+async function refreshData(){
+  setSyncStatus('syncing');
+  try{
+    await loadData();
+    showTab(currentTab);
+    if(currentTab==='roster'&&rHikers.length&&document.getElementById('hkr-in').value.trim())processHikers();
+    notify('Data refreshed');
+  }catch(e){
+    notify("Couldn't refresh — check your connection",'err');
   }
 }
 function showInner(t){
@@ -2142,7 +2349,7 @@ function saveInventory(){
   saveInventoryToSheet();renderInventoryBars();notify('Inventory saved');
 }
 
-function notify(msg){const n=document.getElementById('notif');n.textContent=msg;n.classList.add('show');clearTimeout(n._t);n._t=setTimeout(()=>n.classList.remove('show'),2600);}
+function notify(msg,type){const n=document.getElementById('notif');n.textContent=msg;n.classList.remove('warn','err');if(type)n.classList.add(type);n.classList.add('show');clearTimeout(n._t);n._t=setTimeout(()=>n.classList.remove('show'),2600);}
   
 function setLP(pct, msg) {
   const sub = document.getElementById('load-sub');
@@ -2158,43 +2365,85 @@ function setLP(pct, msg) {
 
 function showLoading(on){
   const el=document.getElementById('loading-overlay');
-  if(el) el.style.display=on?'flex':'none';
+  if(!el)return;
+  if(on){el.style.display='flex';el.style.opacity='1';}
+  else{el.style.opacity='0';setTimeout(()=>{el.style.display='none';},500);}
 }
 
 async function initApp(){
   showLoading(true);
   
-  // Start a timer for 2 seconds (2000 milliseconds)
-  const minLoadingTime = new Promise(resolve => setTimeout(resolve, 3000));
-  
+  // Brief minimum so the mountain-fill animation reads, without feeling slow
+  const minLoadingTime = new Promise(resolve => setTimeout(resolve, 900));
+
   // Run both the data fetch AND the timer simultaneously
-  await Promise.all([loadData(), minLoadingTime]);
+  await Promise.all([loadData().catch(()=>{}), minLoadingTime]);
   
   // Only hide the loading screen after both finish
   showLoading(false);
   
-  document.getElementById('l-date').value=new Date().toISOString().split('T')[0];
-  document.getElementById('co-date').value=new Date().toISOString().split('T')[0];
-  document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('l-date').value=todayStr();
+  document.getElementById('co-date').value=todayStr();
+  document.getElementById('f-date').value=todayStr();
 
-  // Auto-generate quarter dropdown (current + next 3)
+  // Auto-generate quarter dropdown (current + next 3) — derived from the same
+  // logic as getCurrentQuarter so the two can never disagree at quarter boundaries
   const qNames=['Winter','Spring','Summer','Autumn'];
-  const now=new Date(),cy=now.getFullYear(),cm=now.getMonth();
-  const curQi=cm<3?0:cm<6?1:cm<9?2:3;
+  const [curName,curYr]=CURRENT_QUARTER.split(' ');
+  let qi=Math.max(0,qNames.indexOf(curName)),yr=parseInt(curYr)||new Date().getFullYear();
   const qSel=document.getElementById('l-quarter');
   if(qSel){
     qSel.innerHTML='';
     for(let i=0;i<4;i++){
-      const qi=(curQi+i)%4;
-      const yr=cy+Math.floor((curQi+i)/4);
       const opt=document.createElement('option');
       opt.value=`${qNames[qi]} ${yr}`;opt.textContent=`${qNames[qi]} ${yr}`;
       qSel.appendChild(opt);
+      qi++;if(qi>3){qi=0;yr++;}
     }
   }
 
   renderDB();
 }
+
+// ════════════════════════════════════════
+// STATIC UI WIRING
+// ════════════════════════════════════════
+(function initStatic(){
+  // Escape closes any open modal (and the mobile menu)
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){
+      document.querySelectorAll('.modal-overlay.open').forEach(o=>{
+        o.classList.remove('open');
+        if(o.id==='checkout-modal')pendingCheckout=null;
+      });
+      const mm=document.getElementById('mobile-menu');
+      if(mm)mm.classList.remove('open');
+    }
+  });
+  // Clicking the dark backdrop closes the modal
+  document.querySelectorAll('.modal-overlay').forEach(o=>{
+    o.addEventListener('mousedown',e=>{
+      if(e.target===o){
+        o.classList.remove('open');
+        if(o.id==='checkout-modal')pendingCheckout=null;
+      }
+    });
+  });
+  // Drag & drop a CSV straight onto any upload zone
+  function wireDrop(zoneId,onFile){
+    const z=document.getElementById(zoneId);if(!z)return;
+    ['dragenter','dragover'].forEach(ev=>z.addEventListener(ev,e=>{e.preventDefault();z.classList.add('drag');}));
+    ['dragleave','drop'].forEach(ev=>z.addEventListener(ev,e=>{e.preventDefault();z.classList.remove('drag');}));
+    z.addEventListener('drop',e=>{const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(f)onFile(f);});
+  }
+  wireDrop('zone-roster',f=>readCSVInto(f,'hkr-in'));
+  wireDrop('zone-log',f=>readCSVInto(f,'l-applied'));
+  wireDrop('zone-import',f=>bulkImportFile(f));
+  // Restore the session after a refresh (per-tab); otherwise focus the password field
+  const saved=sessionStorage.getItem('pp_role');
+  if(saved==='lead'||saved==='admin'){enterApp(saved);}
+  else{const pw=document.getElementById('pw-input');if(pw)pw.focus();}
+})();
 </script>
 </body>
 </html>
